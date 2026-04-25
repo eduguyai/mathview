@@ -268,6 +268,36 @@ tr.sel td{background:rgba(91,141,238,0.08)}
   body{background:#fff;color:#111}
   .ls-body,.ls-title{color:#333}
 }
+/* ── M5: SETTINGS ── */
+.sett-wrap{max-width:560px;display:flex;flex-direction:column;gap:14px}
+.sett-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.sett-title{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.sett-note{font-size:10px;font-family:var(--mono);color:var(--dim);font-weight:400}
+.sett-grid{display:grid;grid-template-columns:140px 1fr;gap:8px 12px;align-items:center}
+.sett-label{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.sett-input{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:var(--sans);color:var(--text);outline:none;transition:border-color .15s;width:100%}
+.sett-input:focus{border-color:rgba(91,141,238,0.4)}
+.sett-th{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);font-weight:500;padding:6px 10px;text-align:center;border-bottom:1px solid var(--border);font-family:var(--mono)}
+.sett-td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.sett-num{width:80px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 8px;font-size:12px;font-family:var(--mono);color:var(--text);text-align:center;outline:none}
+.sett-num:focus{border-color:rgba(91,141,238,0.4)}
+.sett-danger{color:var(--t3);border-color:var(--t3d)}
+/* ── M5: ALERTS ── */
+.alerts-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.alert-pill{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);cursor:pointer;transition:background .15s}
+.alert-pill:hover{background:var(--bg3)}
+.alert-count{font-family:var(--mono);font-size:22px;font-weight:400;line-height:1;min-width:28px}
+.alert-lbl{font-size:12px;font-weight:600;color:var(--text)}
+.alert-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:1px}
+.alert-ok{display:flex;align-items:center;gap:8px;margin-bottom:18px;padding:10px 14px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:8px;color:var(--t1);font-size:12px}
+/* ── M5: GOALS ── */
+.goal-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.goal-cell{background:var(--bg3);border-radius:7px;padding:10px 12px}
+.goal-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);font-family:var(--mono);margin-bottom:4px}
+.goal-actual{font-family:var(--mono);font-size:20px;line-height:1;margin-bottom:4px}
+.goal-target-row{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--dim);font-family:var(--mono)}
+.goal-inp{width:52px;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:11px;font-family:var(--mono);text-align:center;outline:none;padding:1px 0}
+.goal-inp:focus{border-bottom-color:var(--accent)}
 /* ── M4: GAMES ── */
 .game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .game-filters{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
@@ -343,6 +373,7 @@ tr.sel td{background:rgba(91,141,238,0.08)}
     <button class="ni" data-v="games" onclick="go('games',this)"><span class="ni-icon">🎲</span>Math Games</button>
     <div class="sdiv"></div>
     <button class="ni" data-v="import" onclick="go('import',this)"><span class="ni-icon">⬆</span>Import Data</button>
+    <button class="ni" data-v="settings" onclick="go('settings',this)"><span class="ni-icon">⚙</span>Settings</button>
   </nav>
   <div class="persist-bar">
     <div id="persistBar">
@@ -387,6 +418,7 @@ tr.sel td{background:rgba(91,141,238,0.08)}
         <div class="kpi"><div class="kpi-val" style="color:var(--t2)" id="kpi-t2">31</div><div class="kpi-lbl">Tier 2</div><div class="kpi-sub">Strategic support</div></div>
         <div class="kpi"><div class="kpi-val" style="color:var(--t1)" id="kpi-t1">45</div><div class="kpi-lbl">Tier 1</div><div class="kpi-sub">On/above grade level</div></div>
       </div>
+      <div id="alertsPanel"></div>
       <div class="chart-grid">
         <div class="chart-card"><div class="chart-title">iReady Score Distribution</div><div class="chart-wrap"><canvas id="c-dist"></canvas></div></div>
         <div class="chart-card"><div class="chart-title">Domain Gap (% below proficiency)</div><div class="chart-wrap"><canvas id="c-gap"></canvas></div></div>
@@ -592,6 +624,64 @@ tr.sel td{background:rgba(91,141,238,0.08)}
           <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:6px">Load a previous session</div>
           <input type="file" id="sessionFile" accept=".json" style="display:none" onchange="loadSession(this.files[0])">
           <button class="btn" onclick="document.getElementById('sessionFile').click()" style="font-size:11px">Load JSON session</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="view" id="view-settings">
+      <div class="sett-wrap">
+        <div class="sett-card">
+          <div class="sett-title">School Information</div>
+          <div class="sett-grid">
+            <label class="sett-label">School Name</label>
+            <input class="sett-input" id="cfg-school" placeholder="Lincoln Middle School" oninput="saveCfg()">
+            <label class="sett-label">Teacher Name</label>
+            <input class="sett-input" id="cfg-teacher" placeholder="Ms. Rowe" oninput="saveCfg()">
+            <label class="sett-label">School Year</label>
+            <input class="sett-input" id="cfg-year" placeholder="2025–2026" oninput="saveCfg()">
+          </div>
+        </div>
+        <div class="sett-card">
+          <div class="sett-title">Benchmark Targets <span class="sett-note">iReady IR goal scores by window</span></div>
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr>
+              <th class="sett-th" style="text-align:left">Tier</th>
+              <th class="sett-th">BOY Goal</th>
+              <th class="sett-th">MOY Goal</th>
+              <th class="sett-th">EOY Goal</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td class="sett-td"><span class="tb t3">Tier 3</span></td>
+                <td class="sett-td" style="text-align:center"><input class="sett-num" id="cfg-g3b" type="number" placeholder="380" oninput="saveCfg()"></td>
+                <td class="sett-td" style="text-align:center"><input class="sett-num" id="cfg-g3m" type="number" placeholder="395" oninput="saveCfg()"></td>
+                <td class="sett-td" style="text-align:center"><input class="sett-num" id="cfg-g3e" type="number" placeholder="410" oninput="saveCfg()"></td>
+              </tr>
+              <tr>
+                <td class="sett-td"><span class="tb t2">Tier 2</span></td>
+                <td class="sett-td" style="text-align:center"><input class="sett-num" id="cfg-g2b" type="number" placeholder="415" oninput="saveCfg()"></td>
+                <td class="sett-td" style="text-align:center"><input class="sett-num" id="cfg-g2m" type="number" placeholder="425" oninput="saveCfg()"></td>
+                <td class="sett-td" style="text-align:center"><input class="sett-num" id="cfg-g2e" type="number" placeholder="435" oninput="saveCfg()"></td>
+              </tr>
+              <tr>
+                <td class="sett-td" style="border-bottom:none"><span class="tb t1">Tier 1</span></td>
+                <td class="sett-td" style="border-bottom:none;text-align:center"><input class="sett-num" id="cfg-g1b" type="number" placeholder="445" oninput="saveCfg()"></td>
+                <td class="sett-td" style="border-bottom:none;text-align:center"><input class="sett-num" id="cfg-g1m" type="number" placeholder="455" oninput="saveCfg()"></td>
+                <td class="sett-td" style="border-bottom:none;text-align:center"><input class="sett-num" id="cfg-g1e" type="number" placeholder="465" oninput="saveCfg()"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sett-card">
+          <div class="sett-title">Data Management</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" onclick="exportJSON()">📤 Export Backup</button>
+            <button class="btn" onclick="document.getElementById('importJSONFile').click()">📥 Import Backup</button>
+            <input type="file" id="importJSONFile" accept=".json" style="display:none" onchange="importBackup(this.files[0])">
+            <button class="btn sett-danger" onclick="confirmClearAll()">🗑 Clear All Data</button>
+          </div>
+          <div style="font-size:11px;color:var(--dim);line-height:1.6">Export saves all students, groups, interventions, and settings as a JSON file. Import restores everything from a previous backup.</div>
         </div>
       </div>
     </div>
@@ -816,7 +906,7 @@ const TITLES={
   domains:'Skill <em>Domains</em>',growth:'Growth <em>Trends</em>',
   qualdata:'Qualitative <em>Data</em>',groups:'Group <em>Builder</em>',
   interventions:'Active <em>Interventions</em>',reports:'<em>Reports</em>',
-  lessons:'<em>Lesson Plans</em>',games:'Math <em>Games</em>',import:'Import <em>Data</em>',
+  lessons:'<em>Lesson Plans</em>',games:'Math <em>Games</em>',import:'Import <em>Data</em>',settings:'<em>Settings</em>',
 };
 const inited={};
 function go(v,btn){
@@ -838,6 +928,8 @@ function boot(v){
   if(v==='lessons'){initLessons();}
   if(v==='reports'){initReports();}
   if(v==='games'){initGames();}
+  if(v==='settings'){initSettings();}
+  if(v==='overview'){renderAlerts();}
 }
 
 /* ═══════════════════════════════════════
@@ -962,6 +1054,17 @@ function renderDetail(s){
       </div>
     </div>
     <div class="dsec"><div class="dsl">Domain profile</div>${domH}</div>
+    <div class="dsec" style="padding:12px 16px">
+      <div class="dsl" style="padding:0 0 8px">Growth Goals vs Actual</div>
+      <div class="goal-row">${[['BOY',s.ir,s.goalBOY,'goalBOY'],['MOY',s.irM,s.goalMOY,'goalMOY'],['EOY',s.irE,s.goalEOY,'goalEOY']].map(([w,act,goal,field])=>{
+        const col=act&&goal?(act>=goal?'var(--t1)':act>=goal-10?'var(--t2)':'var(--t3)'):'var(--muted)';
+        const diff=act&&goal?((act-goal>0?'+':'')+(act-goal)):'';
+        return`<div class="goal-cell">
+          <div class="goal-lbl">${w}</div>
+          <div class="goal-actual" style="color:${col}">${act||'—'}${diff?`<span style="font-size:10px;margin-left:4px">${diff}</span>`:''}</div>
+          <div class="goal-target-row">Goal: <input class="goal-inp" type="number" value="${goal||''}" placeholder="—" onchange="saveGoal(${s.id},'${field}',this.value)"></div>
+        </div>`;}).join('')}</div>
+    </div>
     <div class="dsec">
       <div class="dsl">Qualitative indicators</div>
       <div class="tag-editor">
@@ -1385,6 +1488,107 @@ function renderLessonDetail(){
     </div>
     <div class="ls"><div class="ls-title">Guided Practice</div><div class="ls-body">${l.prac}</div></div>
     <div class="ls"><div class="ls-title">Closure / Exit Ticket</div><div class="ls-body">${l.close}</div></div>`;
+}
+
+/* ═══════════════════════════════════════
+   M5: SETTINGS
+═══════════════════════════════════════ */
+let cfg=JSON.parse(localStorage.getItem('mathview_cfg')||'{}');
+
+function initSettings(){
+  ['school','teacher','year','g3b','g3m','g3e','g2b','g2m','g2e','g1b','g1m','g1e'].forEach(k=>{
+    const el=document.getElementById(`cfg-${k}`);
+    if(el&&cfg[k]!=null)el.value=cfg[k];
+  });
+  updateSidebarName();
+}
+
+function saveCfg(){
+  ['school','teacher','year','g3b','g3m','g3e','g2b','g2m','g2e','g1b','g1m','g1e'].forEach(k=>{
+    const el=document.getElementById(`cfg-${k}`);
+    if(el)cfg[k]=el.value;
+  });
+  localStorage.setItem('mathview_cfg',JSON.stringify(cfg));
+  updateSidebarName();
+}
+
+function updateSidebarName(){
+  const sub=document.querySelector('.slogo-sub');
+  if(sub&&cfg.school)sub.textContent=cfg.school.toUpperCase().slice(0,24);
+}
+
+function exportJSON(){
+  const data={students,groups,interventions,cfg,exported:new Date().toISOString()};
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data,null,2));
+  a.download=`mathview-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importBackup(file){
+  if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.students)students.splice(0,students.length,...d.students);
+      if(d.groups)groups.splice(0,groups.length,...d.groups);
+      if(d.interventions)interventions.splice(0,interventions.length,...d.interventions);
+      if(d.cfg){cfg=d.cfg;localStorage.setItem('mathview_cfg',JSON.stringify(cfg));}
+      saveAll();
+      showToast('Backup restored — reloading…','#34d399');
+      setTimeout(()=>location.reload(),1200);
+    }catch(ex){showToast('Invalid backup file','#f87171');}
+  };
+  r.readAsText(file);
+}
+
+function confirmClearAll(){
+  if(!confirm('Clear ALL student data, groups, and interventions? This cannot be undone.'))return;
+  ['mathview_v1','mathview_groups','mathview_ints','mathview_cfg'].forEach(k=>localStorage.removeItem(k));
+  showToast('All data cleared — reloading…','#f87171');
+  setTimeout(()=>location.reload(),1200);
+}
+
+/* ═══════════════════════════════════════
+   M5: ALERTS
+═══════════════════════════════════════ */
+function renderAlerts(){
+  const panel=document.getElementById('alertsPanel');
+  if(!panel)return;
+  const regressing=students.filter(s=>s.irE&&s.ir&&s.irE<s.ir);
+  const noInt=students.filter(s=>{
+    const concerns=s.tags.filter(t=>TQ[t]==='qc').length;
+    return concerns>=2&&!interventions.some(i=>i.sid===s.id);
+  });
+  const noDom=students.filter(s=>!s.dom||Object.values(s.dom).every(v=>!v||v===50));
+  if(!regressing.length&&!noInt.length&&!noDom.length){
+    panel.innerHTML='<div class="alert-ok">✓ No alerts — all students on track</div>';return;
+  }
+  const pills=[
+    {arr:regressing,color:'var(--t3)',bc:'rgba(248,113,113,0.2)',bg:'rgba(248,113,113,0.06)',icon:'↘',lbl:'Regressing',sub:'EOY score below BOY'},
+    {arr:noInt,color:'var(--t2)',bc:'rgba(251,146,60,0.2)',bg:'rgba(251,146,60,0.06)',icon:'⚠',lbl:'Need Intervention',sub:'2+ concerns · no plan logged'},
+    {arr:noDom,color:'var(--accent)',bc:'rgba(91,141,238,0.2)',bg:'rgba(91,141,238,0.06)',icon:'◷',lbl:'Missing Domain Data',sub:'Domain scores not entered'},
+  ].filter(p=>p.arr.length);
+  panel.innerHTML=`<div class="alerts-row">${pills.map(p=>`
+    <div class="alert-pill" style="border-color:${p.bc};background:${p.bg}" onclick="alertNav(${p.arr[0].id},'${p.lbl}',${p.arr.length})">
+      <div class="alert-count" style="color:${p.color}">${p.arr.length}</div>
+      <div><div class="alert-lbl">${p.icon} ${p.lbl}</div><div class="alert-sub">${p.sub}</div></div>
+    </div>`).join('')}</div>`;
+}
+
+function alertNav(id,lbl,count){
+  go('roster',document.querySelector('.ni[data-v=roster]'));
+  setTimeout(()=>selS(id),120);
+  showToast(`${lbl}: ${count} student${count>1?'s':''}  →  showing first`,'#5b8dee');
+}
+
+/* ═══════════════════════════════════════
+   M5: STUDENT GOALS
+═══════════════════════════════════════ */
+function saveGoal(id,field,val){
+  const s=students.find(x=>x.id===id);if(!s)return;
+  s[field]=val?+val:null;markDirty();
 }
 
 /* ═══════════════════════════════════════
