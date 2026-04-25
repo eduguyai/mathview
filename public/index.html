@@ -268,6 +268,15 @@ tr.sel td{background:rgba(91,141,238,0.08)}
   body{background:#fff;color:#111}
   .ls-body,.ls-title{color:#333}
 }
+/* ── M6: ANALYTICS ── */
+.a-section-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);font-family:var(--mono);margin:20px 0 10px;display:flex;align-items:center;gap:10px}
+.a-section-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
+.a-log-panel{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.a-log-title{font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;margin-right:4px}
+.a-log-input{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:11px;font-family:var(--mono);color:var(--text);outline:none;width:80px}
+.a-log-input:focus{border-color:rgba(91,141,238,0.4)}
+.a-log-sep{width:1px;height:20px;background:var(--border);flex-shrink:0}
+.a-log-recent{font-size:10px;font-family:var(--mono);color:var(--dim);margin-left:6px}
 /* ── M5: SETTINGS ── */
 .sett-wrap{max-width:560px;display:flex;flex-direction:column;gap:14px}
 .sett-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:12px}
@@ -363,7 +372,8 @@ tr.sel td{background:rgba(91,141,238,0.08)}
     <div class="sdiv"></div>
     <button class="ni" data-v="domains" onclick="go('domains',this)"><span class="ni-icon">⬡</span>Domains</button>
     <button class="ni" data-v="growth" onclick="go('growth',this)"><span class="ni-icon">↗</span>Growth</button>
-    <button class="ni" data-v="qualdata" onclick="go('qualdata',this)"><span class="ni-icon">◷</span>Qual. Data</button>
+    <button class="ni" data-v="qualdata" onclick="go('qualdata',this)"><span class="ni-icon">◷</span>Deeper Insights</button>
+    <button class="ni" data-v="analytics" onclick="go('analytics',this)"><span class="ni-icon">📈</span>Analytics</button>
     <div class="sdiv"></div>
     <button class="ni" data-v="groups" onclick="go('groups',this)"><span class="ni-icon">⊞</span>Groups</button>
     <button class="ni" data-v="interventions" onclick="go('interventions',this)"><span class="ni-icon">⚡</span>Interventions</button>
@@ -420,9 +430,14 @@ tr.sel td{background:rgba(91,141,238,0.08)}
       </div>
       <div id="alertsPanel"></div>
       <div class="chart-grid">
-        <div class="chart-card"><div class="chart-title">iReady Score Distribution</div><div class="chart-wrap"><canvas id="c-dist"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">iReady Score Distribution — Grade Equivalents</div><div class="chart-wrap"><canvas id="c-dist"></canvas></div></div>
         <div class="chart-card"><div class="chart-title">Domain Gap (% below proficiency)</div><div class="chart-wrap"><canvas id="c-gap"></canvas></div></div>
         <div class="chart-card"><div class="chart-title">Tier Breakdown by Period</div><div class="chart-wrap"><canvas id="c-period"></canvas></div></div>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-title">Tier Movement — BOY → MOY → EOY</div><div class="chart-wrap"><canvas id="c-tiermov"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Domain Strength by Tier</div><div class="chart-wrap"><canvas id="c-domtier"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">At-Risk Students by Period</div><div class="chart-wrap"><canvas id="c-atrisk"></canvas></div></div>
       </div>
     </div>
 
@@ -628,6 +643,49 @@ tr.sel td{background:rgba(91,141,238,0.08)}
       </div>
     </div>
 
+    <!-- ANALYTICS -->
+    <div class="view" id="view-analytics">
+      <div class="a-log-panel">
+        <span class="a-log-title">Quick Log</span>
+        <select class="col-select" id="etDomain" style="width:130px">
+          <option value="all">All Domains</option>
+          <option value="numSense">Number Sense</option><option value="algebra">Algebra</option>
+          <option value="ratios">Ratios</option><option value="stats">Statistics</option>
+          <option value="geometry">Geometry</option>
+        </select>
+        <input class="a-log-input" type="number" id="etScore" placeholder="Score 0–100" min="0" max="100">
+        <input class="a-log-input" type="date" id="etDate" style="width:130px">
+        <button class="btn btnp" style="font-size:11px" onclick="logExitTicket()">+ Exit Ticket</button>
+        <span class="a-log-sep"></span>
+        <input class="a-log-input" type="number" id="waScore" placeholder="Weekly avg" min="0" max="100">
+        <button class="btn" style="font-size:11px" onclick="logWeeklyAssess()">+ Weekly Assess.</button>
+        <span class="a-log-recent" id="logRecent"></span>
+      </div>
+      <div class="a-section-lbl">Growth &amp; Trajectory</div>
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-title">Growth Trajectory by Tier</div><div class="chart-wrap"><canvas id="a1"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Intervention Effectiveness</div><div class="chart-wrap"><canvas id="a2"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Growth vs. Starting Score</div><div class="chart-wrap"><canvas id="a3"></canvas></div></div>
+      </div>
+      <div class="a-section-lbl">Domain Breakdown</div>
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-title">Domain Profile by Tier (Radar)</div><div class="chart-wrap" style="height:220px"><canvas id="a4"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Avg Domain Scores by Period</div><div class="chart-wrap"><canvas id="a5"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Domain Ranking — Class Average</div><div class="chart-wrap"><canvas id="a6"></canvas></div></div>
+      </div>
+      <div class="a-section-lbl">Predictive Analytics</div>
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-title">On-Track Probability by Tier</div><div class="chart-wrap"><canvas id="a7"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Projected EOY vs. Goal (Top 15)</div><div class="chart-wrap"><canvas id="a8"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Exit Ticket Trend</div><div class="chart-wrap"><canvas id="a9"></canvas></div></div>
+      </div>
+      <div class="a-section-lbl">Risk Analysis</div>
+      <div class="chart-grid" style="grid-template-columns:1fr 2fr">
+        <div class="chart-card"><div class="chart-title">At-Risk Funnel (Concern Count)</div><div class="chart-wrap"><canvas id="a10"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Intervention Logs by Domain</div><div class="chart-wrap"><canvas id="a11"></canvas></div></div>
+      </div>
+    </div>
+
     <!-- SETTINGS -->
     <div class="view" id="view-settings">
       <div class="sett-wrap">
@@ -789,8 +847,32 @@ const TAG_BANK=[
   ]},
   {cat:'Attendance',tags:[
     {t:'consistent attendance',cls:'qp'},{t:'on-time consistently',cls:'qp'},
+    {t:'perfect attendance',cls:'qp'},{t:'after-school program',cls:'qp'},
     {t:'inconsistent attendance',cls:'qc'},{t:'high absenteeism',cls:'qc'},
-    {t:'chronic absenteeism (10%+)',cls:'qc'},{t:'inconsistent homework',cls:'qc'},
+    {t:'chronic absenteeism (10%+)',cls:'qc'},{t:'work-related absences',cls:'qc'},
+    {t:'medical absences',cls:'qn'},{t:'inconsistent homework',cls:'qc'},
+  ]},
+  {cat:'Learning Style',tags:[
+    {t:'visual learner',cls:'qn'},{t:'auditory learner',cls:'qn'},
+    {t:'kinesthetic learner',cls:'qn'},{t:'read/write learner',cls:'qn'},
+    {t:'benefits from manipulatives',cls:'qp'},{t:'prefers visual models',cls:'qn'},
+    {t:'learns through movement',cls:'qn'},{t:'benefits from audio support',cls:'qn'},
+    {t:'prefers structured notes',cls:'qn'},{t:'thrives with graphic organizers',cls:'qp'},
+  ]},
+  {cat:'Acad. Behavior',tags:[
+    {t:'completes work consistently',cls:'qp'},{t:'strong class participation',cls:'qp'},
+    {t:'advocates for self',cls:'qp'},{t:'takes academic initiative',cls:'qp'},
+    {t:'revises work independently',cls:'qp'},{t:'asks clarifying questions',cls:'qp'},
+    {t:'inconsistent work completion',cls:'qc'},{t:'rarely participates',cls:'qc'},
+    {t:'difficulty self-advocating',cls:'qc'},{t:'avoids challenging tasks',cls:'qc'},
+    {t:'rushes through tasks',cls:'qc'},{t:'easily gives up',cls:'qc'},
+  ]},
+  {cat:'Family Eng.',tags:[
+    {t:'family highly involved',cls:'qp'},{t:'family supportive at home',cls:'qp'},
+    {t:'family responds promptly',cls:'qp'},{t:'home math support strong',cls:'qp'},
+    {t:'family needs translation',cls:'qn'},{t:'limited family contact',cls:'qc'},
+    {t:'family unresponsive',cls:'qc'},{t:'student is primary caregiver',cls:'qc'},
+    {t:'no home internet access',cls:'qc'},{t:'family in transition',cls:'qc'},
   ]},
 ];
 
@@ -904,7 +986,7 @@ const students=[
 const TITLES={
   overview:'Intervention <em>Overview</em>',roster:'Student <em>Roster</em>',
   domains:'Skill <em>Domains</em>',growth:'Growth <em>Trends</em>',
-  qualdata:'Qualitative <em>Data</em>',groups:'Group <em>Builder</em>',
+  qualdata:'<em>Deeper Insights</em>',analytics:'<em>Analytics</em>',groups:'Group <em>Builder</em>',
   interventions:'Active <em>Interventions</em>',reports:'<em>Reports</em>',
   lessons:'<em>Lesson Plans</em>',games:'Math <em>Games</em>',import:'Import <em>Data</em>',settings:'<em>Settings</em>',
 };
@@ -930,6 +1012,7 @@ function boot(v){
   if(v==='games'){initGames();}
   if(v==='settings'){initSettings();}
   if(v==='overview'){renderAlerts();}
+  if(v==='analytics'){initAnalytics();}
 }
 
 /* ═══════════════════════════════════════
@@ -951,13 +1034,29 @@ function renderOverviewCharts(base){
   const t3d=pds.map(p=>students.filter(s=>s.pd===p&&s.tier==='t3').length);
   const t2d=pds.map(p=>students.filter(s=>s.pd===p&&s.tier==='t2').length);
   const t1d=pds.map(p=>students.filter(s=>s.pd===p&&s.tier==='t1').length);
-  ['c-dist','c-gap','c-period'].forEach(id=>{if(overviewCharts[id]){overviewCharts[id].destroy();delete overviewCharts[id];}});
-  const c1=mkChart('c-dist',{type:'bar',data:{labels:['370–384','385–399','400–414','415–429','430–444','445+'],datasets:[{data:distData,backgroundColor:['#f87171','#f87171','#fb923c','#fb923c','#34d399','#34d399'],borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y} students`}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#7a8099',font:{family:'DM Mono',size:10},maxRotation:0}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},stepSize:5}}}}});
+  ['c-dist','c-gap','c-period','c-tiermov','c-domtier','c-atrisk'].forEach(id=>{if(overviewCharts[id]){overviewCharts[id].destroy();delete overviewCharts[id];}});
+  // Grade-level multi-line labels for distribution
+  const distLabels=[['370–384','Gr 4–5'],['385–399','Gr 5–6'],['400–414','Gr 6'],['415–429','Gr 6–7'],['430–444','Gr 7 ✓'],['445+','Gr 7–8+']];
+  const c1=mkChart('c-dist',{type:'bar',data:{labels:distLabels,datasets:[{data:distData,backgroundColor:['#f87171','#f87171','#fb923c','#fb923c','#34d399','#34d399'],borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{title:c=>c[0].label.join(' '),label:c=>` ${c.parsed.y} students`}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#7a8099',font:{family:'DM Mono',size:9},maxRotation:0}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},stepSize:5}}}}});
   const c2=mkChart('c-gap',{type:'bar',data:{labels:domLabels,datasets:[{data:gapData,backgroundColor:domColors,borderRadius:4,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.x}% below proficiency`}}},scales:{x:{max:100,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},callback:v=>v+'%'}},y:{grid:{display:false},ticks:{color:'#7a8099',font:{size:11}}}}}});
   const c3=mkChart('c-period',{type:'bar',data:{labels:['Period 2','Period 3','Period 4','Period 5'],datasets:[{label:'T3',data:t3d,backgroundColor:'#f87171',borderRadius:3},{label:'T2',data:t2d,backgroundColor:'#fb923c',borderRadius:3},{label:'T1',data:t1d,backgroundColor:'#34d399',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#7a8099',font:{size:11}}},y:{stacked:true,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},stepSize:5}}}}});
+  // ── 3 new overview charts ──
+  const irToTier=ir=>ir<415?'t3':ir<440?'t2':'t1';
+  const irFields=['ir','irM','irE'];
+  const tm3=irFields.map(f=>students.filter(s=>s[f]&&irToTier(s[f])==='t3').length);
+  const tm2=irFields.map(f=>students.filter(s=>s[f]&&irToTier(s[f])==='t2').length);
+  const tm1=irFields.map(f=>students.filter(s=>s[f]&&irToTier(s[f])==='t1').length);
+  const c4=mkChart('c-tiermov',{type:'bar',data:{labels:['BOY','MOY','EOY'],datasets:[{label:'Tier 3',data:tm3,backgroundColor:'#f87171',borderRadius:3},{label:'Tier 2',data:tm2,backgroundColor:'#fb923c',borderRadius:3},{label:'Tier 1',data:tm1,backgroundColor:'#34d399',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#7a8099',font:{size:10,family:'DM Mono'},boxWidth:10}},tooltip:{...TT}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#7a8099',font:{family:'DM Mono',size:11}}},y:{stacked:true,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},stepSize:5}}}}});
+  const domAvgByTier=tier=>domKeys.map(d=>{const a=base.filter(s=>s.tier===tier&&s.dom&&s.dom[d]);return a.length?Math.round(a.reduce((s,x)=>s+x.dom[d],0)/a.length):0;});
+  const c5=mkChart('c-domtier',{type:'bar',data:{labels:domLabels,datasets:[{label:'T3',data:domAvgByTier('t3'),backgroundColor:'rgba(248,113,113,0.7)',borderRadius:3},{label:'T2',data:domAvgByTier('t2'),backgroundColor:'rgba(251,146,60,0.7)',borderRadius:3},{label:'T1',data:domAvgByTier('t1'),backgroundColor:'rgba(52,211,153,0.7)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#7a8099',font:{size:10,family:'DM Mono'},boxWidth:10}},tooltip:{...TT}},scales:{x:{grid:{display:false},ticks:{color:'#7a8099',font:{size:10}}},y:{max:100,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},callback:v=>v+'%'}}}}});
+  const atRiskByPd=[2,3,4,5].map(p=>base.filter(s=>s.pd===p&&s.tags.filter(t=>TQ[t]==='qc').length>=2).length);
+  const c6=mkChart('c-atrisk',{type:'bar',data:{labels:['Period 2','Period 3','Period 4','Period 5'],datasets:[{data:atRiskByPd,backgroundColor:['#f87171','#fb923c','#fb923c','#f87171'],borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y} students (2+ concerns)`}}},scales:{x:{grid:{display:false},ticks:{color:'#7a8099',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},stepSize:1}}}}});
   if(c1)overviewCharts['c-dist']=c1;
   if(c2)overviewCharts['c-gap']=c2;
   if(c3)overviewCharts['c-period']=c3;
+  if(c4)overviewCharts['c-tiermov']=c4;
+  if(c5)overviewCharts['c-domtier']=c5;
+  if(c6)overviewCharts['c-atrisk']=c6;
 }
 
 /* ═══════════════════════════════════════
@@ -1488,6 +1587,155 @@ function renderLessonDetail(){
     </div>
     <div class="ls"><div class="ls-title">Guided Practice</div><div class="ls-body">${l.prac}</div></div>
     <div class="ls"><div class="ls-title">Closure / Exit Ticket</div><div class="ls-body">${l.close}</div></div>`;
+}
+
+/* ═══════════════════════════════════════
+   M6: ANALYTICS
+═══════════════════════════════════════ */
+let exitTickets=JSON.parse(localStorage.getItem('mathview_exits')||'[]');
+let weeklyAssess=JSON.parse(localStorage.getItem('mathview_weeklies')||'[]');
+const analyticsCharts={};
+
+function logExitTicket(){
+  const score=+document.getElementById('etScore').value;
+  const domain=document.getElementById('etDomain').value;
+  const date=document.getElementById('etDate').value||new Date().toISOString().slice(0,10);
+  if(!score||score<0||score>100){showToast('Enter a score 0–100','#f87171');return;}
+  exitTickets.push({date,score,domain});
+  localStorage.setItem('mathview_exits',JSON.stringify(exitTickets));
+  document.getElementById('etScore').value='';
+  updateLogRecent();
+  // refresh exit ticket chart if visible
+  if(analyticsCharts['a9']){analyticsCharts['a9'].destroy();delete analyticsCharts['a9'];}
+  const c=buildA9();if(c)analyticsCharts['a9']=c;
+  showToast('Exit ticket logged','#34d399');
+}
+
+function logWeeklyAssess(){
+  const score=+document.getElementById('waScore').value;
+  const date=new Date().toISOString().slice(0,10);
+  if(!score||score<0||score>100){showToast('Enter a score 0–100','#f87171');return;}
+  weeklyAssess.push({date,score});
+  localStorage.setItem('mathview_weeklies',JSON.stringify(weeklyAssess));
+  document.getElementById('waScore').value='';
+  updateLogRecent();
+  showToast('Weekly assessment logged','#34d399');
+}
+
+function updateLogRecent(){
+  const el=document.getElementById('logRecent');
+  if(!el)return;
+  const total=exitTickets.length+weeklyAssess.length;
+  el.textContent=total?`${exitTickets.length} exit tickets · ${weeklyAssess.length} weekly assessments logged`:'No entries yet';
+}
+
+function initAnalytics(){
+  updateLogRecent();
+  // Set today's date as default for exit ticket
+  const ed=document.getElementById('etDate');
+  if(ed&&!ed.value)ed.value=new Date().toISOString().slice(0,10);
+  // Destroy old charts
+  Object.keys(analyticsCharts).forEach(k=>{analyticsCharts[k].destroy();delete analyticsCharts[k];});
+  // Build all 11 charts (10 content + 1 interventions-by-domain)
+  const charts=[buildA1,buildA2,buildA3,buildA4,buildA5,buildA6,buildA7,buildA8,buildA9,buildA10,buildA11];
+  charts.forEach((fn,i)=>{const c=fn();if(c)analyticsCharts[`a${i+1}`]=c;});
+}
+
+// a1: Growth Trajectory by Tier — line BOY/MOY/EOY
+function buildA1(){
+  const avg=(arr,f)=>{const v=arr.map(s=>s[f]).filter(Boolean);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null;};
+  const tiers=[{key:'t3',color:'#f87171',label:'Tier 3'},{key:'t2',color:'#fb923c',label:'Tier 2'},{key:'t1',color:'#34d399',label:'Tier 1'}];
+  return mkChart('a1',{type:'line',data:{labels:['BOY','MOY','EOY'],datasets:tiers.map(t=>({label:t.label,data:[avg(students.filter(s=>s.tier===t.key),'ir'),avg(students.filter(s=>s.tier===t.key),'irM'),avg(students.filter(s=>s.tier===t.key),'irE')],borderColor:t.color,backgroundColor:t.color+'22',tension:.3,pointRadius:4,pointBackgroundColor:t.color,fill:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#7a8099',font:{size:10,family:'DM Mono'},boxWidth:10}},tooltip:{...TT,callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y}`}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#7a8099',font:{family:'DM Mono',size:11}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}}}}}});
+}
+
+// a2: Intervention Effectiveness — growth with vs without intervention
+function buildA2(){
+  const growth=s=>s.ir&&s.irE?s.irE-s.ir:null;
+  const avg=arr=>{const v=arr.filter(x=>x!=null);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):0;};
+  const tiers=[{key:'t3',label:'Tier 3'},{key:'t2',label:'Tier 2'},{key:'t1',label:'Tier 1'}];
+  const withInt=tiers.map(t=>avg(students.filter(s=>s.tier===t.key&&interventions.some(i=>i.sid===s.id)).map(s=>growth(s))));
+  const noInt=tiers.map(t=>avg(students.filter(s=>s.tier===t.key&&!interventions.some(i=>i.sid===s.id)).map(s=>growth(s))));
+  return mkChart('a2',{type:'bar',data:{labels:['Tier 3','Tier 2','Tier 1'],datasets:[{label:'With Intervention',data:withInt,backgroundColor:'rgba(91,141,238,0.7)',borderRadius:4},{label:'No Intervention',data:noInt,backgroundColor:'rgba(74,80,104,0.6)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#7a8099',font:{size:10,family:'DM Mono'},boxWidth:10}},tooltip:{...TT,callbacks:{label:c=>`${c.dataset.label}: +${c.parsed.y} pts avg`}}},scales:{x:{grid:{display:false},ticks:{color:'#7a8099',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},title:{display:true,text:'Avg Growth (pts)',color:'#4a5068',font:{size:10}}}}}});
+}
+
+// a3: Growth vs Starting Score — scatter
+function buildA3(){
+  const tiers=[{key:'t3',color:'#f87171'},{key:'t2',color:'#fb923c'},{key:'t1',color:'#34d399'}];
+  return mkChart('a3',{type:'scatter',data:{datasets:tiers.map(t=>({label:t.key.toUpperCase(),data:students.filter(s=>s.tier===t.key&&s.ir&&s.irE).map(s=>({x:s.ir,y:s.irE-s.ir,name:s.name})),backgroundColor:t.color+'99',pointRadius:5,pointHoverRadius:7}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#7a8099',font:{size:10,family:'DM Mono'},boxWidth:10}},tooltip:{...TT,callbacks:{label:c=>`${c.raw.name}: start ${c.raw.x}, growth +${c.raw.y}`}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},title:{display:true,text:'BOY Score',color:'#4a5068',font:{size:10}},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},title:{display:true,text:'Growth (pts)',color:'#4a5068',font:{size:10}},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}}}}}});
+}
+
+// a4: Domain profile by tier — radar
+function buildA4(){
+  const domKeys=['numSense','algebra','ratios','stats','geometry'];
+  const domLabels2=['Num. Sense','Algebra','Ratios','Statistics','Geometry'];
+  const avg=(tier,d)=>{const a=students.filter(s=>s.tier===tier&&s.dom&&s.dom[d]);return a.length?Math.round(a.reduce((s,x)=>s+x.dom[d],0)/a.length):0;};
+  return mkChart('a4',{type:'radar',data:{labels:domLabels2,datasets:[{label:'Tier 3',data:domKeys.map(d=>avg('t3',d)),borderColor:'#f87171',backgroundColor:'rgba(248,113,113,0.1)',pointBackgroundColor:'#f87171'},{label:'Tier 2',data:domKeys.map(d=>avg('t2',d)),borderColor:'#fb923c',backgroundColor:'rgba(251,146,60,0.1)',pointBackgroundColor:'#fb923c'},{label:'Tier 1',data:domKeys.map(d=>avg('t1',d)),borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.1)',pointBackgroundColor:'#34d399'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#7a8099',font:{size:10,family:'DM Mono'},boxWidth:10}},tooltip:{...TT}},scales:{r:{min:0,max:100,grid:{color:'rgba(255,255,255,0.08)'},angleLines:{color:'rgba(255,255,255,0.06)'},ticks:{color:'#4a5068',font:{size:9},backdropColor:'transparent',stepSize:20},pointLabels:{color:'#7a8099',font:{size:10}}}}}});
+}
+
+// a5: Avg domain scores by period
+function buildA5(){
+  const domKeys=['numSense','algebra','ratios','stats','geometry'];
+  const domColors2=['#f87171','#a78bfa','#5b8dee','#fb923c','#34d399'];
+  const domLabels2=['Num. Sense','Algebra','Ratios','Stats','Geometry'];
+  const pds=[2,3,4,5];
+  return mkChart('a5',{type:'bar',data:{labels:pds.map(p=>'Pd '+p),datasets:domKeys.map((d,i)=>({label:domLabels2[i],data:pds.map(p=>{const a=students.filter(s=>s.pd===p&&s.dom&&s.dom[d]);return a.length?Math.round(a.reduce((s,x)=>s+x.dom[d],0)/a.length):0;}),backgroundColor:domColors2[i]+'99',borderRadius:2}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#7a8099',font:{size:9,family:'DM Mono'},boxWidth:8}},tooltip:{...TT}},scales:{x:{grid:{display:false},ticks:{color:'#7a8099',font:{size:11}}},y:{max:100,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},callback:v=>v+'%'}}}}});
+}
+
+// a6: Domain ranking — horizontal bar sorted by avg
+function buildA6(){
+  const domKeys=['numSense','algebra','ratios','stats','geometry'];
+  const domColors2=['#f87171','#a78bfa','#5b8dee','#fb923c','#34d399'];
+  const domLabels2=['Number Sense','Algebra','Ratios','Statistics','Geometry'];
+  const avgs=domKeys.map(d=>{const a=students.filter(s=>s.dom&&s.dom[d]);return a.length?Math.round(a.reduce((s,x)=>s+x.dom[d],0)/a.length):0;});
+  const sorted=[...domLabels2.map((l,i)=>({l,v:avgs[i],c:domColors2[i]}))].sort((a,b)=>a.v-b.v);
+  return mkChart('a6',{type:'bar',data:{labels:sorted.map(x=>x.l),datasets:[{data:sorted.map(x=>x.v),backgroundColor:sorted.map(x=>x.c+'cc'),borderRadius:4,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` Class avg: ${c.parsed.x}%`}}},scales:{x:{max:100,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},callback:v=>v+'%'}},y:{grid:{display:false},ticks:{color:'#7a8099',font:{size:11}}}}}});
+}
+
+// a7: On-track probability by tier — donut
+function buildA7(){
+  const projEOY=s=>{if(!s.ir||!s.irM)return s.irE||null;return Math.round(s.irM+(s.irM-s.ir)*0.6);};
+  const hasGoal=s=>s.goalEOY||s.goalMOY||s.goalBOY;
+  const onTrack=s=>{const proj=projEOY(s);if(!proj)return null;const goal=s.goalEOY||(s.tier==='t3'?410:s.tier==='t2'?435:465);return proj>=goal;};
+  const tiers=[{key:'t3',label:'Tier 3',color:'#f87171'},{key:'t2',label:'Tier 2',color:'#fb923c'},{key:'t1',label:'Tier 1',color:'#34d399'}];
+  const pcts=tiers.map(t=>{const arr=students.filter(s=>s.tier===t.key);const on=arr.filter(s=>onTrack(s)===true).length;return arr.length?Math.round(on/arr.length*100):0;});
+  return mkChart('a7',{type:'bar',data:{labels:tiers.map(t=>t.label),datasets:[{label:'% On Track',data:pcts,backgroundColor:tiers.map(t=>t.color+'cc'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y}% projected on track for EOY goal`}}},scales:{x:{grid:{display:false},ticks:{color:'#7a8099',font:{size:11}}},y:{max:100,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},callback:v=>v+'%'}}}}});
+}
+
+// a8: Projected EOY vs goal — horizontal bar (top 15 students by gap)
+function buildA8(){
+  const projEOY=s=>{if(!s.ir||!s.irM)return s.irE||null;return Math.round(s.irM+(s.irM-s.ir)*0.6);};
+  const data=students.map(s=>({name:s.name.split(' ')[0]+' '+s.name.split(' ')[1]?.[0]+'.',proj:projEOY(s),goal:s.goalEOY||(s.tier==='t3'?410:s.tier==='t2'?435:465),tier:s.tier})).filter(x=>x.proj).sort((a,b)=>(a.proj-a.goal)-(b.proj-b.goal)).slice(0,15);
+  const colors=data.map(d=>d.proj>=d.goal?'rgba(52,211,153,0.7)':'rgba(248,113,113,0.7)');
+  return mkChart('a8',{type:'bar',data:{labels:data.map(d=>d.name),datasets:[{label:'Projected EOY',data:data.map(d=>d.proj),backgroundColor:colors,borderRadius:3,borderSkipped:false},{label:'EOY Goal',data:data.map(d=>d.goal),backgroundColor:'rgba(255,255,255,0.08)',borderRadius:3,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#7a8099',font:{size:10,family:'DM Mono'},boxWidth:10}},tooltip:{...TT,callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.x}`}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}}},y:{grid:{display:false},ticks:{color:'#7a8099',font:{size:9}}}}}});
+}
+
+// a9: Exit ticket trend — line
+function buildA9(){
+  const sorted=[...exitTickets].sort((a,b)=>a.date.localeCompare(b.date)).slice(-10);
+  if(!sorted.length){
+    const el=document.getElementById('a9');
+    if(el){const ctx=el.getContext('2d');ctx.fillStyle='#4a5068';ctx.font='12px DM Sans';ctx.textAlign='center';ctx.fillText('No exit tickets logged yet',el.width/2,el.height/2);}
+    return null;
+  }
+  return mkChart('a9',{type:'line',data:{labels:sorted.map(x=>x.date.slice(5)),datasets:[{label:'Exit Ticket Score',data:sorted.map(x=>x.score),borderColor:'#5b8dee',backgroundColor:'rgba(91,141,238,0.1)',tension:.3,pointRadius:4,pointBackgroundColor:'#5b8dee',fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` Score: ${c.parsed.y}%`}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#7a8099',font:{family:'DM Mono',size:10}}},y:{min:0,max:100,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},callback:v=>v+'%'}}}}});
+}
+
+// a10: At-risk funnel — bar by concern count
+function buildA10(){
+  const counts=[0,1,2,3,4];
+  const data=counts.map(n=>students.filter(s=>s.tags.filter(t=>TQ[t]==='qc').length===n).length);
+  const colors=['#34d399','#7a8099','#fb923c','#f87171','#dc2626'];
+  return mkChart('a10',{type:'bar',data:{labels:['0 concerns','1 concern','2 concerns','3 concerns','4+'],datasets:[{data:[...data.slice(0,4),students.filter(s=>s.tags.filter(t=>TQ[t]==='qc').length>=4).length],backgroundColor:colors,borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y} students`}}},scales:{x:{grid:{display:false},ticks:{color:'#7a8099',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},stepSize:2}}}}});
+}
+
+// a11: Interventions by domain — donut
+function buildA11(){
+  const domKeys=['numSense','algebra','ratios','stats','geometry'];
+  const domLabels2=['Number Sense','Algebra','Ratios','Statistics','Geometry'];
+  const domColors2=['#f87171','#a78bfa','#5b8dee','#fb923c','#34d399'];
+  const counts=domKeys.map(d=>interventions.filter(i=>i.dom===d).length);
+  const other=interventions.filter(i=>!domKeys.includes(i.dom)).length;
+  return mkChart('a11',{type:'doughnut',data:{labels:[...domLabels2,'Other'],datasets:[{data:[...counts,other],backgroundColor:[...domColors2.map(c=>c+'cc'),'#4a5068'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'right',labels:{color:'#7a8099',font:{size:10,family:'DM Mono'},boxWidth:10,padding:8}},tooltip:{...TT,callbacks:{label:c=>`${c.label}: ${c.parsed} intervention${c.parsed!==1?'s':''}`}}}}});
 }
 
 /* ═══════════════════════════════════════
