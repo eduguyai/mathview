@@ -268,6 +268,50 @@ tr.sel td{background:rgba(91,141,238,0.08)}
   body{background:#fff;color:#111}
   .ls-body,.ls-title{color:#333}
 }
+/* ── M4: GAMES ── */
+.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.game-filters{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.gf-sep{width:1px;height:16px;background:var(--border);margin:0 4px;flex-shrink:0}
+.gf-lbl{font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.game-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:border-color .15s,background .15s;display:flex;flex-direction:column;gap:8px}
+.game-card:hover{border-color:var(--bmed);background:var(--bg3)}
+.game-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.game-card-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+.game-dom-badge{font-size:9px;font-family:var(--mono);font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0}
+.game-diff{font-size:12px;line-height:1}
+.game-card-desc{font-size:11px;color:var(--muted);line-height:1.5;flex:1}
+.game-card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border);margin-top:auto}
+.game-meta-pill{font-size:10px;font-family:var(--mono);color:var(--dim)}
+/* game modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.hidden{display:none}
+.modal-box{background:var(--bg2);border:1px solid var(--bmed);border-radius:14px;width:100%;max-width:640px;max-height:85vh;overflow-y:auto}
+.modal-head{padding:20px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:sticky;top:0;background:var(--bg2);z-index:1}
+.modal-title{font-family:var(--serif);font-size:18px;font-weight:500;line-height:1.3}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:0;flex-shrink:0}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:18px 22px}
+.modal-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.modal-sec{margin-bottom:16px}
+.modal-sec-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-family:var(--mono);margin-bottom:6px}
+.modal-sec-body{font-size:12px;color:var(--text);line-height:1.65}
+.modal-variants{display:flex;flex-direction:column;gap:6px}
+.modal-variant{background:var(--bg3);border-radius:6px;padding:8px 12px;font-size:11px;color:var(--muted);line-height:1.5}
+.modal-variant strong{color:var(--text)}
+/* ── M4: REPORTS ── */
+.rep-tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.rep-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.rep-card-label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-family:var(--mono);margin-bottom:10px}
+.rep-big{font-family:var(--mono);font-size:28px;line-height:1}
+.rep-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin:4px 0 10px}
+.rep-bar-wrap{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.rep-bar-fill{height:100%;border-radius:3px}
+.rep-table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.rep-table-head{padding:10px 16px;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-family:var(--mono);display:flex;align-items:center;justify-content:space-between}
+.rep-export{padding:4px 12px;border-radius:5px;border:1px solid var(--bmed);background:var(--bg3);color:var(--text);font-size:10px;font-family:var(--mono);cursor:pointer}
+.rep-export:hover{background:var(--bg4)}
+.spill{display:inline-flex;align-items:center;padding:1px 7px;border-radius:4px;font-size:10px;font-family:var(--mono);font-weight:500}
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -445,11 +489,21 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 
     <!-- REPORTS -->
     <div class="view" id="view-reports">
-      <div class="coming-shell">
-        <div class="coming-icon">📊</div>
-        <div class="coming-title">Reports</div>
-        <div class="coming-tag">Coming in Sprint M3</div>
-        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">Tier summary report, domain gap report, student progress printout, and CSV export of assessment data.</p>
+      <div class="rep-tier-grid" id="repTierCards"></div>
+      <div class="rep-table-wrap">
+        <div class="rep-table-head">
+          <span>Domain Gap Summary</span>
+          <button class="rep-export" onclick="exportCSV()">⬇ Export CSV</button>
+        </div>
+        <table><thead><tr>
+          <th>Domain</th><th>Avg Score</th><th>Below 70%</th><th>Class Best</th><th>Class Worst</th>
+        </tr></thead><tbody id="repDomainTable"></tbody></table>
+      </div>
+      <div class="rep-table-wrap">
+        <div class="rep-table-head"><span>Student Progress (BOY → MOY → EOY)</span></div>
+        <table><thead><tr>
+          <th>Student</th><th>Tier</th><th>BOY</th><th>MOY</th><th>EOY</th><th>Growth</th><th>Top Need</th>
+        </tr></thead><tbody id="repProgressTable"></tbody></table>
       </div>
     </div>
 
@@ -482,11 +536,33 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 
     <!-- GAMES -->
     <div class="view" id="view-games">
-      <div class="coming-shell">
-        <div class="coming-icon">🎲</div>
-        <div class="coming-title">Math Games</div>
-        <div class="coming-tag">Coming in Sprint M4</div>
-        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">18 hands-on math games across all 5 domains. Full game guides with setup, rules, variations, and teacher notes. Difficulty ratings and printable game cards.</p>
+      <div class="game-header">
+        <div class="game-filters">
+          <span class="gf-lbl">Domain</span>
+          <button class="fb fa" onclick="setGF('d','all',this)">All</button>
+          <button class="fb" style="color:#f87171" onclick="setGF('d','numSense',this)">Number Sense</button>
+          <button class="fb" style="color:#a78bfa" onclick="setGF('d','algebra',this)">Algebra</button>
+          <button class="fb" style="color:#5b8dee" onclick="setGF('d','ratios',this)">Ratios</button>
+          <button class="fb" style="color:#fb923c" onclick="setGF('d','stats',this)">Statistics</button>
+          <button class="fb" style="color:#34d399" onclick="setGF('d','geometry',this)">Geometry</button>
+          <span class="gf-sep"></span>
+          <span class="gf-lbl">Difficulty</span>
+          <button class="fb fa" onclick="setGF('x','all',this)">All</button>
+          <button class="fb" onclick="setGF('x',1,this)">⭐</button>
+          <button class="fb" onclick="setGF('x',2,this)">⭐⭐</button>
+          <button class="fb" onclick="setGF('x',3,this)">⭐⭐⭐</button>
+        </div>
+      </div>
+      <div class="game-grid" id="gameGrid"></div>
+    </div>
+    <!-- GAME MODAL -->
+    <div class="modal-overlay hidden" id="gameModal" onclick="if(event.target===this)closeGameModal()">
+      <div class="modal-box">
+        <div class="modal-head">
+          <div class="modal-title" id="modalTitle"></div>
+          <button class="modal-close" onclick="closeGameModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
       </div>
     </div>
 
@@ -760,6 +836,8 @@ function boot(v){
   if(v==='groups'){initGroups();}
   if(v==='interventions'){initInterventions();}
   if(v==='lessons'){initLessons();}
+  if(v==='reports'){initReports();}
+  if(v==='games'){initGames();}
 }
 
 /* ═══════════════════════════════════════
@@ -1307,6 +1385,265 @@ function renderLessonDetail(){
     </div>
     <div class="ls"><div class="ls-title">Guided Practice</div><div class="ls-body">${l.prac}</div></div>
     <div class="ls"><div class="ls-title">Closure / Exit Ticket</div><div class="ls-body">${l.close}</div></div>`;
+}
+
+/* ═══════════════════════════════════════
+   M4: GAMES
+═══════════════════════════════════════ */
+const GAMES=[
+  // ── Number Sense ──
+  {id:1,title:'Number Line Dash',domain:'numSense',diff:1,players:'2–4',time:'20 min',
+   desc:'Players race to place integer cards on a floor number line. First to place 5 cards correctly wins.',
+   setup:'Print or tape a number line (−20 to 20) on the floor. Shuffle an integer card deck. Each player draws 5 cards.',
+   rules:'On your turn, place one card on the correct spot. Other players may challenge. Wrong placement = card returns to deck. First to place all 5 wins.',
+   variations:[{name:'Fraction Edition',text:'Use fraction and decimal cards from −2 to 2 in eighths for added complexity.'},{name:'Silent Mode',text:'No talking allowed — communicate only by pointing and gesturing.'}],
+   notes:'Great kinesthetic opener. Target common error: students often place negatives by absolute value, ignoring direction. Debrief by asking "which is greater, −7 or −3?"'},
+  {id:2,title:'Percent Bingo',domain:'numSense',diff:1,players:'Whole class',time:'25 min',
+   desc:'Teacher calls fractions or decimals; students cover the equivalent percent on their bingo card.',
+   setup:'Print unique 5×5 bingo cards with percents from 10%–150%. Caller deck contains equivalent fractions and decimals.',
+   rules:'Teacher calls a value (e.g., "3/4"). Students find and cover the matching percent. BINGO = 5 in a row. Verify before awarding.',
+   variations:[{name:'Reverse Bingo',text:'Cards show fractions; teacher calls percents.'},{name:'Team Bingo',text:'Pairs share one card and must agree before covering a square.'}],
+   notes:'Low floor, high engagement. Include 125% and 150% to stretch T1 students. Watch for students who only recognize "nice" fractions (1/4, 1/2, 3/4).'},
+  {id:3,title:'Rational Rummy',domain:'numSense',diff:2,players:'2–5',time:'30 min',
+   desc:'Card game where players collect sets of equivalent values (fraction = decimal = percent) to score points.',
+   setup:'54-card deck: 18 triplets each containing one fraction, its decimal equivalent, and its percent form. Deal 7 cards each; remaining cards form draw pile.',
+   rules:'On your turn, draw one card. Play sets of 3 equivalent values from your hand. Build on existing sets. First to empty hand wins round. Score = sum of cards still held by others.',
+   variations:[{name:'Pairs Version',text:'Collect fraction-decimal pairs only (36 cards) for a shorter, simpler game.'},{name:'Wild Cards',text:'Add 4 wild cards that can represent any value in a set.'}],
+   notes:'Builds fluency across all three representations. To scaffold T3 groups, remove thirds (1/3, 2/3) from the deck — those repeating decimals cause the most confusion.'},
+  {id:4,title:'Estimation Station',domain:'numSense',diff:1,players:'Teams of 3',time:'20 min',
+   desc:'Teams compete to give the closest estimate for multi-step problems. No calculators — mental math only.',
+   setup:'Prepare 20 estimation prompt cards (e.g., "37% of 820"). Exact answers on card backs. Timer set to 30 sec.',
+   rules:'Flip a card. Teams write estimate in 30 seconds. Closest estimate earns the point. Tiebreak: explain your strategy.',
+   variations:[{name:'Open Estimation',text:'Closest total distance from correct answer wins — going over is allowed.'},{name:'Measurement Round',text:'Use physical objects; estimate length, area, or weight.'}],
+   notes:'Reinforce benchmark percents (10%, 25%, 50%) as anchor strategies. Debrief the most-missed card each round.'},
+  // ── Algebra ──
+  {id:5,title:'Equation Relay',domain:'algebra',diff:1,players:'Teams of 4',time:'25 min',
+   desc:'Teams race to solve a multi-step equation — each player completes one step before passing to the next.',
+   setup:'Print equation strips with 4 steps each. Teams of 4 sit in relay order. Stack of equation strips at front.',
+   rules:'Player 1 writes Step 1, passes to Player 2 who checks and does Step 2, and so on. First team to finish with a correct solution wins the round.',
+   variations:[{name:'Inequality Relay',text:'Use inequalities; final player must graph the solution on a number line.'},{name:'Error Hunt',text:'Pre-solve equations with hidden mistakes; teams identify and correct the error.'}],
+   notes:'Wrong intermediate answers cascade into wrong finals — teach students to verify each step before passing. Great for showing multi-step structure.'},
+  {id:6,title:'Function Machine',domain:'algebra',diff:2,players:'2–3',time:'25 min',
+   desc:'One player is the "machine" (knows the secret rule); others figure out the rule by testing inputs.',
+   setup:'Machine player secretly draws a rule card (e.g., y = 3x − 2). Others have an input/output recording table.',
+   rules:'Other players take turns giving inputs. Machine gives the output. Guessers may guess the rule at any time. Correct guess earns 1 point. Max 10 inputs per round.',
+   variations:[{name:'Two-Step Rules',text:'Rules require two operations (e.g., multiply by 2 then subtract 1).'},{name:'Non-linear Round',text:'Include rules like y = x² or y = 2x to preview non-linear functions.'}],
+   notes:'Encourage students to record all input/output pairs in a table. Build toward y = mx + b by asking "does the output grow by the same amount each time?"'},
+  {id:7,title:'Slope Slalom',domain:'algebra',diff:3,players:'2',time:'30 min',
+   desc:'Players graph lines from slope-intercept equations, scoring points for each "gate" (target region) their line passes through.',
+   setup:'Print game boards: coordinate grids with 6 colored gate regions. Each player has a deck of equation cards.',
+   rules:'Play one equation card, graph the line. Count how many gates your line passes through — that is your round score. 5 rounds total.',
+   variations:[{name:'Parallel Challenge',text:'Must write a parallel line to opponent\'s last equation before drawing a new card.'},{name:'Intersection Hunt',text:'Score double if your line intersects opponent\'s last graphed line.'}],
+   notes:'Previews systems of equations for T1 students. Debrief: "How does changing m affect which gates you hit? What about changing b?"'},
+  {id:8,title:'Variable Volleyball',domain:'algebra',diff:2,players:'Teams of 2',time:'20 min',
+   desc:'Teams pass an algebraic expression back and forth, each player applying one valid simplification step — like a volleyball rally.',
+   setup:'Start with complex expressions (e.g., 3x + 2 − 5x + 7 + x). Alternate turns. Score sheet.',
+   rules:'Each "hit" = one valid step: combine like terms, apply distributive property, etc. An error = point for the other team. Rally continues until fully simplified. First team to 5 points wins.',
+   variations:[{name:'Negative Coefficients',text:'Include negative coefficients and subtraction of negatives.'},{name:'Distributive Warmup',text:'Start with un-distributed expressions so first step is always distributing.'}],
+   notes:'Require students to name the property used on each step. Makes algebraic reasoning social and audible.'},
+  // ── Ratios & Proportions ──
+  {id:9,title:'Ratio Rundown',domain:'ratios',diff:1,players:'2–4',time:'20 min',
+   desc:'Memory-style game where players match equivalent ratios shown in four different representations.',
+   setup:'48 cards: 12 ratio families × 4 forms (fraction, colon notation, word form, tape diagram). Shuffle and lay face-down.',
+   rules:'Flip two cards per turn. Collect sets of 4 equivalent representations. Most complete sets at end wins.',
+   variations:[{name:'Pairs Only',text:'Match only fraction and colon form (24 cards) for shorter play with beginners.'},{name:'Odd One Out',text:'Lay 5 cards (4 equivalent + 1 different). Teams race to identify the odd one out.'}],
+   notes:'Ratio notation fluency before proportional reasoning. Flag students who only recognize one representation — they will struggle with proportion word problems.'},
+  {id:10,title:'Proportion Pursuit',domain:'ratios',diff:2,players:'2–3',time:'25 min',
+   desc:'Board game: answer proportion word problems correctly to advance spaces. Wrong answers send you back.',
+   setup:'40-space board game. Proportion problem cards in three difficulty piles. Two standard dice.',
+   rules:'Roll dice — high total = hard card (move 3), mid = medium (move 2), low = easy (move 1). Solve problem correctly to advance. Wrong = stay put.',
+   variations:[{name:'Speed Round',text:'45-second timer per problem. Timeout = move back 1 space.'},{name:'CTE Context',text:'All problems use cooking, construction, or healthcare scenarios.'}],
+   notes:'Differentiate by pile selection: T3 students draw only easy, T1 students draw only hard. Peer verification required before moving.'},
+  {id:11,title:'Rate Race',domain:'ratios',diff:2,players:'Teams of 2',time:'20 min',
+   desc:'Teams race to find the best unit rate from real-world purchase option pairs.',
+   setup:'Cards show products in two sizes/quantities with prices (e.g., 6 apples for $2.40 vs. 10 apples for $3.80). Answer key on back.',
+   rules:'Flip a card set. First team to correctly identify the better deal and explain why earns the card. Most cards at end wins.',
+   variations:[{name:'Sale Twist',text:'Add a "sale" card each round — teams must determine if the sale price is actually better.'},{name:'Unit Conversion',text:'Include oz vs. lb or mL vs. L so students must convert before comparing.'}],
+   notes:'Requires both unit rate calculation AND comparison — two skills in one. Connect to consumer math: ask "would this change your decision at a grocery store?"'},
+  // ── Statistics ──
+  {id:12,title:'Data Detectives',domain:'stats',diff:1,players:'2–4',time:'25 min',
+   desc:'Players examine mystery graphs and answer questions to collect clue cards. Most cards wins.',
+   setup:'20 mystery graph cards (bar, line, circle graphs) with one question each. Question types: read, compare, predict, title, mistake-find.',
+   rules:'Draw a graph card, answer correctly to keep it. Any player may challenge — peers judge. Most cards at the end wins.',
+   variations:[{name:'Misleading Graphs',text:'Half the cards feature intentionally distorted y-axes or missing labels.'},{name:'Create It',text:'Students sketch a graph from a data table — peers ask questions about it.'}],
+   notes:'Begin with "mistake-find" cards to build critical graph literacy before moving to read and compare. "What\'s wrong with this graph?" is highly engaging.'},
+  {id:13,title:'Mean Mode Madness',domain:'stats',diff:2,players:'2–4',time:'25 min',
+   desc:'Roll dice to build a data set, then race to correctly calculate mean, median, and mode.',
+   setup:'6 dice per player. Score sheet with 6 rounds. All players roll simultaneously.',
+   rules:'First to correctly state all three measures (mean, median, mode) earns 3 pts. Partial credit: 1 pt per correct measure. Must show work.',
+   variations:[{name:'Outlier Edition',text:'One die is a "10×" multiplier. Applying it creates an outlier — recalculate all measures and discuss the change.'},{name:'Team Average',text:'Combine two players\' dice (12 values total) to work with larger data sets.'}],
+   notes:'Builds calculation fluency through repetition. Track which measure each student consistently misses — most common error is median on even-numbered data sets.'},
+  {id:14,title:'Probability Showdown',domain:'stats',diff:2,players:'2',time:'20 min',
+   desc:'Players predict outcomes of compound events, then run trials to compare theoretical vs. experimental probability.',
+   setup:'Spinner set (4 spinners with different sections), coin, two-color counters. Prediction worksheet.',
+   rules:'Both players predict P(event) for a compound experiment. Run 20 trials. Player whose prediction is closest (within %) earns the point.',
+   variations:[{name:'Large Sample',text:'Run 50 trials using a random number generator to demonstrate the law of large numbers.'},{name:'Dependent Events',text:'Draw marbles without replacement to introduce conditional probability.'}],
+   notes:'Debrief: why doesn\'t experimental probability always match theoretical? Use this to introduce the law of large numbers intuitively.'},
+  {id:15,title:'Scatter Plot Stories',domain:'stats',diff:3,players:'2–3',time:'30 min',
+   desc:'Players examine scatter plots and compete to write the most accurate description of trend, strength, and prediction.',
+   setup:'12 scatter plot cards (positive/negative/no correlation, linear/non-linear). Scoring rubric (2 pts: trend, 2 pts: strength, 2 pts: prediction).',
+   rules:'Flip a card. Each player writes a 3-sentence description independently. Peer-score with rubric. Max 6 pts per round. 6 rounds total.',
+   variations:[{name:'Outlier Audit',text:'Each plot has one circled outlier — describe its effect on the line of best fit.'},{name:'Draw the Line',text:'Players draw their own line of best fit and compare slopes using rise/run.'}],
+   notes:'Post anchor vocabulary: positive/negative/no correlation, linear/non-linear. Sentence frame: "As ___ increases, ___ tends to ___, which shows a ___ correlation."'},
+  // ── Geometry ──
+  {id:16,title:'Area Architect',domain:'geometry',diff:1,players:'2–4',time:'25 min',
+   desc:'Players use area calculations to "purchase" land on a shared game board, racing to claim 100 square units first.',
+   setup:'10×10 game board (grid paper). Shape cards (triangles, parallelograms, trapezoids) with formulas printed. Play money chips.',
+   rules:'Draw a shape card, calculate its area correctly to "buy" that many grid squares. Place your color marker. First to 100 sq units wins.',
+   variations:[{name:'Composite Shapes',text:'Some cards show composite figures — calculate total combined area.'},{name:'Perimeter Tax',text:'Each turn, pay perimeter ÷ 4 squares in "taxes" — reinforces area vs. perimeter distinction.'}],
+   notes:'Formula reference on each card for T3 students. Challenge T1 students to derive the formula from a rectangle each time, not just plug in.'},
+  {id:17,title:'Perimeter Pursuit',domain:'geometry',diff:2,players:'2',time:'20 min',
+   desc:'Players take turns adding polygon tiles to a growing composite figure, calculating the perimeter after each addition.',
+   setup:'Polygon tile set (hexagons, squares, triangles, rectangles in various sizes). Perimeter recording sheet. Target perimeter card (e.g., "Stay under 60 cm").',
+   rules:'Take turns adding one tile. After each addition, recalculate the total perimeter. Shared sides do NOT count. Player who causes the perimeter to exceed the target loses.',
+   variations:[{name:'Area Constraint',text:'Keep total area under 50 sq cm while maximizing perimeter.'},{name:'Missing Side',text:'Cover one tile dimension — use the perimeter constraint to find the missing side algebraically.'}],
+   notes:'Shared-side subtraction is the key concept — students must identify which sides "disappear" when tiles join. This is the most common error in composite perimeter.'},
+  {id:18,title:'Angle Assassin',domain:'geometry',diff:3,players:'2–4',time:'30 min',
+   desc:'Players "eliminate" angle cards by writing the equation that proves a missing angle measure using the correct angle relationship.',
+   setup:'72 angle diagram cards (complementary, supplementary, vertical angles, parallel lines with transversal). Equation worksheet.',
+   rules:'Flip a card. Write the angle relationship equation and solve for x within 60 seconds. Correct equation AND answer = keep the card. Wrong = discard.',
+   variations:[{name:'Proof Chain',text:'Link 3 consecutive angle relationships to justify a final angle measure.'},{name:'Triangle Round',text:'Add triangle interior and exterior angle theorem cards to the deck.'}],
+   notes:'Equation setup is harder than solving — require students to write the relationship name (e.g., "Vertical angles are equal") before writing the equation. This slows them down productively.'}
+];
+
+const DOM_COLORS={numSense:'#f87171',algebra:'#a78bfa',ratios:'#5b8dee',stats:'#fb923c',geometry:'#34d399'};
+const DOM_BG={numSense:'rgba(248,113,113,0.12)',algebra:'rgba(167,139,250,0.12)',ratios:'rgba(91,141,238,0.12)',stats:'rgba(251,146,60,0.12)',geometry:'rgba(52,211,153,0.12)'};
+const DIFF_STARS=['','⭐','⭐⭐','⭐⭐⭐'];
+const DIFF_LABELS=['','Beginner','Intermediate','Advanced'];
+
+let gfDom='all',gfDiff='all';
+
+function initGames(){renderGameCards();}
+
+function setGF(type,val,btn){
+  const wrap=document.getElementById('view-games');
+  const allBtns=[...wrap.querySelectorAll('.game-filters .fb')];
+  const domBtns=allBtns.slice(0,7);  // All + 5 domains + sep
+  const diffBtns=allBtns.slice(8);   // All + ⭐ ⭐⭐ ⭐⭐⭐
+  if(type==='d'){gfDom=val;domBtns.forEach(b=>b.classList.remove('fa'));btn.classList.add('fa');}
+  else{gfDiff=val;diffBtns.forEach(b=>b.classList.remove('fa'));btn.classList.add('fa');}
+  renderGameCards();
+}
+
+function renderGameCards(){
+  const grid=document.getElementById('gameGrid');
+  const list=GAMES.filter(g=>(gfDom==='all'||g.domain===gfDom)&&(gfDiff==='all'||g.diff===gfDiff));
+  if(!list.length){
+    grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🎲</div><div class="empty-state-title">No games match these filters</div></div>';
+    return;
+  }
+  grid.innerHTML=list.map(g=>`
+    <div class="game-card" onclick="openGameModal(${g.id})">
+      <div class="game-card-top">
+        <div class="game-card-title">${g.title}</div>
+        <div class="game-dom-badge" style="color:${DOM_COLORS[g.domain]};background:${DOM_BG[g.domain]}">${DL[g.domain]}</div>
+      </div>
+      <div class="game-diff">${DIFF_STARS[g.diff]}</div>
+      <div class="game-card-desc">${g.desc}</div>
+      <div class="game-card-footer">
+        <span class="game-meta-pill">👥 ${g.players}</span>
+        <span class="game-meta-pill">⏱ ${g.time}</span>
+      </div>
+    </div>`).join('');
+}
+
+function openGameModal(id){
+  const g=GAMES.find(x=>x.id===id);if(!g)return;
+  document.getElementById('modalTitle').textContent=g.title;
+  document.getElementById('modalBody').innerHTML=`
+    <div class="modal-meta">
+      <div class="game-dom-badge" style="color:${DOM_COLORS[g.domain]};background:${DOM_BG[g.domain]}">${DL[g.domain]}</div>
+      <span class="tb" style="background:var(--bg3);border:1px solid var(--bmed);color:var(--muted)">${DIFF_STARS[g.diff]} ${DIFF_LABELS[g.diff]}</span>
+      <span class="tb" style="background:var(--bg3);border:1px solid var(--bmed);color:var(--muted)">👥 ${g.players}</span>
+      <span class="tb" style="background:var(--bg3);border:1px solid var(--bmed);color:var(--muted)">⏱ ${g.time}</span>
+    </div>
+    <div class="modal-sec"><div class="modal-sec-title">Overview</div><div class="modal-sec-body">${g.desc}</div></div>
+    <div class="modal-sec"><div class="modal-sec-title">Setup</div><div class="modal-sec-body">${g.setup}</div></div>
+    <div class="modal-sec"><div class="modal-sec-title">How to Play</div><div class="modal-sec-body">${g.rules}</div></div>
+    <div class="modal-sec"><div class="modal-sec-title">Variations</div><div class="modal-variants">${g.variations.map(v=>`<div class="modal-variant"><strong>${v.name}:</strong> ${v.text}</div>`).join('')}</div></div>
+    <div class="modal-sec"><div class="modal-sec-title">Teacher Notes</div><div class="modal-sec-body">${g.notes}</div></div>
+    <div style="margin-top:4px"><button class="btn" onclick="window.print()">🖨 Print Game Card</button></div>`;
+  document.getElementById('gameModal').classList.remove('hidden');
+}
+function closeGameModal(){document.getElementById('gameModal').classList.add('hidden');}
+
+/* ═══════════════════════════════════════
+   M4: REPORTS
+═══════════════════════════════════════ */
+function initReports(){renderReports();}
+
+function renderReports(){
+  const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length):0;
+  const pct=n=>sts.length?Math.round((n/sts.length)*100):0;
+  const sts=students;
+
+  // Tier summary cards
+  const tiers=[
+    {key:'t3',label:'Tier 3 — Intensive',color:'var(--t3)',hex:'#f87171'},
+    {key:'t2',label:'Tier 2 — Strategic',color:'var(--t2)',hex:'#fb923c'},
+    {key:'t1',label:'Tier 1 — Benchmark',color:'var(--t1)',hex:'#34d399'}
+  ];
+  document.getElementById('repTierCards').innerHTML=tiers.map(t=>{
+    const arr=sts.filter(s=>s.tier===t.key);
+    const boyAvg=avg(arr.map(s=>s.ir||0).filter(Boolean));
+    return `<div class="rep-card">
+      <div class="rep-card-label">${t.label}</div>
+      <div class="rep-big" style="color:${t.color}">${arr.length}</div>
+      <div class="rep-sub">${pct(arr.length)}% of class · Avg BOY: ${boyAvg||'—'}</div>
+      <div class="rep-bar-wrap"><div class="rep-bar-fill" style="width:${pct(arr.length)}%;background:${t.hex}"></div></div>
+    </div>`;
+  }).join('');
+
+  // Domain gap table
+  const doms=Object.keys(DL);
+  document.getElementById('repDomainTable').innerHTML=doms.map(d=>{
+    const scores=sts.map(s=>s.dom?s.dom[d]:null).filter(x=>x!=null);
+    if(!scores.length)return`<tr><td>${DL[d]}</td><td colspan="4" style="color:var(--dim)">No data</td></tr>`;
+    const a=avg(scores),below=scores.filter(x=>x<70).length;
+    const best=Math.max(...scores),worst=Math.min(...scores);
+    const sc=a>=70?'#34d399':a>=55?'#fb923c':'#f87171';
+    const sbg=a>=70?'rgba(52,211,153,0.1)':a>=55?'rgba(251,146,60,0.1)':'rgba(248,113,113,0.1)';
+    return`<tr>
+      <td style="font-weight:600">${DL[d]}</td>
+      <td><span class="spill" style="color:${sc};background:${sbg}">${a}%</span></td>
+      <td style="font-family:var(--mono);color:${below>0?'var(--t3)':'var(--muted)'}">${below} (${Math.round((below/scores.length)*100)}%)</td>
+      <td style="font-family:var(--mono);color:var(--t1)">${best}%</td>
+      <td style="font-family:var(--mono);color:var(--t3)">${worst}%</td>
+    </tr>`;
+  }).join('');
+
+  // Student progress table
+  document.getElementById('repProgressTable').innerHTML=[...sts].sort((a,b)=>a.name.localeCompare(b.name)).map(s=>{
+    const boy=s.ir||'—',moy=s.irM||'—',eoy=s.irE||'—';
+    const growth=(s.ir&&s.irE)?s.irE-s.ir:null;
+    const gc=growth===null?'var(--dim)':growth>0?'var(--t1)':growth<0?'var(--t3)':'var(--muted)';
+    const gs=growth===null?'—':(growth>0?'+':'')+growth;
+    let topNeed='—';
+    if(s.dom){const e=Object.entries(s.dom).sort((a,b)=>a[1]-b[1]);if(e.length)topNeed=DL[e[0][0]]||e[0][0];}
+    return`<tr>
+      <td style="font-weight:500">${s.name}</td>
+      <td><span class="tb ${s.tier}">${s.tier.toUpperCase()}</span></td>
+      <td style="font-family:var(--mono)">${boy}</td>
+      <td style="font-family:var(--mono)">${moy}</td>
+      <td style="font-family:var(--mono)">${eoy}</td>
+      <td style="font-family:var(--mono);color:${gc}">${gs}</td>
+      <td style="font-size:11px;color:var(--muted)">${topNeed}</td>
+    </tr>`;
+  }).join('');
+}
+
+function exportCSV(){
+  const rows=[['Name','Tier','Period','BOY IR','MOY IR','EOY IR','Growth','Number Sense','Algebra','Ratios','Statistics','Geometry']];
+  students.forEach(s=>{
+    const g=(s.ir&&s.irE)?s.irE-s.ir:'';
+    rows.push([s.name,s.tier,s.pd||'',s.ir||'',s.irM||'',s.irE||'',g,
+      s.dom?s.dom.numSense||'':'',s.dom?s.dom.algebra||'':'',
+      s.dom?s.dom.ratios||'':'',s.dom?s.dom.stats||'':'',s.dom?s.dom.geometry||'':'']);
+  });
+  const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='mathview-export.csv';a.click();
 }
 
 /* ═══════════════════════════════════════
