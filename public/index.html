@@ -268,6 +268,41 @@ tr.sel td{background:rgba(91,141,238,0.08)}
   body{background:#fff;color:#111}
   .ls-body,.ls-title{color:#333}
 }
+/* ── M7: DEMO + IMPORT HUB ── */
+.demo-badge{margin:8px 14px 0;padding:5px 10px;background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.25);border-radius:6px;display:flex;align-items:center;gap:7px;font-size:10px;font-family:var(--mono);color:#fb923c;letter-spacing:.04em}
+.demo-badge-dot{width:6px;height:6px;border-radius:50%;background:#fb923c;flex-shrink:0;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.demo-banner{display:flex;align-items:center;gap:12px;padding:11px 16px;background:rgba(251,146,60,0.07);border:1px solid rgba(251,146,60,0.2);border-radius:10px;margin-bottom:18px}
+.demo-banner-icon{font-size:16px;flex-shrink:0}
+.demo-banner-text{flex:1;font-size:12px;color:var(--text);line-height:1.5}
+.demo-banner-text strong{color:#fb923c}
+.demo-banner-link{font-size:11px;color:var(--accent);cursor:pointer;white-space:nowrap;font-weight:500;text-decoration:underline;flex-shrink:0}
+.demo-banner-close{background:none;border:none;color:var(--dim);font-size:16px;cursor:pointer;line-height:1;padding:0;flex-shrink:0}
+.demo-banner-close:hover{color:var(--muted)}
+.privacy-box{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:8px;margin-bottom:20px}
+.privacy-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.privacy-text{font-size:11px;color:var(--muted);line-height:1.6}
+.privacy-text strong{color:var(--t1)}
+.import-section-title{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);font-family:var(--mono);margin:20px 0 10px;display:flex;align-items:center;gap:10px}
+.import-section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.platform-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:8px}
+.platform-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:border-color .15s,background .15s;display:flex;flex-direction:column;gap:6px}
+.platform-card:hover{border-color:var(--bmed);background:var(--bg3)}
+.platform-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.platform-icon{font-size:20px;line-height:1}
+.platform-cat-badge{font-size:9px;font-family:var(--mono);font-weight:600;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em}
+.cat-assessment{color:#5b8dee;background:rgba(91,141,238,0.1)}
+.cat-lms{color:#a78bfa;background:rgba(167,139,250,0.1)}
+.cat-sis{color:#fb923c;background:rgba(251,146,60,0.1)}
+.cat-rostering{color:#34d399;background:rgba(52,211,153,0.1)}
+.platform-name{font-size:13px;font-weight:600;color:var(--text)}
+.platform-tagline{font-size:11px;color:var(--muted);line-height:1.4;flex:1}
+.platform-btn{margin-top:4px;padding:5px 10px;border-radius:6px;border:1px solid var(--bmed);background:transparent;color:var(--accent);font-size:11px;font-family:var(--sans);cursor:pointer;font-weight:500;transition:background .15s;text-align:left}
+.platform-btn:hover{background:rgba(91,141,238,0.1)}
+.guide-step{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.guide-step-num{width:20px;height:20px;border-radius:50%;background:rgba(91,141,238,0.15);color:var(--accent);font-size:10px;font-family:var(--mono);font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.guide-step-text{font-size:12px;color:var(--text);line-height:1.5}
+.guide-cols{font-size:11px;font-family:var(--mono);color:var(--muted);background:var(--bg3);border-radius:6px;padding:8px 12px;margin:10px 0;line-height:1.7}
 /* ── M6: ANALYTICS ── */
 .a-section-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);font-family:var(--mono);margin:20px 0 10px;display:flex;align-items:center;gap:10px}
 .a-section-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
@@ -366,6 +401,7 @@ tr.sel td{background:rgba(91,141,238,0.08)}
     <div class="slogo-title">MathView</div>
     <div class="slogo-sub">7TH GRADE · INTERVENTION</div>
   </div>
+  <div class="demo-badge"><span class="demo-badge-dot"></span>SAMPLE DATA — DEMO MODE</div>
   <nav class="snav">
     <button class="ni on" data-v="overview" onclick="go('overview',this)"><span class="ni-icon">◎</span>Overview</button>
     <button class="ni" data-v="roster" onclick="go('roster',this)"><span class="ni-icon">◈</span>Roster</button>
@@ -427,6 +463,12 @@ tr.sel td{background:rgba(91,141,238,0.08)}
         <div class="kpi"><div class="kpi-val" style="color:var(--t3)" id="kpi-t3">18</div><div class="kpi-lbl">Tier 3</div><div class="kpi-sub">Intensive support</div></div>
         <div class="kpi"><div class="kpi-val" style="color:var(--t2)" id="kpi-t2">31</div><div class="kpi-lbl">Tier 2</div><div class="kpi-sub">Strategic support</div></div>
         <div class="kpi"><div class="kpi-val" style="color:var(--t1)" id="kpi-t1">45</div><div class="kpi-lbl">Tier 1</div><div class="kpi-sub">On/above grade level</div></div>
+      </div>
+      <div id="demoBanner" class="demo-banner">
+        <span class="demo-banner-icon">🔬</span>
+        <div class="demo-banner-text"><strong>You're viewing sample data.</strong> All 94 students, scores, and insights shown here are fictional and intended for demonstration purposes only. No real student information is displayed.</div>
+        <span class="demo-banner-link" onclick="go('import',document.querySelector('.ni[data-v=import]'))">Import real data →</span>
+        <button class="demo-banner-close" onclick="dismissDemoBanner()" title="Dismiss">✕</button>
       </div>
       <div id="alertsPanel"></div>
       <div class="chart-grid">
@@ -615,7 +657,24 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 
     <!-- IMPORT -->
     <div class="view" id="view-import">
-      <div style="max-width:640px">
+      <!-- Privacy statement -->
+      <div class="privacy-box">
+        <span class="privacy-icon">🔒</span>
+        <div class="privacy-text"><strong>Your student data never leaves this device.</strong> MathView runs entirely in your browser. No data is transmitted to any server, stored in the cloud, or shared with third parties. All information is saved locally to your browser only.</div>
+      </div>
+      <!-- Platform filter tabs -->
+      <div class="frow" id="platformTabs">
+        <span style="font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">Connect from</span>
+        <button class="fb fa" onclick="filterPlatforms('all',this)">All Platforms</button>
+        <button class="fb" onclick="filterPlatforms('assessment',this)"><span style="color:#5b8dee">●</span> Assessment</button>
+        <button class="fb" onclick="filterPlatforms('lms',this)"><span style="color:#a78bfa">●</span> LMS</button>
+        <button class="fb" onclick="filterPlatforms('sis',this)"><span style="color:#fb923c">●</span> SIS</button>
+        <button class="fb" onclick="filterPlatforms('rostering',this)"><span style="color:#34d399">●</span> Rostering</button>
+      </div>
+      <div class="platform-grid" id="platformGrid"></div>
+      <!-- CSV Import -->
+      <div class="import-section-title">Manual CSV Import</div>
+      <div style="max-width:620px">
         <div class="import-zone" id="importZone" onclick="document.getElementById('csvFile').click()">
           <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="handleFile(this.files[0])">
           <div class="import-zone-icon">⬆</div>
@@ -640,6 +699,16 @@ tr.sel td{background:rgba(91,141,238,0.08)}
           <input type="file" id="sessionFile" accept=".json" style="display:none" onchange="loadSession(this.files[0])">
           <button class="btn" onclick="document.getElementById('sessionFile').click()" style="font-size:11px">Load JSON session</button>
         </div>
+      </div>
+    </div>
+    <!-- PLATFORM GUIDE MODAL -->
+    <div class="modal-overlay hidden" id="platformModal" onclick="if(event.target===this)closePlatformModal()">
+      <div class="modal-box">
+        <div class="modal-head">
+          <div class="modal-title" id="platformModalTitle"></div>
+          <button class="modal-close" onclick="closePlatformModal()">✕</button>
+        </div>
+        <div class="modal-body" id="platformModalBody"></div>
       </div>
     </div>
 
@@ -988,7 +1057,7 @@ const TITLES={
   domains:'Skill <em>Domains</em>',growth:'Growth <em>Trends</em>',
   qualdata:'<em>Deeper Insights</em>',analytics:'<em>Analytics</em>',groups:'Group <em>Builder</em>',
   interventions:'Active <em>Interventions</em>',reports:'<em>Reports</em>',
-  lessons:'<em>Lesson Plans</em>',games:'Math <em>Games</em>',import:'Import <em>Data</em>',settings:'<em>Settings</em>',
+  lessons:'<em>Lesson Plans</em>',games:'Math <em>Games</em>',import:'<em>Connect</em> Your Data',settings:'<em>Settings</em>',
 };
 const inited={};
 function go(v,btn){
@@ -1013,6 +1082,7 @@ function boot(v){
   if(v==='settings'){initSettings();}
   if(v==='overview'){renderAlerts();}
   if(v==='analytics'){initAnalytics();}
+  if(v==='import'){initImportHub();}
 }
 
 /* ═══════════════════════════════════════
@@ -1588,6 +1658,150 @@ function renderLessonDetail(){
     <div class="ls"><div class="ls-title">Guided Practice</div><div class="ls-body">${l.prac}</div></div>
     <div class="ls"><div class="ls-title">Closure / Exit Ticket</div><div class="ls-body">${l.close}</div></div>`;
 }
+
+/* ═══════════════════════════════════════
+   M7: DEMO INDICATOR + IMPORT HUB
+═══════════════════════════════════════ */
+function dismissDemoBanner(){
+  const b=document.getElementById('demoBanner');
+  if(b){b.style.display='none';}
+  sessionStorage.setItem('mv_demo_dismissed','1');
+}
+function checkDemoBanner(){
+  if(sessionStorage.getItem('mv_demo_dismissed')){
+    const b=document.getElementById('demoBanner');
+    if(b)b.style.display='none';
+  }
+}
+
+const PLATFORMS=[
+  // ── Assessment (most relevant to this iReady dashboard)
+  {id:'iready',cat:'assessment',name:'iReady',icon:'📊',tagline:'Curriculum Associates diagnostic & instructional data',
+   desc:'iReady is the most direct data source for this dashboard. Export your Diagnostic results to get IR scores, grade-level placements, and all 5 domain performance scores.',
+   cols:['Student Name','Student ID','Overall Scale Score','Grade Level Placement','Domain: Numbers & Operations','Domain: Algebra','Domain: Ratios & Proportional Relationships','Domain: Statistics & Probability','Domain: Geometry'],
+   steps:['Log in at i-ready.com','Go to Reports → Diagnostic → Class Diagnostic Results','Select your class and the assessment window (BOY / MOY / EOY)','Click Export → Download as CSV','Upload the CSV using the Manual Import section below']},
+  {id:'nwea',cat:'assessment',name:'NWEA MAP Growth',icon:'📈',tagline:'Growth & RIT score tracking',
+   desc:'Import MAP Growth scores including RIT scores, Lexile ranges, and goal area performance. MathView can map goal areas to its 5 domain structure.',
+   cols:['Student Name','Student ID','RIT Score','Grade Level','Goal Area Name','Goal Area RIT Score','Test Type'],
+   steps:['Log in to NWEA.org','Go to MAP Growth → Reports → Student Progress Report','Select your class and term','Click Export → CSV','Upload the file below and map RIT Score to the Scale Score column']},
+  {id:'renaissance',cat:'assessment',name:'Renaissance STAR Math',icon:'⭐',tagline:'STAR Math assessment data',
+   desc:'Import STAR Math scores including Scaled Score, Grade Equivalent, and domain strands for targeted intervention planning.',
+   cols:['Student Name','Student ID','Scaled Score','Grade Equivalent','Domain Strand Scores','Performance Level'],
+   steps:['Log in to Renaissance at renaissance.com','Go to STAR Math → Class Reports → Summary','Select your class and date range','Click Download Report → CSV / Excel','Upload the exported file below']},
+  {id:'fastbridge',cat:'assessment',name:'FastBridge (FAST)',icon:'🌉',tagline:'MTSS screening & progress monitoring',
+   desc:'FastBridge aReading and aMath screening data integrates directly with tiered support planning. Import risk levels and composite scores.',
+   cols:['Student Name','Student ID','Composite Score','Risk Level','Domain Scores','Assessment Window'],
+   steps:['Log in to FastBridge Learning','Navigate to Reports → Class Summary','Filter by your math assessment and date range','Click Export → CSV','Upload below and map Risk Level to Tier and Composite Score to Scale Score']},
+  {id:'edulastic',cat:'assessment',name:'Edulastic',icon:'📝',tagline:'Standards-aligned assessment results',
+   desc:'Export Edulastic assessment scores and standards mastery data to track student performance by math standard and domain.',
+   cols:['Student Name','Student ID','Score','Standard Code','Mastery Level','Class Period'],
+   steps:['Log in at edulastic.com','Go to Reports → Class Report or Standards Mastery','Apply your class and assignment filters','Click Download Report → CSV','Upload below']},
+  {id:'illuminate',cat:'assessment',name:'Illuminate Education',icon:'💡',tagline:'Assessment & data management platform',
+   desc:'Import Illuminate assessment results, performance bands, and standards alignment data for full MTSS reporting.',
+   cols:['Student Name','Student ID','Score','Standard','Performance Band','Period'],
+   steps:['Log in to Illuminate Education','Go to Assessments → Results Dashboard','Filter by class and assessment period','Click Export Results → CSV','Upload the file below']},
+  // ── LMS
+  {id:'google',cat:'lms',name:'Google Classroom',icon:'🎓',tagline:'Dominant K-12 LMS — 170M+ users worldwide',
+   desc:'Export your Google Classroom roster and grade data to populate your MathView student list. Pair with an iReady or MAP export for full assessment scores.',
+   cols:['Student Name','Student Email','Student ID','Section / Period','Grade'],
+   steps:['Open Google Classroom and select your class','Go to People tab to view your roster','Use Google Takeout or a rostering tool (e.g., Clever, ClassLink) to export the roster as CSV','Format the CSV with Student Name, Email, and Period','Upload below — then import an assessment CSV separately for IR scores']},
+  {id:'canvas',cat:'lms',name:'Canvas (Instructure)',icon:'🖼',tagline:'Leading district LMS platform',
+   desc:'Export Canvas gradebook and roster data. Canvas integrations are available through most SIS providers and can sync with Clever.',
+   cols:['Student Name','Student ID','Section','Grade','Email'],
+   steps:['Log in to Canvas','Navigate to your Course → Grades','Click the Export button (top right of Grades)','Download the CSV gradebook file','Upload below and map Student Name and Section to MathView fields']},
+  {id:'schoology',cat:'lms',name:'Schoology (PowerSchool)',icon:'🏫',tagline:'Widely adopted K-12 LMS',
+   desc:'Schoology gradebook and roster data can be exported directly. If your district uses PowerSchool SIS, your roster is already synced.',
+   cols:['Student Name','Student ID','Section','Score','Grade'],
+   steps:['Log in at app.schoology.com','Go to your Course → Gradebook','Click the wrench/settings icon → Export Gradebook as CSV','Download the file','Upload below']},
+  {id:'teams',cat:'lms',name:'Microsoft Teams (Education)',icon:'💼',tagline:'Microsoft 365 Education platform',
+   desc:'Export Teams class rosters and assignment grades via Microsoft School Data Sync or directly from Teams Assignments.',
+   cols:['Student Name','Student Email','Grade','Section','Score'],
+   steps:['Open Microsoft Teams → Education, go to your Class','Click Grades at the top','Click Export to Excel → save as CSV','Upload below — pair with NWEA or STAR data for assessment scores']},
+  {id:'seesaw',cat:'lms',name:'Seesaw',icon:'🔭',tagline:'Popular K-5/6 portfolio & LMS',
+   desc:'Export Seesaw student rosters and class lists to populate the MathView roster for younger intervention groups.',
+   cols:['Student Name','Student Email','Grade Level','Period / Class'],
+   steps:['Log in at app.seesaw.me','Go to your class → Class Settings → Students','Use the export or print roster option','Format as CSV with Name, Grade, and Period','Upload below']},
+  // ── SIS
+  {id:'powerschool',cat:'sis',name:'PowerSchool',icon:'⚡',tagline:'#1 K-12 SIS — 50M+ students',
+   desc:'PowerSchool is the most widely used SIS in the US. Export your class section roster to instantly populate your MathView student list.',
+   cols:['Student Name','Student Number','Grade Level','Section','Period','Teacher'],
+   steps:['Log in to PowerSchool admin or teacher portal','Go to Reports → Class Roster or Student Data Export','Select fields: Student Name, ID, Grade, Period, Section','Export as CSV','Upload below']},
+  {id:'infinitecampus',cat:'sis',name:'Infinite Campus',icon:'🏛',tagline:'#2 K-12 SIS — 2,000+ districts',
+   desc:'Export class rosters and student enrollment data from Infinite Campus using Ad Hoc Reports or the Roster Export tool.',
+   cols:['Student Name','Student ID','Grade','Section','Period','Demographics'],
+   steps:['Log in to Infinite Campus','Go to Ad Hoc Reporting → Query Wizard or Scheduling → Roster Reports','Set up a query for Students by Section with Name, ID, Grade, Period','Export as CSV','Upload below']},
+  {id:'skyward',cat:'sis',name:'Skyward',icon:'🌤',tagline:'K-12 SIS & ERP system',
+   desc:'Export student and enrollment data from Skyward Student Management System including period assignments and demographic info.',
+   cols:['Student Name','Student ID','Grade Level','Period','Teacher Name'],
+   steps:['Log in to Skyward','Go to Student Management → Educator Access Plus','Open your class section roster','Use Report → Export to export as CSV or Excel','Upload below']},
+  {id:'aeries',cat:'sis',name:'Aeries SIS',icon:'🌬',tagline:'K-12 SIS — common in California districts',
+   desc:'Export your Aeries student roster and section data for your intervention math classes.',
+   cols:['Student Name','Student ID','Grade','Period','Section','Counselor'],
+   steps:['Log in to Aeries','Go to Navigation → Reports → Student Data Export or Roster Print','Select your section and choose Student Name, ID, Grade, Period fields','Download as CSV','Upload below']},
+  // ── Rostering
+  {id:'clever',cat:'rostering',name:'Clever',icon:'🔗',tagline:'District rostering hub — 65,000+ schools',
+   desc:'Clever automatically syncs district SIS data into connected apps. Export your Clever-synced class roster directly for any section.',
+   cols:['Student Name','Student ID','Grade','Section','Email','Teacher'],
+   steps:['Log in at clever.com with your district account','Go to Applications → Data Browser','Select your school → Sections → find your math class','Export student list as CSV','Upload below']},
+  {id:'classlink',cat:'rostering',name:'ClassLink',icon:'🔐',tagline:'Rostering & SSO — 20M+ users',
+   desc:'ClassLink Roster Server syncs student data from your district SIS. Export your class section to get a roster CSV.',
+   cols:['Student Name','Student ID','Grade','Section','Email'],
+   steps:['Log in at launchpad.classlink.com','Navigate to OneSync → Roster Server → Students','Filter by your school and math class section','Export as CSV','Upload below']},
+];
+
+const CAT_LABELS={assessment:'Assessment',lms:'LMS',sis:'SIS',rostering:'Rostering'};
+let pfFilter='all';
+
+function initImportHub(){
+  renderPlatformGrid();
+}
+
+function filterPlatforms(cat,btn){
+  pfFilter=cat;
+  document.querySelectorAll('#platformTabs .fb').forEach(b=>b.classList.remove('fa'));
+  btn.classList.add('fa');
+  renderPlatformGrid();
+}
+
+function renderPlatformGrid(){
+  const grid=document.getElementById('platformGrid');
+  const list=pfFilter==='all'?PLATFORMS:PLATFORMS.filter(p=>p.cat===pfFilter);
+  grid.innerHTML=list.map(p=>`
+    <div class="platform-card">
+      <div class="platform-card-top">
+        <span class="platform-icon">${p.icon}</span>
+        <span class="platform-cat-badge cat-${p.cat}">${CAT_LABELS[p.cat]}</span>
+      </div>
+      <div class="platform-name">${p.name}</div>
+      <div class="platform-tagline">${p.tagline}</div>
+      <button class="platform-btn" onclick="openPlatformGuide('${p.id}')">Export guide →</button>
+    </div>`).join('');
+}
+
+function openPlatformGuide(id){
+  const p=PLATFORMS.find(x=>x.id===id);if(!p)return;
+  document.getElementById('platformModalTitle').innerHTML=`${p.icon} ${p.name} — Export Guide`;
+  document.getElementById('platformModalBody').innerHTML=`
+    <div class="modal-meta">
+      <span class="platform-cat-badge cat-${p.cat}" style="font-size:11px;padding:3px 8px">${CAT_LABELS[p.cat]}</span>
+    </div>
+    <div class="modal-sec"><div class="modal-sec-title">What you get</div><div class="modal-sec-body">${p.desc}</div></div>
+    <div class="modal-sec">
+      <div class="modal-sec-title">Expected columns in your export</div>
+      <div class="guide-cols">${p.cols.join(' · ')}</div>
+    </div>
+    <div class="modal-sec">
+      <div class="modal-sec-title">How to export from ${p.name}</div>
+      ${p.steps.map((s,i)=>`<div class="guide-step"><div class="guide-step-num">${i+1}</div><div class="guide-step-text">${s}</div></div>`).join('')}
+    </div>
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btnp" onclick="closePlatformGuide()">Got it — upload CSV below</button>
+    </div>`;
+  document.getElementById('platformModal').classList.remove('hidden');
+}
+
+function closePlatformModal(){document.getElementById('platformModal').classList.add('hidden');}
+function closePlatformGuide(){closePlatformModal();}
 
 /* ═══════════════════════════════════════
    M6: ANALYTICS
