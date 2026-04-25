@@ -185,6 +185,60 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 .import-status.err{background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2)}
 .import-preview{font-size:10px;font-family:var(--mono);color:var(--dim);margin-top:8px;white-space:pre-wrap}
 
+/* ── M2: DOMAINS ── */
+.dom-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
+.dom-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.dom-card-name{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-family:var(--mono);margin-bottom:10px}
+.dom-avg{font-family:var(--mono);font-size:26px;font-weight:400;line-height:1}
+.dom-pct{font-size:10px;color:var(--dim);font-family:var(--mono);margin-top:3px}
+.heat-table{width:100%;border-collapse:separate;border-spacing:3px;margin-top:8px}
+.heat-table th{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);font-weight:500;text-align:center;padding:4px;background:none;border:none;position:static}
+.heat-table td{text-align:center;border-radius:5px;padding:8px 4px;font-size:11px;font-family:var(--mono);border:none}
+/* ── M2: GROWTH ── */
+.growth-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.growth-full{grid-column:1/-1}
+/* ── M2: QUAL DATA ── */
+.qual-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.qual-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.qual-cat-title{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-family:var(--mono);margin-bottom:10px}
+.qual-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.qual-bar-label{font-size:10px;color:var(--muted);width:160px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qual-bar-wrap{flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.qual-bar-fill{height:100%;border-radius:3px}
+.qual-count{font-size:9px;font-family:var(--mono);color:var(--dim);width:20px;text-align:right}
+.flag-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.flag-row:last-child{border-bottom:none}
+.flag-name{font-size:12px;color:var(--text);font-weight:500;min-width:130px;flex-shrink:0}
+.flag-tags{display:flex;flex-wrap:wrap;gap:3px}
+/* ── M2: GROUPS ── */
+.group-layout{display:grid;grid-template-columns:260px 1fr;gap:14px}
+.group-sidebar{display:flex;flex-direction:column;gap:8px}
+.group-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.group-card:hover,.group-card.sel{border-color:rgba(91,141,238,0.4)}
+.group-card.sel{background:rgba(91,141,238,0.06)}
+.group-card-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px}
+.group-card-meta{font-size:10px;font-family:var(--mono);color:var(--dim)}
+.group-detail-panel{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.group-name-inp{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:6px 10px;outline:none;font-family:var(--sans)}
+.group-name-inp:focus{border-color:rgba(91,141,238,0.4)}
+.group-member{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
+.group-member:last-child{border-bottom:none}
+.group-member-name{flex:1;font-size:12px;color:var(--text)}
+.group-member-meta{font-size:10px;font-family:var(--mono);color:var(--dim)}
+/* ── M2: INTERVENTIONS ── */
+.int-layout{display:grid;grid-template-columns:1fr 300px;gap:14px}
+.int-row{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);transition:background .1s}
+.int-row:hover{background:var(--bg3)}
+.int-name{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px}
+.int-meta{font-size:10px;font-family:var(--mono);color:var(--dim)}
+.int-badge{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:4px;font-weight:600;flex-shrink:0;margin-top:2px}
+.int-active{background:rgba(91,141,238,0.1);color:var(--accent);border:1px solid rgba(91,141,238,0.25)}
+.int-overdue{background:rgba(248,113,113,0.1);color:var(--t3);border:1px solid rgba(248,113,113,0.25)}
+.int-form{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.int-field{margin-bottom:10px}
+.int-label{font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.int-select,.int-text{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:6px 9px;outline:none;font-family:var(--sans)}
+.int-select:focus,.int-text:focus{border-color:rgba(91,141,238,0.4)}
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -290,51 +344,73 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 
     <!-- DOMAINS -->
     <div class="view" id="view-domains">
-      <div class="coming-shell">
-        <div class="coming-icon">⬡</div>
-        <div class="coming-title">Skill Domain Analysis</div>
-        <div class="coming-tag">Coming in Sprint M2</div>
-        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">Domain-level heat maps, class-wide proficiency by subdomain (Number Sense, Algebra, Ratios, Statistics, Geometry), and research-backed teacher learning links.</p>
-      </div>
+      <div class="dom-grid" id="domCards"></div>
+      <div class="chart-card"><div class="chart-title">Domain proficiency by period (avg %)</div><div id="heatGrid" style="overflow-x:auto"></div></div>
     </div>
 
     <!-- GROWTH -->
     <div class="view" id="view-growth">
-      <div class="coming-shell">
-        <div class="coming-icon">↗</div>
-        <div class="coming-title">Growth Trends</div>
-        <div class="coming-tag">Coming in Sprint M2</div>
-        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">BOY → MOY → EOY iReady growth by tier, top movers bar chart, and score vs. growth scatter plot with bubble sizing by state test level.</p>
+      <div class="kpi-row" id="growthKpis"></div>
+      <div class="growth-grid">
+        <div class="chart-card growth-full"><div class="chart-title">iReady trajectory — BOY → MOY → EOY by tier</div><div class="chart-wrap"><canvas id="c-growth-line"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Top 10 movers (BOY → EOY gain)</div><div class="chart-wrap"><canvas id="c-growth-movers"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">BOY score vs. MOY growth</div><div class="chart-wrap"><canvas id="c-growth-scatter"></canvas></div></div>
       </div>
     </div>
 
     <!-- QUAL DATA -->
     <div class="view" id="view-qualdata">
-      <div class="coming-shell">
-        <div class="coming-icon">◷</div>
-        <div class="coming-title">Qualitative Data</div>
-        <div class="coming-tag">Coming in Sprint M2</div>
-        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">Class-wide qualitative tag view, counselor flag panel, observation notes, and tag frequency analytics across Academic, Behavioral, SEL, Family, Language, and IEP/504 categories.</p>
+      <div class="qual-grid">
+        <div class="qual-card"><div class="qual-cat-title">Top concern tags</div><div id="qualConcernBars"></div></div>
+        <div class="qual-card"><div class="qual-cat-title">Top strength tags</div><div id="qualStrengthBars"></div></div>
+        <div class="qual-card" style="grid-column:1/-1"><div class="qual-cat-title">Flagged students — 3+ concern indicators</div><div id="qualFlagged"></div></div>
       </div>
     </div>
 
     <!-- GROUPS -->
     <div class="view" id="view-groups">
-      <div class="coming-shell">
-        <div class="coming-icon">⊞</div>
-        <div class="coming-title">Group Builder</div>
-        <div class="coming-tag">Coming in Sprint M2</div>
-        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">Build intervention groups by tier and period. Add/remove students, set focus skills, view group composition at a glance.</p>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+        <input class="group-name-inp" id="newGroupName" placeholder="Group name (e.g. T3 Pd 3 Algebra Pull-out)…" style="max-width:320px">
+        <select class="col-select" id="newGroupTier" style="width:110px">
+          <option value="all">All tiers</option><option value="t3">Tier 3</option><option value="t2">Tier 2</option><option value="t1">Tier 1</option>
+        </select>
+        <select class="col-select" id="newGroupPeriod" style="width:110px">
+          <option value="all">All periods</option><option value="2">Period 2</option><option value="3">Period 3</option><option value="4">Period 4</option><option value="5">Period 5</option>
+        </select>
+        <button class="btn btnp" onclick="createGroup()">+ Create group</button>
+      </div>
+      <div class="group-layout">
+        <div class="group-sidebar" id="groupList"><div style="color:var(--dim);font-size:12px;padding:12px 0">No groups yet.</div></div>
+        <div class="group-detail-panel" id="groupDetail"><div style="color:var(--dim);font-size:12px;text-align:center;padding:40px">← Select a group to view or edit</div></div>
       </div>
     </div>
 
     <!-- INTERVENTIONS -->
     <div class="view" id="view-interventions">
-      <div class="coming-shell">
-        <div class="coming-icon">⚡</div>
-        <div class="coming-title">Active Interventions</div>
-        <div class="coming-tag">Coming in Sprint M2</div>
-        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">Log and track active interventions per student. Set frequency, focus domain, start date, and progress notes. Flag students overdue for reassessment.</p>
+      <div class="int-layout">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:11px;color:var(--muted)">Active intervention logs</div>
+            <button class="btn btnp" style="font-size:11px" onclick="openIntForm()">+ Log intervention</button>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden"><div id="intList"></div></div>
+        </div>
+        <div class="int-form" id="intForm">
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px">Log intervention</div>
+          <div class="int-field"><div class="int-label">Student</div><select class="int-select" id="intStudent"></select></div>
+          <div class="int-field"><div class="int-label">Focus domain</div>
+            <select class="int-select" id="intDomain">
+              <option value="numSense">Number Sense</option><option value="algebra">Algebra</option>
+              <option value="ratios">Ratios & Proportions</option><option value="stats">Statistics</option><option value="geometry">Geometry</option>
+            </select></div>
+          <div class="int-field"><div class="int-label">Frequency</div>
+            <select class="int-select" id="intFreq">
+              <option>1x/week</option><option>2x/week</option><option selected>3x/week</option><option>Daily</option><option>As needed</option>
+            </select></div>
+          <div class="int-field"><div class="int-label">Start date</div><input type="date" class="int-text" id="intDate"></div>
+          <div class="int-field"><div class="int-label">Notes</div><textarea class="int-text" id="intNotes" rows="3" placeholder="Strategy, materials, co-teacher…" style="resize:vertical"></textarea></div>
+          <button class="btn btnp" style="width:100%" onclick="saveIntervention()">Save</button>
+        </div>
       </div>
     </div>
 
@@ -632,6 +708,11 @@ function go(v,btn){
 function boot(v){
   if(v==='overview'){initOverviewCharts();}
   if(v==='roster'){renderT('all');}
+  if(v==='domains'){initDomains();}
+  if(v==='growth'){initGrowth();}
+  if(v==='qualdata'){initQualData();}
+  if(v==='groups'){initGroups();}
+  if(v==='interventions'){initInterventions();}
 }
 
 /* ═══════════════════════════════════════
@@ -681,6 +762,8 @@ function setPeriod(pd,btn){
   btn.classList.add('on');
   renderT(af);updateKPIs();
   if(inited['overview']){const base=pd==='all'?students:students.filter(s=>s.pd===pd);renderOverviewCharts(base);}
+  const cv=document.querySelector('.view.on')?.id?.replace('view-','');
+  if(cv&&['domains','growth','qualdata','interventions'].includes(cv)){delete inited[cv];inited[cv]=true;boot(cv);}
 }
 function filteredStudents(tier){
   let list=tier==='all'?[...students]:students.filter(s=>s.tier===tier);
@@ -961,6 +1044,203 @@ function showToast(msg,color){
   t.classList.add('vis');clearTimeout(t._to);
   t._to=setTimeout(()=>t.classList.remove('vis'),2200);
 }
+
+/* ═══════════════════════════════════════
+   M2 DATA
+═══════════════════════════════════════ */
+let groups=JSON.parse(localStorage.getItem('mathview_groups')||'[]');
+let interventions=JSON.parse(localStorage.getItem('mathview_ints')||'[]');
+let selGroupId=null;
+function saveGroups(){localStorage.setItem('mathview_groups',JSON.stringify(groups));}
+function saveInts(){localStorage.setItem('mathview_ints',JSON.stringify(interventions));}
+
+/* ═══════════════════════════════════════
+   M2: DOMAINS
+═══════════════════════════════════════ */
+function initDomains(){
+  const domKeys=['numSense','algebra','ratios','stats','geometry'];
+  const domLabels=['Number Sense','Algebra','Ratios','Statistics','Geometry'];
+  const domColors=['#f87171','#a78bfa','#5b8dee','#fb923c','#34d399'];
+  const base=activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod);
+  const cards=document.getElementById('domCards');
+  if(cards)cards.innerHTML=domKeys.map((k,i)=>{
+    const avg=Math.round(base.reduce((s,x)=>s+x.dom[k],0)/base.length);
+    const below=Math.round(base.filter(s=>s.dom[k]<70).length/base.length*100);
+    return `<div class="dom-card" style="border-top:3px solid ${domColors[i]}">
+      <div class="dom-card-name">${domLabels[i]}</div>
+      <div class="dom-avg" style="color:${domColors[i]}">${avg}%</div>
+      <div class="dom-pct">${below}% below proficiency</div>
+      <div style="margin-top:10px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${avg}%;background:${domColors[i]};border-radius:2px;opacity:.7"></div>
+      </div>
+    </div>`;
+  }).join('');
+  const heat=document.getElementById('heatGrid');
+  if(heat){
+    const rows=[2,3,4,5].map(pd=>{
+      const ps=students.filter(s=>s.pd===pd);
+      const cells=domKeys.map((k,i)=>{
+        const avg=Math.round(ps.reduce((s,x)=>s+x.dom[k],0)/ps.length);
+        return `<td style="background:${domColors[i]};opacity:${0.18+avg/100*0.55};color:#fff;font-weight:500">Pd ${pd===2&&i===0?'':''} ${avg}%</td>`;
+      }).join('');
+      return `<tr><td style="font-size:10px;font-family:var(--mono);color:var(--muted);padding:6px 12px 6px 0;white-space:nowrap;border:none;background:none">Period ${pd}</td>${cells}</tr>`;
+    }).join('');
+    heat.innerHTML=`<table class="heat-table"><thead><tr><th></th>${domLabels.map(l=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
+  }
+}
+
+/* ═══════════════════════════════════════
+   M2: GROWTH
+═══════════════════════════════════════ */
+const growthCharts={};
+function initGrowth(){
+  const base=activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod);
+  const kpis=document.getElementById('growthKpis');
+  if(kpis){
+    const avg=arr=>Math.round(arr.reduce((s,x)=>s+x,0)/arr.length);
+    const boy=avg(base.map(s=>s.ir)),moy=avg(base.map(s=>s.irM)),eoy=avg(base.map(s=>s.irE));
+    kpis.innerHTML=`<div class="kpi"><div class="kpi-val" style="font-size:22px">${boy}</div><div class="kpi-lbl">Avg BOY</div><div class="kpi-sub">Beginning of year</div></div>
+    <div class="kpi"><div class="kpi-val" style="font-size:22px">${moy}</div><div class="kpi-lbl">Avg MOY</div><div class="kpi-sub">Mid-year</div></div>
+    <div class="kpi"><div class="kpi-val" style="font-size:22px">${eoy}</div><div class="kpi-lbl">Avg EOY</div><div class="kpi-sub">End of year</div></div>
+    <div class="kpi"><div class="kpi-val" style="font-size:22px;color:var(--t1)">+${eoy-boy}</div><div class="kpi-lbl">Avg Growth</div><div class="kpi-sub">BOY → EOY</div></div>`;
+  }
+  ['c-growth-line','c-growth-movers','c-growth-scatter'].forEach(id=>{if(growthCharts[id]){growthCharts[id].destroy();delete growthCharts[id];}});
+  const tierColors={t3:'#f87171',t2:'#fb923c',t1:'#34d399'};
+  const datasets=[{key:'t3',label:'Tier 3'},{key:'t2',label:'Tier 2'},{key:'t1',label:'Tier 1'},{key:'all',label:'All'}].map(({key,label})=>{
+    const sub=key==='all'?base:base.filter(s=>s.tier===key);if(!sub.length)return null;
+    const avg=arr=>Math.round(arr.reduce((s,x)=>s+x,0)/arr.length);
+    const c=key==='all'?'#5b8dee':tierColors[key];
+    return {label,data:[avg(sub.map(s=>s.ir)),avg(sub.map(s=>s.irM)),avg(sub.map(s=>s.irE))],borderColor:c,backgroundColor:c+'22',tension:.35,pointRadius:5,pointHoverRadius:7,fill:false};
+  }).filter(Boolean);
+  const c1=mkChart('c-growth-line',{type:'line',data:{labels:['BOY','MOY','EOY'],datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7a8099',font:{size:10}}},tooltip:{...TT}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#7a8099'}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}}}}}});
+  if(c1)growthCharts['c-growth-line']=c1;
+  const movers=[...base].sort((a,b)=>(b.irE-b.ir)-(a.irE-a.ir)).slice(0,10);
+  const c2=mkChart('c-growth-movers',{type:'bar',data:{labels:movers.map(s=>s.name.split(' ')[0]+' '+s.name.split(' ').pop()[0]+'.'),datasets:[{data:movers.map(s=>s.irE-s.ir),backgroundColor:movers.map(s=>tierColors[s.tier]),borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` +${c.parsed.y} pts`}}},scales:{x:{grid:{display:false},ticks:{color:'#7a8099',font:{size:9},maxRotation:35}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}}}}}});
+  if(c2)growthCharts['c-growth-movers']=c2;
+  const tierDs=['t3','t2','t1'].map((t,i)=>({
+    label:['Tier 3','Tier 2','Tier 1'][i],
+    data:base.filter(s=>s.tier===t).map(s=>({x:s.ir,y:s.irE-s.ir})),
+    backgroundColor:[tierColors.t3,tierColors.t2,tierColors.t1][i]+'99',pointRadius:5,pointHoverRadius:7
+  }));
+  const c3=mkChart('c-growth-scatter',{type:'scatter',data:{datasets:tierDs},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7a8099',font:{size:10}}},tooltip:{...TT,callbacks:{label:c=>`BOY: ${c.parsed.x}  Growth: +${c.parsed.y}`}}},scales:{x:{title:{display:true,text:'BOY Score',color:'#7a8099',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}}},y:{title:{display:true,text:'Growth (pts)',color:'#7a8099',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}}}}}});
+  if(c3)growthCharts['c-growth-scatter']=c3;
+}
+
+/* ═══════════════════════════════════════
+   M2: QUAL DATA
+═══════════════════════════════════════ */
+function initQualData(){
+  const base=activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod);
+  const concerns={},strengths={};
+  base.forEach(s=>s.tags.forEach(t=>{
+    const cls=TQ[t]||'qn';
+    if(cls==='qc')concerns[t]=(concerns[t]||0)+1;
+    if(cls==='qp')strengths[t]=(strengths[t]||0)+1;
+  }));
+  const topC=Object.entries(concerns).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const topS=Object.entries(strengths).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const bars=(items,max,color)=>items.map(([t,n])=>`<div class="qual-bar-row"><span class="qual-bar-label" title="${t}">${t}</span><div class="qual-bar-wrap"><div class="qual-bar-fill" style="width:${Math.round(n/max*100)}%;background:${color}"></div></div><span class="qual-count">${n}</span></div>`).join('');
+  const cEl=document.getElementById('qualConcernBars');
+  if(cEl)cEl.innerHTML=topC.length?bars(topC,topC[0][1],'#f87171'):'<div style="color:var(--dim);font-size:11px">None</div>';
+  const sEl=document.getElementById('qualStrengthBars');
+  if(sEl)sEl.innerHTML=topS.length?bars(topS,topS[0][1],'#34d399'):'<div style="color:var(--dim);font-size:11px">None</div>';
+  const flagged=base.filter(s=>s.tags.filter(t=>(TQ[t]||'qn')==='qc').length>=3).sort((a,b)=>b.tags.filter(t=>(TQ[t]||'qn')==='qc').length-a.tags.filter(t=>(TQ[t]||'qn')==='qc').length);
+  const fEl=document.getElementById('qualFlagged');
+  if(fEl)fEl.innerHTML=flagged.length?flagged.map(s=>`<div class="flag-row"><div><div class="flag-name">${s.name}</div><div style="font-size:10px;font-family:var(--mono);color:var(--dim)">Pd ${s.pd} · ${s.tier.toUpperCase()}</div></div><div class="flag-tags">${s.tags.filter(t=>(TQ[t]||'qn')==='qc').map(t=>`<span class="qtag-rm qc">${t}</span>`).join('')}</div></div>`).join(''):'<div style="color:var(--dim);font-size:11px;padding:8px 0">No students with 3+ concern flags.</div>';
+}
+
+/* ═══════════════════════════════════════
+   M2: GROUPS
+═══════════════════════════════════════ */
+function initGroups(){renderGroupList();renderGroupDetail();}
+function createGroup(){
+  const name=document.getElementById('newGroupName').value.trim();
+  if(!name){showToast('Enter a group name','#f87171');return;}
+  const tier=document.getElementById('newGroupTier').value;
+  const pd=document.getElementById('newGroupPeriod').value;
+  const members=students.filter(s=>(tier==='all'||s.tier===tier)&&(pd==='all'||s.pd===parseInt(pd))).map(s=>s.id);
+  const g={id:Date.now(),name,tier,pd,members,created:new Date().toISOString().slice(0,10)};
+  groups.push(g);saveGroups();selGroupId=g.id;
+  document.getElementById('newGroupName').value='';
+  renderGroupList();renderGroupDetail();showToast('Group created','#34d399');
+}
+function renderGroupList(){
+  const el=document.getElementById('groupList');if(!el)return;
+  if(!groups.length){el.innerHTML='<div style="color:var(--dim);font-size:12px;padding:12px 0">No groups yet.</div>';return;}
+  el.innerHTML=groups.map(g=>`<div class="group-card${selGroupId===g.id?' sel':''}" onclick="selGroup(${g.id})">
+    <div class="group-card-name">${g.name}</div>
+    <div class="group-card-meta">${g.members.length} students · ${g.created}</div>
+    <div style="margin-top:5px;display:flex;gap:4px">${g.tier!=='all'?`<span class="tb ${g.tier}" style="font-size:9px">${g.tier.toUpperCase()}</span>`:''} ${g.pd!=='all'?`<span style="font-size:9px;font-family:var(--mono);color:var(--dim)">Pd ${g.pd}</span>`:''}</div>
+  </div>`).join('');
+}
+function selGroup(id){selGroupId=id;renderGroupList();renderGroupDetail();}
+function renderGroupDetail(){
+  const el=document.getElementById('groupDetail');if(!el)return;
+  const g=groups.find(x=>x.id===selGroupId);
+  if(!g){el.innerHTML='<div style="color:var(--dim);font-size:12px;text-align:center;padding:40px">← Select a group</div>';return;}
+  const members=students.filter(s=>g.members.includes(s.id));
+  const avail=students.filter(s=>!g.members.includes(s.id)&&(g.tier==='all'||s.tier===g.tier)&&(g.pd==='all'||s.pd===parseInt(g.pd))).slice(0,30);
+  const mRow=s=>`<div class="group-member"><span class="tb ${s.tier}" style="font-size:9px">${s.tier.toUpperCase()}</span><span class="group-member-name">${s.name}</span><span class="group-member-meta">Pd ${s.pd} · ${s.ir}</span>`;
+  el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div style="font-size:14px;font-weight:500">${g.name}</div>
+    <button class="btn" style="font-size:10px;color:var(--t3)" onclick="deleteGroup(${g.id})">Delete</button>
+  </div>
+  <div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Members (${members.length})</div>
+  <div style="background:var(--bg3);border-radius:8px;padding:8px 12px;margin-bottom:14px;max-height:220px;overflow-y:auto">
+    ${members.length?members.map(s=>mRow(s)+`<button class="btn" style="font-size:9px;padding:2px 7px;color:var(--dim)" onclick="removeFromGroup(${g.id},${s.id})">✕</button></div>`).join(''):'<div style="color:var(--dim);font-size:11px;padding:6px 0">No members.</div>'}
+  </div>
+  ${avail.length?`<div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Add students</div>
+  <div style="max-height:160px;overflow-y:auto">${avail.map(s=>mRow(s)+`<button class="btn btnp" style="font-size:9px;padding:2px 7px" onclick="addToGroup(${g.id},${s.id})">+</button></div>`).join('')}</div>`:''}`;
+}
+function addToGroup(gid,sid){const g=groups.find(x=>x.id===gid);if(g&&!g.members.includes(sid)){g.members.push(sid);saveGroups();renderGroupDetail();renderGroupList();}}
+function removeFromGroup(gid,sid){const g=groups.find(x=>x.id===gid);if(g){g.members=g.members.filter(x=>x!==sid);saveGroups();renderGroupDetail();renderGroupList();}}
+function deleteGroup(id){if(!confirm('Delete this group?'))return;groups=groups.filter(x=>x.id!==id);saveGroups();selGroupId=null;renderGroupList();renderGroupDetail();}
+
+/* ═══════════════════════════════════════
+   M2: INTERVENTIONS
+═══════════════════════════════════════ */
+function initInterventions(){
+  const sel=document.getElementById('intStudent');
+  if(sel){
+    const base=(activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod)).slice().sort((a,b)=>a.name.localeCompare(b.name));
+    sel.innerHTML=base.map(s=>`<option value="${s.id}">${s.name} (Pd ${s.pd} · ${s.tier.toUpperCase()})</option>`).join('');
+  }
+  const d=document.getElementById('intDate');if(d&&!d.value)d.value=new Date().toISOString().slice(0,10);
+  renderIntList();
+}
+function renderIntList(){
+  const el=document.getElementById('intList');if(!el)return;
+  if(!interventions.length){el.innerHTML='<div style="color:var(--dim);font-size:12px;padding:24px;text-align:center">No interventions logged yet.</div>';return;}
+  const now=new Date();
+  el.innerHTML=[...interventions].reverse().map(iv=>{
+    const s=students.find(x=>x.id===iv.sid);if(!s)return '';
+    const weeks=Math.floor((now-new Date(iv.date))/(1000*60*60*24*7));
+    const ov=weeks>=4;
+    return `<div class="int-row">
+      <span class="int-badge ${ov?'int-overdue':'int-active'}">${ov?'OVERDUE':'ACTIVE'}</span>
+      <div style="flex:1">
+        <div class="int-name">${s.name}</div>
+        <div class="int-meta">Pd ${s.pd} · ${DL[iv.domain]||iv.domain} · ${iv.freq} · Started ${iv.date}${ov?` · <span style="color:var(--t3)">${weeks}w ago</span>`:''}</div>
+        ${iv.notes?`<div style="font-size:11px;color:var(--muted);margin-top:3px">${iv.notes}</div>`:''}
+      </div>
+      <button class="btn" style="font-size:9px;padding:2px 7px;color:var(--dim)" onclick="removeInt(${iv.id})">✕</button>
+    </div>`;
+  }).join('');
+}
+function openIntForm(){document.getElementById('intForm').scrollIntoView({behavior:'smooth'});}
+function saveIntervention(){
+  const sid=parseInt(document.getElementById('intStudent').value);
+  const domain=document.getElementById('intDomain').value;
+  const freq=document.getElementById('intFreq').value;
+  const date=document.getElementById('intDate').value;
+  const notes=document.getElementById('intNotes').value.trim();
+  if(!sid||!date){showToast('Select student and date','#f87171');return;}
+  interventions.push({id:Date.now(),sid,domain,freq,date,notes});
+  saveInts();renderIntList();
+  document.getElementById('intNotes').value='';
+  showToast('Intervention logged','#34d399');
+}
+function removeInt(id){interventions=interventions.filter(x=>x.id!==id);saveInts();renderIntList();}
 
 /* ═══════════════════════════════════════
    INIT
