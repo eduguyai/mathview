@@ -1,0 +1,15 @@
+{
+  "name": "mathview",
+  "version": "1.0.0",
+  "description": "MathView — 7th Grade Math Intervention Dashboard",
+  "scripts": {
+    "start": "node backend/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}

@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MathView — 7th Grade Intervention Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161a24;--bg3:#1d2230;--bg4:#242838;
+  --accent:#5b8dee;--accent2:#a78bfa;
+  --t3:#f87171;--t3b:rgba(248,113,113,0.08);--t3d:rgba(248,113,113,0.25);
+  --t2:#fb923c;--t2b:rgba(251,146,60,0.08);--t2d:rgba(251,146,60,0.25);
+  --t1:#34d399;--t1b:rgba(52,211,153,0.08);--t1d:rgba(52,211,153,0.25);
+  --text:#e8eaf0;--muted:#7a8099;--dim:#4a5068;
+  --border:rgba(255,255,255,0.06);--bmed:rgba(255,255,255,0.1);
+  --sans:'DM Sans',sans-serif;--serif:'Fraunces',serif;--mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden;font-size:13px}
+
+/* ── SHELL ── */
+.shell{display:flex;width:100%;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:200px;min-width:200px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.slogo{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.slogo-title{font-family:var(--serif);font-size:17px;font-weight:500;color:var(--text)}
+.slogo-sub{font-size:10px;font-family:var(--mono);color:var(--dim);margin-top:2px;letter-spacing:.05em}
+.snav{flex:1;overflow-y:auto;padding:8px 0}
+.ni{display:flex;align-items:center;gap:9px;padding:7px 14px;cursor:pointer;border-radius:6px;margin:1px 6px;color:var(--muted);font-size:12px;font-weight:500;transition:background .15s,color .15s;user-select:none;border:none;background:transparent;width:calc(100% - 12px);text-align:left}
+.ni:hover{background:var(--bg3);color:var(--text)}
+.ni.on{background:rgba(91,141,238,0.12);color:var(--accent)}
+.ni-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.sdiv{height:1px;background:var(--border);margin:6px 14px}
+
+/* ── PERSIST BAR ── */
+.persist-bar{padding:10px 14px;border-top:1px solid var(--border);background:var(--bg2)}
+#persistBar{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+#persistBar.unsaved #persistDot{background:var(--t2)}
+.persist-dot{width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0;transition:background .3s}
+.persist-msg{font-size:10px;font-family:var(--mono);color:var(--muted)}
+.persist-btns{display:flex;gap:5px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:5px 12px;border-radius:6px;border:1px solid var(--bmed);background:var(--bg3);color:var(--text);font-size:11px;font-family:var(--sans);font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;white-space:nowrap}
+.btn:hover{background:var(--bg4)}
+.btnp{background:rgba(91,141,238,0.12);border-color:rgba(91,141,238,0.3);color:var(--accent)}
+.btnp:hover{background:rgba(91,141,238,0.2)}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{display:flex;align-items:center;gap:14px;padding:0 22px;height:52px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.vtitle{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--text);flex:1}
+.vtitle em{font-style:italic;color:var(--accent)}
+
+/* ── SUB-BAR ── */
+.subbar{display:flex;align-items:center;gap:10px;padding:7px 22px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.search-wrap{position:relative;display:flex;align-items:center}
+.search-wrap input{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:5px 28px 5px 10px;font-size:12px;font-family:var(--mono);color:var(--text);outline:none;width:200px;transition:border-color .15s}
+.search-wrap input:focus{border-color:rgba(91,141,238,0.4)}
+.search-wrap input::placeholder{color:var(--dim)}
+.search-clear{position:absolute;right:7px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;display:none;padding:0;line-height:1}
+.search-clear.vis{display:block}
+.pd-row{display:flex;gap:4px;align-items:center;margin-left:6px}
+.pd-label{font-size:10px;font-family:var(--mono);color:var(--dim);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.pd-btn{padding:3px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-family:var(--mono);cursor:pointer;transition:all .15s}
+.pd-btn:hover{border-color:var(--bmed);color:var(--text)}
+.pd-btn.on{background:rgba(91,141,238,0.12);border-color:rgba(91,141,238,0.3);color:var(--accent)}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:0}
+.view{display:none;padding:22px}
+.view.on{display:block}
+
+/* ── FILTER ROW ── */
+.frow{display:flex;gap:6px;margin-bottom:14px;align-items:center}
+.fb{padding:4px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
+.fb:hover{border-color:var(--bmed);color:var(--text)}
+.fb.fa{background:rgba(91,141,238,0.12);border-color:rgba(91,141,238,0.3);color:var(--accent)}
+
+/* ── KPI STRIP ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.kpi-val{font-family:var(--mono);font-size:28px;font-weight:400;line-height:1}
+.kpi-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:4px}
+.kpi-sub{font-size:10px;color:var(--dim);font-family:var(--mono);margin-top:2px}
+
+/* ── CHARTS GRID ── */
+.chart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.chart-title{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:12px;font-family:var(--mono)}
+.chart-wrap{position:relative;height:200px}
+
+/* ── ROSTER ── */
+.roster-shell{display:grid;grid-template-columns:1fr 320px;gap:14px;min-height:0}
+.roster-left{display:flex;flex-direction:column;gap:0}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);font-weight:500;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);font-family:var(--mono);background:var(--bg2);position:sticky;top:0;z-index:2}
+td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:hover td{background:var(--bg3);cursor:pointer}
+tr.sel td{background:rgba(91,141,238,0.08)}
+.tb{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;font-family:var(--mono)}
+.t3{background:var(--t3b);color:var(--t3);border:1px solid var(--t3d)}
+.t2{background:var(--t2b);color:var(--t2);border:1px solid var(--t2d)}
+.t1{background:var(--t1b);color:var(--t1);border:1px solid var(--t1d)}
+.sbw{display:flex;align-items:center;gap:7px}
+.sb{flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.sbf{height:100%;border-radius:3px;transition:width .4s}
+.empty-state{text-align:center;padding:40px 20px}
+.empty-state-icon{font-size:28px;color:var(--dim);margin-bottom:8px}
+.empty-state-title{font-size:14px;color:var(--muted);margin-bottom:4px}
+.empty-state-sub{font-size:11px;color:var(--dim)}
+
+/* ── STUDENT DETAIL ── */
+.detail-panel{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:calc(100vh - 160px)}
+.detail-empty{display:flex;align-items:center;justify-content:center;height:200px;color:var(--dim);font-size:12px;text-align:center;padding:20px}
+.dsec{border-bottom:1px solid var(--border)}
+.dsec:last-child{border-bottom:none}
+.dname{font-family:var(--serif);font-size:16px;font-weight:500}
+.dmeta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center;font-size:11px;color:var(--muted)}
+.dsl{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);font-family:var(--mono);padding:10px 18px 6px}
+.drow{display:flex;align-items:center;gap:8px;padding:4px 18px}
+.ddom{font-size:11px;color:var(--muted);width:130px;flex-shrink:0}
+.dbar{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.dbarf{height:100%;border-radius:3px;transition:width .4s}
+.dsc{font-size:10px;font-family:var(--mono);color:var(--dim);width:36px;text-align:right}
+.plan-btn{padding:5px 12px;border-radius:6px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);color:var(--accent2);font-size:11px;cursor:pointer;font-family:var(--sans);font-weight:500;white-space:nowrap}
+.plan-btn:hover{background:rgba(167,139,250,0.18)}
+
+/* ── TAG EDITOR ── */
+.tag-editor{padding:4px 14px 10px}
+.tag-list-edit{display:flex;flex-wrap:wrap;gap:4px;min-height:22px;margin-bottom:7px}
+.qtag-rm{display:inline-flex;align-items:center;gap:4px;padding:2px 7px 2px 8px;border-radius:4px;font-size:10px;font-family:var(--mono)}
+.qp{background:rgba(52,211,153,0.08);color:#34d399;border:1px solid rgba(52,211,153,0.2)}
+.qn{background:rgba(122,128,153,0.1);color:#7a8099;border:1px solid rgba(122,128,153,0.2)}
+.qc{background:rgba(248,113,113,0.08);color:#f87171;border:1px solid rgba(248,113,113,0.2)}
+.rm-x{cursor:pointer;opacity:.6;font-size:9px}
+.rm-x:hover{opacity:1}
+.tag-add-row{display:flex;gap:5px;align-items:center}
+.tag-type-sel{background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:10px;padding:3px 5px;font-family:var(--mono)}
+.tag-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:11px;padding:4px 8px;outline:none;font-family:var(--mono)}
+.tag-input:focus{border-color:rgba(91,141,238,0.4)}
+.tag-bank{padding:8px 14px 4px;border-top:1px solid var(--border)}
+.tag-bank-tabs{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px}
+.tbt{padding:2px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--dim);font-size:9px;font-family:var(--mono);cursor:pointer;transition:all .12s;text-transform:uppercase;letter-spacing:.05em}
+.tbt.on{background:rgba(91,141,238,0.12);border-color:rgba(91,141,238,0.3);color:var(--accent)}
+.tag-bank-body{display:flex;flex-wrap:wrap;gap:3px;max-height:90px;overflow-y:auto}
+.tag-chip{display:inline-flex;padding:2px 7px;border-radius:4px;font-size:10px;font-family:var(--mono);cursor:pointer;opacity:.75;transition:opacity .12s}
+.tag-chip:hover{opacity:1}
+.tag-chip.added{opacity:.35;text-decoration:line-through;cursor:not-allowed}
+
+/* ── STUDENT PLAN MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.vis{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--bmed);border-radius:12px;max-width:520px;width:100%;max-height:85vh;overflow-y:auto;padding:24px}
+.modal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-title{font-family:var(--serif);font-size:16px;font-weight:500}
+.modal-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0}
+.modal-close:hover{color:var(--text)}
+
+/* ── COMING SOON SHELLS ── */
+.coming-shell{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;text-align:center;gap:12px}
+.coming-icon{font-size:40px;opacity:.4}
+.coming-title{font-family:var(--serif);font-size:18px;color:var(--muted)}
+.coming-tag{font-size:10px;font-family:var(--mono);padding:3px 10px;border-radius:4px;background:rgba(91,141,238,0.1);border:1px solid rgba(91,141,238,0.2);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;padding:9px 16px;border-radius:8px;font-size:12px;font-family:var(--mono);color:#fff;z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+.toast.vis{opacity:1;transform:translateY(0)}
+
+/* ── IMPORT ── */
+.import-zone{border:2px dashed var(--bmed);border-radius:10px;padding:32px;text-align:center;cursor:pointer;transition:border-color .2s}
+.import-zone:hover,.import-zone.drag{border-color:var(--accent)}
+.import-zone-icon{font-size:28px;margin-bottom:8px;opacity:.5}
+.import-zone-txt{font-size:13px;color:var(--muted)}
+.import-zone-sub{font-size:11px;color:var(--dim);margin-top:4px}
+.col-map-panel{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:14px}
+.col-map-panel table{margin-top:8px}
+.col-map-panel th{font-size:10px;color:var(--dim);font-weight:500;padding:6px 10px;text-transform:uppercase;letter-spacing:.06em}
+.col-map-panel td{padding:7px 10px;font-size:12px}
+.col-select{background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:11px;padding:4px 6px;font-family:var(--mono);min-width:160px}
+.import-status{margin-top:10px;font-size:12px;font-family:var(--mono);padding:6px 12px;border-radius:6px}
+.import-status.ok{background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.2)}
+.import-status.err{background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2)}
+.import-preview{font-size:10px;font-family:var(--mono);color:var(--dim);margin-top:8px;white-space:pre-wrap}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="slogo">
+    <div class="slogo-title">MathView</div>
+    <div class="slogo-sub">7TH GRADE · INTERVENTION</div>
+  </div>
+  <nav class="snav">
+    <button class="ni on" data-v="overview" onclick="go('overview',this)"><span class="ni-icon">◎</span>Overview</button>
+    <button class="ni" data-v="roster" onclick="go('roster',this)"><span class="ni-icon">◈</span>Roster</button>
+    <div class="sdiv"></div>
+    <button class="ni" data-v="domains" onclick="go('domains',this)"><span class="ni-icon">⬡</span>Domains</button>
+    <button class="ni" data-v="growth" onclick="go('growth',this)"><span class="ni-icon">↗</span>Growth</button>
+    <button class="ni" data-v="qualdata" onclick="go('qualdata',this)"><span class="ni-icon">◷</span>Qual. Data</button>
+    <div class="sdiv"></div>
+    <button class="ni" data-v="groups" onclick="go('groups',this)"><span class="ni-icon">⊞</span>Groups</button>
+    <button class="ni" data-v="interventions" onclick="go('interventions',this)"><span class="ni-icon">⚡</span>Interventions</button>
+    <button class="ni" data-v="reports" onclick="go('reports',this)"><span class="ni-icon">📊</span>Reports</button>
+    <div class="sdiv"></div>
+    <button class="ni" data-v="lessons" onclick="go('lessons',this)"><span class="ni-icon">📋</span>Lesson Plans</button>
+    <button class="ni" data-v="games" onclick="go('games',this)"><span class="ni-icon">🎲</span>Math Games</button>
+    <div class="sdiv"></div>
+    <button class="ni" data-v="import" onclick="go('import',this)"><span class="ni-icon">⬆</span>Import Data</button>
+  </nav>
+  <div class="persist-bar">
+    <div id="persistBar">
+      <div class="persist-dot" id="persistDot"></div>
+      <span class="persist-msg" id="persistMsg">Demo data</span>
+    </div>
+    <div class="persist-btns">
+      <button class="btn btnp" style="font-size:10px;padding:3px 9px" onclick="saveAll()">Save</button>
+      <button class="btn" style="font-size:10px;padding:3px 9px" onclick="exportSession()">Export</button>
+      <button class="btn" style="font-size:10px;padding:3px 9px;color:var(--dim)" onclick="clearSaved()">Reset</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="vtitle" id="vtitle">Intervention <em>Overview</em></div>
+  </div>
+  <div class="subbar">
+    <div class="search-wrap">
+      <input type="text" id="globalSearch" placeholder="Search students…" oninput="onSearch(this.value)">
+      <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+    </div>
+    <div class="pd-row">
+      <span class="pd-label">Period:</span>
+      <button class="pd-btn on" onclick="setPeriod('all',this)">All</button>
+      <button class="pd-btn" onclick="setPeriod(2,this)">Pd 2</button>
+      <button class="pd-btn" onclick="setPeriod(3,this)">Pd 3</button>
+      <button class="pd-btn" onclick="setPeriod(4,this)">Pd 4</button>
+      <button class="pd-btn" onclick="setPeriod(5,this)">Pd 5</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="view on" id="view-overview">
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-val" id="kpi-total">94</div><div class="kpi-lbl">Total Students</div><div class="kpi-sub" id="kpi-total-sub">Periods 2–5</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:var(--t3)" id="kpi-t3">18</div><div class="kpi-lbl">Tier 3</div><div class="kpi-sub">Intensive support</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:var(--t2)" id="kpi-t2">31</div><div class="kpi-lbl">Tier 2</div><div class="kpi-sub">Strategic support</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:var(--t1)" id="kpi-t1">45</div><div class="kpi-lbl">Tier 1</div><div class="kpi-sub">On/above grade level</div></div>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-title">iReady Score Distribution</div><div class="chart-wrap"><canvas id="c-dist"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Domain Gap (% below proficiency)</div><div class="chart-wrap"><canvas id="c-gap"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Tier Breakdown by Period</div><div class="chart-wrap"><canvas id="c-period"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- ROSTER -->
+    <div class="view" id="view-roster">
+      <div class="frow">
+        <button class="fb fa" onclick="filt('all',this)">All</button>
+        <button class="fb" style="color:var(--t3);border-color:var(--t3d)" onclick="filt('t3',this)">Tier 3</button>
+        <button class="fb" style="color:var(--t2);border-color:var(--t2d)" onclick="filt('t2',this)">Tier 2</button>
+        <button class="fb" style="color:var(--t1);border-color:var(--t1d)" onclick="filt('t1',this)">Tier 1</button>
+      </div>
+      <div class="roster-shell">
+        <div class="roster-left">
+          <table>
+            <thead><tr><th>Student</th><th>Tier</th><th>iReady Score</th><th>Grade Equiv.</th><th>Trend</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="detail-panel" id="ddetail">
+          <div class="detail-empty">← Select a student<br>to view their profile</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOMAINS -->
+    <div class="view" id="view-domains">
+      <div class="coming-shell">
+        <div class="coming-icon">⬡</div>
+        <div class="coming-title">Skill Domain Analysis</div>
+        <div class="coming-tag">Coming in Sprint M2</div>
+        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">Domain-level heat maps, class-wide proficiency by subdomain (Number Sense, Algebra, Ratios, Statistics, Geometry), and research-backed teacher learning links.</p>
+      </div>
+    </div>
+
+    <!-- GROWTH -->
+    <div class="view" id="view-growth">
+      <div class="coming-shell">
+        <div class="coming-icon">↗</div>
+        <div class="coming-title">Growth Trends</div>
+        <div class="coming-tag">Coming in Sprint M2</div>
+        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">BOY → MOY → EOY iReady growth by tier, top movers bar chart, and score vs. growth scatter plot with bubble sizing by state test level.</p>
+      </div>
+    </div>
+
+    <!-- QUAL DATA -->
+    <div class="view" id="view-qualdata">
+      <div class="coming-shell">
+        <div class="coming-icon">◷</div>
+        <div class="coming-title">Qualitative Data</div>
+        <div class="coming-tag">Coming in Sprint M2</div>
+        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">Class-wide qualitative tag view, counselor flag panel, observation notes, and tag frequency analytics across Academic, Behavioral, SEL, Family, Language, and IEP/504 categories.</p>
+      </div>
+    </div>
+
+    <!-- GROUPS -->
+    <div class="view" id="view-groups">
+      <div class="coming-shell">
+        <div class="coming-icon">⊞</div>
+        <div class="coming-title">Group Builder</div>
+        <div class="coming-tag">Coming in Sprint M2</div>
+        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">Build intervention groups by tier and period. Add/remove students, set focus skills, view group composition at a glance.</p>
+      </div>
+    </div>
+
+    <!-- INTERVENTIONS -->
+    <div class="view" id="view-interventions">
+      <div class="coming-shell">
+        <div class="coming-icon">⚡</div>
+        <div class="coming-title">Active Interventions</div>
+        <div class="coming-tag">Coming in Sprint M2</div>
+        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">Log and track active interventions per student. Set frequency, focus domain, start date, and progress notes. Flag students overdue for reassessment.</p>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="view" id="view-reports">
+      <div class="coming-shell">
+        <div class="coming-icon">📊</div>
+        <div class="coming-title">Reports</div>
+        <div class="coming-tag">Coming in Sprint M3</div>
+        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">Tier summary report, domain gap report, student progress printout, and CSV export of assessment data.</p>
+      </div>
+    </div>
+
+    <!-- LESSONS -->
+    <div class="view" id="view-lessons">
+      <div class="coming-shell">
+        <div class="coming-icon">📋</div>
+        <div class="coming-title">Lesson Plans</div>
+        <div class="coming-tag">Coming in Sprint M3</div>
+        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">12 research-aligned lesson plans across all 5 math domains. CTE real-world context hooks (Culinary, Construction, Healthcare, Financial). Adapt menus for IEP, MLL, and Advanced learners. Print-ready format.</p>
+      </div>
+    </div>
+
+    <!-- GAMES -->
+    <div class="view" id="view-games">
+      <div class="coming-shell">
+        <div class="coming-icon">🎲</div>
+        <div class="coming-title">Math Games</div>
+        <div class="coming-tag">Coming in Sprint M4</div>
+        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.6;margin-top:8px">18 hands-on math games across all 5 domains. Full game guides with setup, rules, variations, and teacher notes. Difficulty ratings and printable game cards.</p>
+      </div>
+    </div>
+
+    <!-- IMPORT -->
+    <div class="view" id="view-import">
+      <div style="max-width:640px">
+        <div class="import-zone" id="importZone" onclick="document.getElementById('csvFile').click()">
+          <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="handleFile(this.files[0])">
+          <div class="import-zone-icon">⬆</div>
+          <div class="import-zone-txt">Drop a CSV or click to browse</div>
+          <div class="import-zone-sub">Expected columns: Student Name, Scale Score, Class Period, Performance Level</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn" onclick="downloadTemplate(event)" style="font-size:11px">⬇ Download template CSV</button>
+        </div>
+        <div id="importPreview" class="import-preview"></div>
+        <div id="colMapPanel" class="col-map-panel" style="display:none">
+          <div style="font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text)">Map your columns</div>
+          <table style="width:100%"><tbody id="colMapTable"></tbody></table>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn btnp" onclick="applyImport()">Import students</button>
+            <button class="btn" onclick="cancelImport()">Cancel</button>
+          </div>
+          <div id="importStatus"></div>
+        </div>
+        <div style="margin-top:18px;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">
+          <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:6px">Load a previous session</div>
+          <input type="file" id="sessionFile" accept=".json" style="display:none" onchange="loadSession(this.files[0])">
+          <button class="btn" onclick="document.getElementById('sessionFile').click()" style="font-size:11px">Load JSON session</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- STUDENT PLAN MODAL -->
+<div class="overlay" id="planOverlay" onclick="if(event.target===this)closePlanModal()">
+  <div class="modal">
+    <div class="modal-h">
+      <div class="modal-title" id="planTitle">Plan for Student</div>
+      <button class="modal-close" onclick="closePlanModal()">✕</button>
+    </div>
+    <div id="planBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════ */
+const SL=['','Below Basic','Basic','Proficient','Advanced'];
+const DC={ratios:'#5b8dee',algebra:'#a78bfa',geometry:'#34d399',stats:'#fb923c',numSense:'#f87171'};
+const DL={numSense:'Number Sense',algebra:'Algebra',ratios:'Ratios & Prop.',stats:'Statistics',geometry:'Geometry'};
+const DM={
+  ns:{label:'Number Sense',color:'#f87171',bg:'rgba(248,113,113,0.08)',bd:'rgba(248,113,113,0.25)'},
+  alg:{label:'Algebra',color:'#a78bfa',bg:'rgba(167,139,250,0.08)',bd:'rgba(167,139,250,0.25)'},
+  rat:{label:'Ratios & Proportions',color:'#5b8dee',bg:'rgba(91,141,238,0.08)',bd:'rgba(91,141,238,0.25)'},
+  sta:{label:'Statistics',color:'#fb923c',bg:'rgba(251,146,60,0.08)',bd:'rgba(251,146,60,0.25)'},
+  geo:{label:'Geometry',color:'#34d399',bg:'rgba(52,211,153,0.08)',bd:'rgba(52,211,153,0.25)'},
+};
+const TQ={
+  'growth mindset':'qp','high engagement':'qp','strong work ethic':'qp','peer tutor potential':'qp',
+  'math identity: strong':'qp','high achiever':'qp','improving trend':'qp','responds to challenge':'qp',
+  'strong oral skills':'qp','strong in geometry':'qp','strong written work':'qp','math confident':'qp',
+  'advanced learner':'qp','strong number sense':'qp','strong in algebra':'qp','strong in ratios':'qp',
+  'strong in statistics':'qp','engages in discourse':'qp','retains concepts well':'qp',
+  'math anxiety':'qc','low written output':'qc','minor algebra gap':'qc','minor number sense gap':'qc',
+  'minor ratio gap':'qc','struggles with fractions':'qc','struggles with word problems':'qc',
+  'gaps from prior grade':'qc','below grade-level reading':'qc','difficulty showing work':'qc',
+  'steady performer':'qn','prefers independent work':'qn','prefers hands-on':'qn',
+  'prefers verbal reasoning':'qn','responds to praise':'qn','responds to routine':'qn',
+  'engaged in class':'qn','engaged':'qn','quiet in class':'qn','off-task frequently':'qc',
+  'difficulty with transitions':'qc','disruptive behavior':'qc','requires redirection':'qc',
+  'thrives with movement':'qn','works well in groups':'qp','leadership in class':'qp',
+  'high self-efficacy':'qp','low self-efficacy':'qc','fixed mindset':'qc','frustrated easily':'qc',
+  'resilient':'qp','emotionally regulated':'qp','difficulty with frustration':'qc',
+  'social isolation concerns':'qc','peer conflict reported':'qc','positive peer relationships':'qp',
+  'trauma-informed flag':'qc','counselor referral pending':'qc',
+  'parent support: high':'qp','parent support: med':'qn','parent support: low':'qc',
+  'home literacy: low':'qc','home math support strong':'qp','frequent family contact':'qp',
+  'language barrier at home':'qn','unstable housing flag':'qc','food insecurity flag':'qc',
+  'EL: Spanish':'qn','EL: Arabic':'qn','EL: Haitian Creole':'qn','EL: Mandarin':'qn',
+  'EL: French':'qn','EL: Portuguese':'qn','EL: Somali':'qn','EL: Vietnamese':'qn',
+  'EL: other':'qn','bilingual strength':'qp','benefits from visual language support':'qn',
+  'IEP: Attention & Executive Function':'qc','IEP: Processing Disorder':'qc',
+  'IEP: Speech & Language':'qc','IEP: Emotional/Behavioral':'qc',
+  'IEP: Autism Spectrum':'qc','IEP: Other Health Impairment':'qc',
+  '504: ADHD':'qc','504: Anxiety':'qc','504: Other':'qc',
+  'extended time accommodation':'qn','preferential seating':'qn','reduced assignment load':'qn',
+  'high absenteeism':'qc','inconsistent attendance':'qc','chronic absenteeism (10%+)':'qc',
+  'consistent attendance':'qp','on-time consistently':'qp','inconsistent homework':'qc',
+};
+const TAG_BANK=[
+  {cat:'Academic',tags:[
+    {t:'strong number sense',cls:'qp'},{t:'strong in algebra',cls:'qp'},{t:'strong in geometry',cls:'qp'},
+    {t:'strong in ratios',cls:'qp'},{t:'strong in statistics',cls:'qp'},{t:'improving trend',cls:'qp'},
+    {t:'retains concepts well',cls:'qp'},{t:'minor number sense gap',cls:'qc'},{t:'minor algebra gap',cls:'qc'},
+    {t:'minor ratio gap',cls:'qc'},{t:'struggles with fractions',cls:'qc'},{t:'struggles with word problems',cls:'qc'},
+    {t:'gaps from prior grade',cls:'qc'},{t:'below grade-level reading',cls:'qc'},
+  ]},
+  {cat:'Behavioral',tags:[
+    {t:'responds to routine',cls:'qn'},{t:'responds to praise',cls:'qn'},{t:'prefers hands-on',cls:'qn'},
+    {t:'prefers independent work',cls:'qn'},{t:'prefers verbal reasoning',cls:'qn'},
+    {t:'works well in groups',cls:'qp'},{t:'leadership in class',cls:'qp'},{t:'thrives with movement',cls:'qn'},
+    {t:'off-task frequently',cls:'qc'},{t:'requires redirection',cls:'qc'},{t:'disruptive behavior',cls:'qc'},
+  ]},
+  {cat:'Social-Emotional',tags:[
+    {t:'growth mindset',cls:'qp'},{t:'high self-efficacy',cls:'qp'},{t:'resilient',cls:'qp'},
+    {t:'positive peer relationships',cls:'qp'},{t:'math identity: strong',cls:'qp'},
+    {t:'math anxiety',cls:'qc'},{t:'fixed mindset',cls:'qc'},{t:'low self-efficacy',cls:'qc'},
+    {t:'frustrated easily',cls:'qc'},{t:'social isolation concerns',cls:'qc'},
+  ]},
+  {cat:'Family',tags:[
+    {t:'parent support: high',cls:'qp'},{t:'home math support strong',cls:'qp'},
+    {t:'parent support: med',cls:'qn'},{t:'language barrier at home',cls:'qn'},
+    {t:'parent support: low',cls:'qc'},{t:'home literacy: low',cls:'qc'},
+    {t:'unstable housing flag',cls:'qc'},{t:'food insecurity flag',cls:'qc'},
+  ]},
+  {cat:'Language',tags:[
+    {t:'EL: Spanish',cls:'qn'},{t:'EL: Arabic',cls:'qn'},{t:'EL: Haitian Creole',cls:'qn'},
+    {t:'EL: Mandarin',cls:'qn'},{t:'EL: French',cls:'qn'},{t:'EL: Portuguese',cls:'qn'},
+    {t:'EL: Somali',cls:'qn'},{t:'EL: Vietnamese',cls:'qn'},{t:'bilingual strength',cls:'qp'},
+  ]},
+  {cat:'IEP/504',tags:[
+    {t:'IEP: Attention & Executive Function',cls:'qc'},{t:'IEP: Processing Disorder',cls:'qc'},
+    {t:'IEP: Speech & Language',cls:'qc'},{t:'IEP: Emotional/Behavioral',cls:'qc'},
+    {t:'IEP: Autism Spectrum',cls:'qc'},{t:'504: ADHD',cls:'qc'},{t:'504: Anxiety',cls:'qc'},
+    {t:'extended time accommodation',cls:'qn'},{t:'preferential seating',cls:'qn'},
+  ]},
+  {cat:'Attendance',tags:[
+    {t:'consistent attendance',cls:'qp'},{t:'on-time consistently',cls:'qp'},
+    {t:'inconsistent attendance',cls:'qc'},{t:'high absenteeism',cls:'qc'},
+    {t:'chronic absenteeism (10%+)',cls:'qc'},{t:'inconsistent homework',cls:'qc'},
+  ]},
+];
+
+/* ═══════════════════════════════════════
+   STUDENT DATA
+═══════════════════════════════════════ */
+const students=[
+  // PERIOD 2
+  {id:1,name:'Aaliyah Torres',tier:'t3',ir:388,irM:398,irE:410,st:2,trend:'down',pd:2,dom:{ratios:42,algebra:38,geometry:55,stats:48,numSense:36},tags:['math anxiety','parent support: low'],rec:'Intensive pull-out 3x/wk. Number sense and ratio foundations. Coordinate with counselor re: anxiety.',notes:''},
+  {id:2,name:'Marcus Lee',tier:'t3',ir:392,irM:402,irE:415,st:2,trend:'flat',pd:2,dom:{ratios:45,algebra:40,geometry:58,stats:52,numSense:41},tags:['inconsistent attendance','strong oral skills'],rec:'Small group 3x/wk. Prioritize algebraic thinking. Attendance outreach needed.',notes:''},
+  {id:19,name:'Devon Carter',tier:'t3',ir:384,irM:393,irE:406,st:1,trend:'down',pd:2,dom:{ratios:36,algebra:32,geometry:46,stats:38,numSense:30},tags:['high absenteeism','math anxiety','parent support: low'],rec:'Attendance intervention first. Intensive pull-out when present.',notes:''},
+  {id:20,name:'Jasmine Flores',tier:'t3',ir:391,irM:400,irE:413,st:2,trend:'flat',pd:2,dom:{ratios:44,algebra:38,geometry:52,stats:44,numSense:38},tags:['EL: Spanish','home literacy: low'],rec:'EL scaffolding + number sense foundations. Use visual models.',notes:''},
+  {id:21,name:'Tobias Grant',tier:'t3',ir:397,irM:408,irE:420,st:2,trend:'up',pd:2,dom:{ratios:52,algebra:44,geometry:58,stats:48,numSense:44},tags:['growth mindset','IEP: Attention & Executive Function','responds to praise'],rec:'Near T2. Structure and routine with positive reinforcement.',notes:''},
+  {id:7,name:'Priya Nair',tier:'t2',ir:418,irM:430,irE:441,st:2,trend:'up',pd:2,dom:{ratios:65,algebra:58,geometry:70,stats:62,numSense:60},tags:['strong work ethic','parent support: high','minor algebra gap'],rec:'Targeted algebra small group 2x/wk. On track for Tier 1 by MOY.',notes:''},
+  {id:8,name:'DeShawn Brooks',tier:'t2',ir:412,irM:422,irE:433,st:2,trend:'flat',pd:2,dom:{ratios:60,algebra:55,geometry:68,stats:58,numSense:57},tags:['prefers verbal reasoning','low written output','engaged'],rec:'Ratio and algebra focus group. Scaffold written math explanations.',notes:''},
+  {id:22,name:'Mei-Ling Chen',tier:'t2',ir:416,irM:428,irE:439,st:2,trend:'up',pd:2,dom:{ratios:62,algebra:57,geometry:68,stats:60,numSense:58},tags:['EL: Mandarin','strong written work','parent support: high'],rec:'Algebra small group with EL differentiation.',notes:''},
+  {id:23,name:'Anthony Rivera',tier:'t2',ir:420,irM:432,irE:443,st:2,trend:'flat',pd:2,dom:{ratios:64,algebra:59,geometry:72,stats:61,numSense:62},tags:['steady performer','inconsistent homework','parent support: med'],rec:'Statistics focus group. Homework accountability check-in weekly.',notes:''},
+  {id:24,name:'Simone Dubois',tier:'t2',ir:414,irM:426,irE:437,st:2,trend:'up',pd:2,dom:{ratios:61,algebra:56,geometry:70,stats:59,numSense:58},tags:['improving trend','EL: French','parent support: med'],rec:'Ratio and algebra group. EL sentence frames.',notes:''},
+  {id:25,name:'Kevin Okafor',tier:'t2',ir:417,irM:427,irE:438,st:2,trend:'flat',pd:2,dom:{ratios:63,algebra:57,geometry:69,stats:60,numSense:59},tags:['responds to routine','IEP: Processing Disorder','parent support: med'],rec:'Structured small group. Chunked tasks and consistent routine.',notes:''},
+  {id:26,name:'Amara Diallo',tier:'t2',ir:422,irM:434,irE:445,st:3,trend:'up',pd:2,dom:{ratios:68,algebra:63,geometry:73,stats:65,numSense:62},tags:['growth mindset','strong in geometry','parent support: high'],rec:'Algebra and stats group. Geometry strength to anchor new concepts.',notes:''},
+  {id:27,name:'Ryan Kowalski',tier:'t2',ir:419,irM:431,irE:442,st:2,trend:'flat',pd:2,dom:{ratios:65,algebra:60,geometry:71,stats:62,numSense:61},tags:['prefers hands-on','engaged in class','parent support: med'],rec:'Ratio group with manipulatives.',notes:''},
+  {id:13,name:'Maya Patel',tier:'t1',ir:448,irM:458,irE:468,st:3,trend:'up',pd:2,dom:{ratios:82,algebra:79,geometry:88,stats:80,numSense:78},tags:['high engagement','parent support: high','peer tutor potential'],rec:'Enrichment track. Consider peer tutoring role.',notes:''},
+  {id:17,name:'Fatima Al-Rashid',tier:'t1',ir:451,irM:460,irE:469,st:3,trend:'flat',pd:2,dom:{ratios:84,algebra:80,geometry:87,stats:82,numSense:79},tags:['EL: Arabic','high achiever','parent support: high'],rec:'Monitor. Exceptional trajectory.',notes:''},
+  {id:28,name:'Lucas Henrique',tier:'t1',ir:444,irM:454,irE:463,st:3,trend:'up',pd:2,dom:{ratios:80,algebra:76,geometry:85,stats:78,numSense:75},tags:['growth mindset','engages in discourse','parent support: high'],rec:'Enrichment extensions. Encourage leadership.',notes:''},
+  {id:29,name:'Olivia Thornton',tier:'t1',ir:449,irM:459,irE:468,st:3,trend:'up',pd:2,dom:{ratios:83,algebra:80,geometry:87,stats:80,numSense:78},tags:['advanced learner','peer tutor potential','parent support: high'],rec:'Pre-algebra extensions. Peer tutor for Tier 2.',notes:''},
+  {id:30,name:'Jalen Scott',tier:'t1',ir:440,irM:450,irE:460,st:3,trend:'flat',pd:2,dom:{ratios:78,algebra:74,geometry:83,stats:76,numSense:73},tags:['steady performer','prefers independent work','parent support: med'],rec:'Monitor quarterly. Challenge extensions.',notes:''},
+  {id:31,name:'Elena Vasquez',tier:'t1',ir:446,irM:456,irE:465,st:3,trend:'up',pd:2,dom:{ratios:81,algebra:77,geometry:86,stats:79,numSense:76},tags:['high engagement','math identity: strong','parent support: high'],rec:'Advanced tasks. Explore pre-algebra enrichment.',notes:''},
+  {id:32,name:'Marcus Williams',tier:'t1',ir:443,irM:452,irE:461,st:3,trend:'flat',pd:2,dom:{ratios:79,algebra:75,geometry:84,stats:77,numSense:74},tags:['steady performer','responds to challenge','parent support: med'],rec:'Monitor. Challenge problems.',notes:''},
+  {id:33,name:'Aisha Mohammed',tier:'t1',ir:452,irM:461,irE:470,st:3,trend:'up',pd:2,dom:{ratios:85,algebra:81,geometry:88,stats:83,numSense:80},tags:['high achiever','EL: Somali','parent support: high'],rec:'Enrichment + EL strength model.',notes:''},
+  {id:34,name:'Tyler Nguyen',tier:'t1',ir:447,irM:457,irE:466,st:3,trend:'up',pd:2,dom:{ratios:82,algebra:78,geometry:86,stats:80,numSense:77},tags:['growth mindset','engages in discourse','parent support: med'],rec:'On track. Math discourse leadership.',notes:''},
+  {id:35,name:'Camille Rousseau',tier:'t1',ir:445,irM:455,irE:464,st:3,trend:'flat',pd:2,dom:{ratios:80,algebra:76,geometry:85,stats:78,numSense:75},tags:['steady performer','prefers independent work','parent support: high'],rec:'Monitor. Independent extension projects.',notes:''},
+  {id:36,name:'Jordan Blake',tier:'t1',ir:453,irM:462,irE:471,st:4,trend:'up',pd:2,dom:{ratios:87,algebra:83,geometry:90,stats:85,numSense:82},tags:['advanced learner','math identity: strong','parent support: high'],rec:'Acceleration discussion with family. Connect with gifted coordinator.',notes:''},
+  // PERIOD 3
+  {id:3,name:'Destiny Okafor',tier:'t3',ir:381,irM:390,irE:402,st:1,trend:'down',pd:3,dom:{ratios:38,algebra:33,geometry:44,stats:40,numSense:30},tags:['EL: Spanish','math anxiety','parent support: high'],rec:'Intensive + EL support. Build number sense with visual models.',notes:''},
+  {id:4,name:'Jordan Kim',tier:'t3',ir:395,irM:405,irE:418,st:2,trend:'flat',pd:3,dom:{ratios:50,algebra:42,geometry:52,stats:45,numSense:43},tags:['IEP: Processing Disorder','prefers hands-on','engaged in class'],rec:'Pull-out aligned to IEP goals. Manipulatives for ratio/proportion work.',notes:''},
+  {id:37,name:'Keisha Brown',tier:'t3',ir:386,irM:396,irE:408,st:2,trend:'flat',pd:3,dom:{ratios:40,algebra:35,geometry:50,stats:42,numSense:34},tags:['home literacy: low','parent support: low'],rec:'Build relationship first. Start with geometry as confidence entry point.',notes:''},
+  {id:38,name:'Oscar Medina',tier:'t3',ir:389,irM:399,irE:411,st:2,trend:'up',pd:3,dom:{ratios:46,algebra:40,geometry:55,stats:46,numSense:38},tags:['growth mindset','EL: Spanish','responds to challenge'],rec:'EL scaffolding + structured challenge. Near T2 trajectory.',notes:''},
+  {id:39,name:'Tanya Petrov',tier:'t3',ir:383,irM:392,irE:405,st:1,trend:'down',pd:3,dom:{ratios:37,algebra:31,geometry:45,stats:39,numSense:29},tags:['math anxiety','high absenteeism','parent support: med'],rec:'Attendance outreach + intensive support. Anxiety-aware instruction.',notes:''},
+  {id:9,name:'Sofia Reyes',tier:'t2',ir:422,irM:436,irE:447,st:3,trend:'up',pd:3,dom:{ratios:70,algebra:62,geometry:72,stats:65,numSense:63},tags:['strong in geometry','parent support: high','growth mindset'],rec:'Statistics and algebra targeted group.',notes:''},
+  {id:10,name:'Amir Hassan',tier:'t2',ir:408,irM:418,irE:429,st:2,trend:'flat',pd:3,dom:{ratios:58,algebra:52,geometry:65,stats:55,numSense:54},tags:['EL: Arabic','quiet in class','strong written work'],rec:'Small group with EL differentiation. Algebraic reasoning focus.',notes:''},
+  {id:40,name:'Brianna Moss',tier:'t2',ir:413,irM:424,irE:435,st:2,trend:'up',pd:3,dom:{ratios:60,algebra:56,geometry:67,stats:58,numSense:55},tags:['improving trend','responds to praise','parent support: med'],rec:'Algebra focus group. Reinforce with specific verbal praise.',notes:''},
+  {id:41,name:'Isaiah Park',tier:'t2',ir:415,irM:427,irE:438,st:2,trend:'flat',pd:3,dom:{ratios:62,algebra:58,geometry:69,stats:60,numSense:57},tags:['prefers hands-on','engaged in class','parent support: med'],rec:'Ratio group with manipulatives.',notes:''},
+  {id:42,name:'Nadia Okonkwo',tier:'t2',ir:421,irM:433,irE:444,st:3,trend:'up',pd:3,dom:{ratios:67,algebra:62,geometry:72,stats:64,numSense:61},tags:['growth mindset','strong written work','parent support: high'],rec:'Statistics and algebra group.',notes:''},
+  {id:43,name:'Carlos Espinoza',tier:'t2',ir:411,irM:422,irE:433,st:2,trend:'flat',pd:3,dom:{ratios:59,algebra:54,geometry:66,stats:57,numSense:54},tags:['EL: Spanish','responds to routine','parent support: med'],rec:'Structured ratio group with EL supports.',notes:''},
+  {id:44,name:'Hannah Fischer',tier:'t2',ir:418,irM:430,irE:441,st:2,trend:'up',pd:3,dom:{ratios:64,algebra:59,geometry:70,stats:61,numSense:59},tags:['strong work ethic','inconsistent homework','parent support: low'],rec:'Algebra group. Homework accountability structure needed.',notes:''},
+  {id:45,name:'Terrence Woods',tier:'t2',ir:416,irM:428,irE:439,st:2,trend:'flat',pd:3,dom:{ratios:62,algebra:57,geometry:68,stats:60,numSense:58},tags:['prefers verbal reasoning','low written output','parent support: med'],rec:'Ratio group. Scaffold written explanations with sentence stems.',notes:''},
+  {id:14,name:'Noah Castillo',tier:'t1',ir:442,irM:451,irE:460,st:3,trend:'flat',pd:3,dom:{ratios:78,algebra:75,geometry:84,stats:77,numSense:74},tags:['steady performer','parent support: med','prefers independent work'],rec:'Monitor quarterly.',notes:''},
+  {id:46,name:'Sophia Turner',tier:'t1',ir:445,irM:455,irE:464,st:3,trend:'up',pd:3,dom:{ratios:81,algebra:77,geometry:85,stats:79,numSense:76},tags:['high engagement','parent support: high','peer tutor potential'],rec:'Enrichment. Peer tutor role for Tier 2 algebra group.',notes:''},
+  {id:47,name:'Nathan Adeyemi',tier:'t1',ir:440,irM:450,irE:459,st:3,trend:'flat',pd:3,dom:{ratios:78,algebra:74,geometry:82,stats:76,numSense:73},tags:['steady performer','responds to challenge','parent support: high'],rec:'Monitor. Challenge problems.',notes:''},
+  {id:48,name:'Grace Hoffman',tier:'t1',ir:447,irM:457,irE:466,st:3,trend:'up',pd:3,dom:{ratios:82,algebra:78,geometry:86,stats:80,numSense:77},tags:['growth mindset','math identity: strong','parent support: high'],rec:'Advanced extensions.',notes:''},
+  {id:49,name:'Dante Robinson',tier:'t1',ir:443,irM:453,irE:462,st:3,trend:'up',pd:3,dom:{ratios:79,algebra:75,geometry:83,stats:77,numSense:74},tags:['engages in discourse','growth mindset','parent support: med'],rec:'On track. Discussion leadership.',notes:''},
+  {id:50,name:'Yuki Tanaka',tier:'t1',ir:449,irM:459,irE:468,st:3,trend:'flat',pd:3,dom:{ratios:83,algebra:80,geometry:87,stats:81,numSense:79},tags:['high achiever','parent support: high'],rec:'Monitor. Exceptional trajectory.',notes:''},
+  {id:51,name:'Marisol Gutierrez',tier:'t1',ir:444,irM:454,irE:463,st:3,trend:'up',pd:3,dom:{ratios:80,algebra:76,geometry:84,stats:78,numSense:75},tags:['strong work ethic','parent support: high','EL: Spanish'],rec:'Enrichment. Document as EL success model.',notes:''},
+  {id:52,name:'Eliot Chambers',tier:'t1',ir:441,irM:451,irE:460,st:3,trend:'flat',pd:3,dom:{ratios:77,algebra:73,geometry:82,stats:75,numSense:72},tags:['steady performer','prefers independent work','parent support: med'],rec:'Monitor.',notes:''},
+  {id:53,name:'Lena Kowalczyk',tier:'t1',ir:446,irM:456,irE:465,st:3,trend:'up',pd:3,dom:{ratios:81,algebra:77,geometry:85,stats:79,numSense:76},tags:['high engagement','peer tutor potential','parent support: high'],rec:'Enrichment + peer tutor for statistics group.',notes:''},
+  {id:54,name:'Jerome Baptiste',tier:'t1',ir:454,irM:463,irE:472,st:4,trend:'up',pd:3,dom:{ratios:86,algebra:82,geometry:89,stats:84,numSense:81},tags:['advanced learner','math identity: strong','parent support: high'],rec:'Acceleration conversation. Gifted coordinator referral.',notes:''},
+  // PERIOD 4
+  {id:5,name:'Brianna Walsh',tier:'t3',ir:376,irM:384,irE:394,st:1,trend:'down',pd:4,dom:{ratios:35,algebra:30,geometry:48,stats:38,numSense:28},tags:['high absenteeism','math anxiety','EL: Haitian Creole'],rec:'Urgent: attendance and intensive math support. Bilingual resource referral.',notes:''},
+  {id:6,name:'Elijah Mendez',tier:'t3',ir:400,irM:414,irE:428,st:2,trend:'up',pd:4,dom:{ratios:55,algebra:48,geometry:60,stats:50,numSense:47},tags:['growth mindset','parent support: med','responds to challenge'],rec:'Near-Tier 2. Structured practice small group.',notes:''},
+  {id:55,name:'Tamara Ellis',tier:'t3',ir:387,irM:396,irE:408,st:2,trend:'flat',pd:4,dom:{ratios:41,algebra:36,geometry:52,stats:43,numSense:35},tags:['inconsistent attendance','parent support: low'],rec:'Family outreach + build relationship.',notes:''},
+  {id:56,name:'Marco Santos',tier:'t3',ir:393,irM:403,irE:416,st:2,trend:'up',pd:4,dom:{ratios:48,algebra:42,geometry:56,stats:47,numSense:42},tags:['EL: Portuguese','growth mindset','parent support: med'],rec:'EL scaffolding + structured challenge. Near T2.',notes:''},
+  {id:11,name:'Camille Dupont',tier:'t2',ir:425,irM:438,irE:449,st:3,trend:'up',pd:4,dom:{ratios:68,algebra:65,geometry:74,stats:68,numSense:64},tags:['math confident','inconsistent homework','parent support: low'],rec:'Strategic group for statistics. Homework accountability.',notes:''},
+  {id:57,name:'Darius King',tier:'t2',ir:413,irM:424,irE:435,st:2,trend:'up',pd:4,dom:{ratios:60,algebra:56,geometry:67,stats:59,numSense:56},tags:['improving trend','responds to praise','parent support: med'],rec:'Algebra group. Positive trend — reinforce.',notes:''},
+  {id:58,name:'Aaliya Sharma',tier:'t2',ir:416,irM:427,irE:438,st:2,trend:'flat',pd:4,dom:{ratios:62,algebra:57,geometry:69,stats:60,numSense:58},tags:['strong written work','parent support: high'],rec:'Ratio group with EL differentiation.',notes:''},
+  {id:59,name:'Tre Williams',tier:'t2',ir:411,irM:422,irE:433,st:2,trend:'flat',pd:4,dom:{ratios:59,algebra:54,geometry:65,stats:57,numSense:54},tags:['prefers verbal reasoning','engaged','parent support: med'],rec:'Algebra group. Verbal explanation tasks.',notes:''},
+  {id:60,name:'Nina Marchetti',tier:'t2',ir:419,irM:431,irE:442,st:2,trend:'up',pd:4,dom:{ratios:65,algebra:60,geometry:71,stats:62,numSense:60},tags:['growth mindset','strong in geometry','parent support: high'],rec:'Stats and algebra group.',notes:''},
+  {id:61,name:'Kwame Asante',tier:'t2',ir:421,irM:433,irE:444,st:3,trend:'up',pd:4,dom:{ratios:67,algebra:62,geometry:73,stats:64,numSense:62},tags:['high engagement','responds to challenge','parent support: med'],rec:'Near T1. Challenge problems to accelerate trajectory.',notes:''},
+  {id:62,name:'Fiona OBrien',tier:'t2',ir:414,irM:425,irE:436,st:2,trend:'flat',pd:4,dom:{ratios:61,algebra:56,geometry:68,stats:59,numSense:57},tags:['responds to routine','IEP: Attention & Executive Function','parent support: med'],rec:'Structured algebra group. IEP accommodations in place.',notes:''},
+  {id:63,name:'Hector Fuentes',tier:'t2',ir:417,irM:429,irE:440,st:2,trend:'up',pd:4,dom:{ratios:63,algebra:58,geometry:70,stats:61,numSense:59},tags:['EL: Spanish','improving trend','parent support: med'],rec:'Ratio group with EL supports.',notes:''},
+  {id:15,name:'Zoe Henderson',tier:'t1',ir:455,irM:465,irE:474,st:4,trend:'up',pd:4,dom:{ratios:88,algebra:85,geometry:91,stats:84,numSense:83},tags:['advanced learner','math identity: strong','parent support: high'],rec:'Advanced extension tasks.',notes:''},
+  {id:64,name:'Amani Jackson',tier:'t1',ir:444,irM:454,irE:463,st:3,trend:'up',pd:4,dom:{ratios:80,algebra:76,geometry:85,stats:78,numSense:75},tags:['high engagement','parent support: high','peer tutor potential'],rec:'Enrichment + peer tutor.',notes:''},
+  {id:65,name:'Connor Murphy',tier:'t1',ir:440,irM:450,irE:459,st:3,trend:'flat',pd:4,dom:{ratios:77,algebra:73,geometry:82,stats:75,numSense:72},tags:['steady performer','prefers independent work','parent support: med'],rec:'Monitor.',notes:''},
+  {id:66,name:'Priya Chandrasekaran',tier:'t1',ir:448,irM:458,irE:467,st:3,trend:'up',pd:4,dom:{ratios:82,algebra:78,geometry:87,stats:80,numSense:77},tags:['high achiever','parent support: high'],rec:'Enrichment.',notes:''},
+  {id:67,name:'Marcus Green',tier:'t1',ir:442,irM:452,irE:461,st:3,trend:'flat',pd:4,dom:{ratios:78,algebra:74,geometry:83,stats:76,numSense:73},tags:['steady performer','responds to challenge','parent support: med'],rec:'Monitor. Challenge problems.',notes:''},
+  {id:68,name:'Isabelle Laurent',tier:'t1',ir:446,irM:456,irE:465,st:3,trend:'up',pd:4,dom:{ratios:81,algebra:77,geometry:85,stats:79,numSense:76},tags:['growth mindset','math identity: strong','parent support: high'],rec:'Advanced extensions.',notes:''},
+  {id:69,name:'Kofi Mensah',tier:'t1',ir:450,irM:460,irE:469,st:3,trend:'up',pd:4,dom:{ratios:84,algebra:80,geometry:87,stats:82,numSense:79},tags:['high achiever','engages in discourse','parent support: high'],rec:'Enrichment + discussion leadership.',notes:''},
+  {id:70,name:'Valentina Cruz',tier:'t1',ir:443,irM:453,irE:462,st:3,trend:'flat',pd:4,dom:{ratios:79,algebra:75,geometry:84,stats:77,numSense:74},tags:['steady performer','EL: Spanish','parent support: high'],rec:'Monitor.',notes:''},
+  {id:71,name:'Aaron Nkosi',tier:'t1',ir:447,irM:457,irE:466,st:3,trend:'up',pd:4,dom:{ratios:82,algebra:78,geometry:86,stats:80,numSense:77},tags:['growth mindset','responds to challenge','parent support: med'],rec:'Enrichment.',notes:''},
+  {id:72,name:'Jade Thompson',tier:'t1',ir:451,irM:461,irE:470,st:3,trend:'up',pd:4,dom:{ratios:84,algebra:81,geometry:88,stats:83,numSense:80},tags:['peer tutor potential','high engagement','parent support: high'],rec:'Enrichment + peer tutor.',notes:''},
+  {id:73,name:'Rafael Torres',tier:'t1',ir:456,irM:465,irE:474,st:4,trend:'up',pd:4,dom:{ratios:89,algebra:85,geometry:91,stats:86,numSense:83},tags:['advanced learner','math identity: strong','parent support: high'],rec:'Acceleration discussion.',notes:''},
+  // PERIOD 5
+  {id:74,name:'Samira Osei',tier:'t3',ir:385,irM:394,irE:406,st:2,trend:'flat',pd:5,dom:{ratios:40,algebra:34,geometry:49,stats:41,numSense:33},tags:['parent support: low','home literacy: low'],rec:'Build relationship. Geometry as confidence entry point. Family outreach.',notes:''},
+  {id:75,name:'Andre Mitchell',tier:'t3',ir:390,irM:400,irE:412,st:2,trend:'up',pd:5,dom:{ratios:46,algebra:40,geometry:55,stats:46,numSense:39},tags:['growth mindset','responds to challenge','parent support: med'],rec:'Near T2. Structured challenge with scaffolding.',notes:''},
+  {id:76,name:'Leila Ahmadi',tier:'t3',ir:382,irM:391,irE:404,st:1,trend:'down',pd:5,dom:{ratios:37,algebra:31,geometry:45,stats:39,numSense:29},tags:['EL: other','math anxiety','parent support: high'],rec:'Intensive + EL support. Bilingual resources.',notes:''},
+  {id:77,name:'Deon Patterson',tier:'t3',ir:396,irM:407,irE:419,st:2,trend:'up',pd:5,dom:{ratios:52,algebra:45,geometry:58,stats:49,numSense:44},tags:['improving trend','responds to praise','parent support: med'],rec:'Near T2. Positive reinforcement + structured challenge.',notes:''},
+  {id:12,name:'Liam Osei',tier:'t2',ir:415,irM:425,irE:436,st:2,trend:'flat',pd:5,dom:{ratios:62,algebra:56,geometry:70,stats:60,numSense:58},tags:['IEP: Attention & Executive Function','responds to routine','parent support: med'],rec:'Structured routine small group. Ratio and algebra focus.',notes:''},
+  {id:18,name:'Caleb Washington',tier:'t2',ir:410,irM:424,irE:437,st:2,trend:'up',pd:5,dom:{ratios:60,algebra:57,geometry:68,stats:62,numSense:55},tags:['improving trend','parent support: med','responds to praise'],rec:'Statistics and number sense group. Positive trend.',notes:''},
+  {id:78,name:'Destiny Thompson',tier:'t2',ir:413,irM:424,irE:435,st:2,trend:'flat',pd:5,dom:{ratios:60,algebra:55,geometry:67,stats:58,numSense:55},tags:['prefers hands-on','engaged in class','parent support: med'],rec:'Ratio group with manipulatives.',notes:''},
+  {id:79,name:'Alejandro Ruiz',tier:'t2',ir:418,irM:430,irE:441,st:2,trend:'up',pd:5,dom:{ratios:64,algebra:59,geometry:70,stats:61,numSense:59},tags:['EL: Spanish','growth mindset','parent support: high'],rec:'Algebra group with EL differentiation. Near T1.',notes:''},
+  {id:80,name:'Simone Laurent',tier:'t2',ir:420,irM:432,irE:443,st:2,trend:'flat',pd:5,dom:{ratios:66,algebra:61,geometry:72,stats:63,numSense:61},tags:['strong work ethic','inconsistent homework','parent support: low'],rec:'Algebra group. Homework accountability.',notes:''},
+  {id:81,name:'Tyrese Banks',tier:'t2',ir:416,irM:427,irE:438,st:2,trend:'flat',pd:5,dom:{ratios:62,algebra:57,geometry:68,stats:60,numSense:57},tags:['responds to routine','parent support: med','engaged'],rec:'Structured ratio group.',notes:''},
+  {id:82,name:'Amara Osei',tier:'t2',ir:422,irM:434,irE:445,st:3,trend:'up',pd:5,dom:{ratios:68,algebra:63,geometry:73,stats:65,numSense:62},tags:['growth mindset','strong in geometry','parent support: high'],rec:'Stats and algebra group. Near T1.',notes:''},
+  {id:16,name:'Isaiah Freeman',tier:'t1',ir:438,irM:448,irE:457,st:3,trend:'up',pd:5,dom:{ratios:76,algebra:72,geometry:82,stats:75,numSense:71},tags:['growth mindset','engages in discourse','parent support: med'],rec:'On track. Math discourse leadership.',notes:''},
+  {id:83,name:'Nia Robinson',tier:'t1',ir:444,irM:454,irE:463,st:3,trend:'up',pd:5,dom:{ratios:80,algebra:76,geometry:85,stats:78,numSense:75},tags:['high engagement','peer tutor potential','parent support: high'],rec:'Enrichment + peer tutor.',notes:''},
+  {id:84,name:'Ethan Park',tier:'t1',ir:440,irM:450,irE:459,st:3,trend:'flat',pd:5,dom:{ratios:77,algebra:73,geometry:82,stats:75,numSense:72},tags:['steady performer','prefers independent work','parent support: med'],rec:'Monitor.',notes:''},
+  {id:85,name:'Adaeze Eze',tier:'t1',ir:448,irM:458,irE:467,st:3,trend:'up',pd:5,dom:{ratios:82,algebra:78,geometry:87,stats:80,numSense:77},tags:['high achiever','parent support: high'],rec:'Enrichment.',notes:''},
+  {id:86,name:'Chris Delacroix',tier:'t1',ir:442,irM:452,irE:461,st:3,trend:'flat',pd:5,dom:{ratios:78,algebra:74,geometry:83,stats:76,numSense:73},tags:['steady performer','responds to challenge','parent support: med'],rec:'Monitor. Challenge problems.',notes:''},
+  {id:87,name:'Mia Johansson',tier:'t1',ir:446,irM:456,irE:465,st:3,trend:'up',pd:5,dom:{ratios:81,algebra:77,geometry:85,stats:79,numSense:76},tags:['growth mindset','math identity: strong','parent support: high'],rec:'Advanced extensions.',notes:''},
+  {id:88,name:'Samuel Okonkwo',tier:'t1',ir:450,irM:460,irE:469,st:3,trend:'up',pd:5,dom:{ratios:84,algebra:80,geometry:87,stats:82,numSense:79},tags:['high achiever','engages in discourse','parent support: high'],rec:'Enrichment + discussion leadership.',notes:''},
+  {id:89,name:'Jasmine Patel',tier:'t1',ir:443,irM:453,irE:462,st:3,trend:'flat',pd:5,dom:{ratios:79,algebra:75,geometry:84,stats:77,numSense:74},tags:['steady performer','parent support: high'],rec:'Monitor.',notes:''},
+  {id:90,name:'Leon Muller',tier:'t1',ir:447,irM:457,irE:466,st:3,trend:'up',pd:5,dom:{ratios:82,algebra:78,geometry:86,stats:80,numSense:77},tags:['growth mindset','responds to challenge','parent support: med'],rec:'Enrichment.',notes:''},
+  {id:91,name:'Kezia Abara',tier:'t1',ir:451,irM:461,irE:470,st:3,trend:'up',pd:5,dom:{ratios:84,algebra:81,geometry:88,stats:83,numSense:80},tags:['peer tutor potential','high engagement','parent support: high'],rec:'Enrichment + peer tutor.',notes:''},
+  {id:92,name:'Dylan Tran',tier:'t1',ir:441,irM:451,irE:460,st:3,trend:'flat',pd:5,dom:{ratios:77,algebra:73,geometry:82,stats:75,numSense:72},tags:['steady performer','prefers hands-on','parent support: med'],rec:'Monitor.',notes:''},
+  {id:93,name:'Fatou Diallo',tier:'t1',ir:445,irM:455,irE:464,st:3,trend:'up',pd:5,dom:{ratios:80,algebra:76,geometry:85,stats:78,numSense:75},tags:['EL: other','growth mindset','parent support: high'],rec:'Enrichment.',notes:''},
+  {id:94,name:'Marcus Adeyemi',tier:'t1',ir:456,irM:465,irE:474,st:4,trend:'up',pd:5,dom:{ratios:89,algebra:85,geometry:91,stats:86,numSense:83},tags:['advanced learner','math identity: strong','parent support: high'],rec:'Acceleration discussion. Gifted coordinator referral.',notes:''},
+];
+
+/* ═══════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════ */
+const TITLES={
+  overview:'Intervention <em>Overview</em>',roster:'Student <em>Roster</em>',
+  domains:'Skill <em>Domains</em>',growth:'Growth <em>Trends</em>',
+  qualdata:'Qualitative <em>Data</em>',groups:'Group <em>Builder</em>',
+  interventions:'Active <em>Interventions</em>',reports:'<em>Reports</em>',
+  lessons:'<em>Lesson Plans</em>',games:'Math <em>Games</em>',import:'Import <em>Data</em>',
+};
+const inited={};
+function go(v,btn){
+  document.querySelectorAll('.ni').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('on'));
+  document.getElementById('view-'+v).classList.add('on');
+  document.getElementById('vtitle').innerHTML=TITLES[v];
+  if(!inited[v]){inited[v]=true;boot(v);}
+}
+function boot(v){
+  if(v==='overview'){initOverviewCharts();}
+  if(v==='roster'){renderT('all');}
+}
+
+/* ═══════════════════════════════════════
+   CHARTS — TOOLTIP CONFIG
+═══════════════════════════════════════ */
+const TT={backgroundColor:'#1d2230',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#e8eaf0',bodyColor:'#7a8099'};
+function mkChart(id,cfg){const el=document.getElementById(id);if(el)return new Chart(el,cfg);}
+
+const overviewCharts={};
+function initOverviewCharts(){renderOverviewCharts(students);}
+function renderOverviewCharts(base){
+  const bands=[s=>s.ir<385,s=>s.ir>=385&&s.ir<400,s=>s.ir>=400&&s.ir<415,s=>s.ir>=415&&s.ir<430,s=>s.ir>=430&&s.ir<445,s=>s.ir>=445];
+  const distData=bands.map(fn=>base.filter(fn).length);
+  const domKeys=['numSense','algebra','ratios','stats','geometry'];
+  const domLabels=['Number Sense','Algebra','Ratios','Statistics','Geometry'];
+  const domColors=['#f87171','#a78bfa','#5b8dee','#fb923c','#34d399'];
+  const gapData=domKeys.map(k=>base.length?Math.round(base.filter(s=>s.dom[k]<70).length/base.length*100):0);
+  const pds=[2,3,4,5];
+  const t3d=pds.map(p=>students.filter(s=>s.pd===p&&s.tier==='t3').length);
+  const t2d=pds.map(p=>students.filter(s=>s.pd===p&&s.tier==='t2').length);
+  const t1d=pds.map(p=>students.filter(s=>s.pd===p&&s.tier==='t1').length);
+  ['c-dist','c-gap','c-period'].forEach(id=>{if(overviewCharts[id]){overviewCharts[id].destroy();delete overviewCharts[id];}});
+  const c1=mkChart('c-dist',{type:'bar',data:{labels:['370–384','385–399','400–414','415–429','430–444','445+'],datasets:[{data:distData,backgroundColor:['#f87171','#f87171','#fb923c','#fb923c','#34d399','#34d399'],borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y} students`}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#7a8099',font:{family:'DM Mono',size:10},maxRotation:0}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},stepSize:5}}}}});
+  const c2=mkChart('c-gap',{type:'bar',data:{labels:domLabels,datasets:[{data:gapData,backgroundColor:domColors,borderRadius:4,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.x}% below proficiency`}}},scales:{x:{max:100,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},callback:v=>v+'%'}},y:{grid:{display:false},ticks:{color:'#7a8099',font:{size:11}}}}}});
+  const c3=mkChart('c-period',{type:'bar',data:{labels:['Period 2','Period 3','Period 4','Period 5'],datasets:[{label:'T3',data:t3d,backgroundColor:'#f87171',borderRadius:3},{label:'T2',data:t2d,backgroundColor:'#fb923c',borderRadius:3},{label:'T1',data:t1d,backgroundColor:'#34d399',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#7a8099',font:{size:11}}},y:{stacked:true,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},stepSize:5}}}}});
+  if(c1)overviewCharts['c-dist']=c1;
+  if(c2)overviewCharts['c-gap']=c2;
+  if(c3)overviewCharts['c-period']=c3;
+}
+
+/* ═══════════════════════════════════════
+   PERIOD FILTER + SEARCH
+═══════════════════════════════════════ */
+let searchQ='',activePeriod='all',af='all',sid=null;
+function onSearch(val){
+  searchQ=val.trim().toLowerCase();
+  document.getElementById('searchClear').classList.toggle('vis',!!searchQ);
+  renderT(af);
+  if(searchQ&&document.querySelector('.view.on')?.id!=='view-roster'){
+    go('roster',document.querySelector('.ni[data-v=roster]'));
+  }
+}
+function clearSearch(){document.getElementById('globalSearch').value='';onSearch('');}
+function setPeriod(pd,btn){
+  activePeriod=pd;
+  document.querySelectorAll('.pd-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderT(af);updateKPIs();
+  if(inited['overview']){const base=pd==='all'?students:students.filter(s=>s.pd===pd);renderOverviewCharts(base);}
+}
+function filteredStudents(tier){
+  let list=tier==='all'?[...students]:students.filter(s=>s.tier===tier);
+  if(activePeriod!=='all')list=list.filter(s=>s.pd===activePeriod);
+  if(searchQ)list=list.filter(s=>s.name.toLowerCase().includes(searchQ));
+  return list;
+}
+function updateKPIs(){
+  const base=activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod);
+  const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  el('kpi-total',base.length);
+  el('kpi-t3',base.filter(s=>s.tier==='t3').length);
+  el('kpi-t2',base.filter(s=>s.tier==='t2').length);
+  el('kpi-t1',base.filter(s=>s.tier==='t1').length);
+  const sub=document.getElementById('kpi-total-sub');
+  if(sub)sub.textContent=activePeriod==='all'?'Periods 2–5':`Period ${activePeriod}`;
+}
+
+/* ═══════════════════════════════════════
+   ROSTER
+═══════════════════════════════════════ */
+function filt(tier,btn){
+  document.querySelectorAll('.frow .fb').forEach(b=>{b.className='fb';});
+  btn.classList.add('fa');renderT(tier);
+}
+function renderT(f){
+  af=f;const b=document.getElementById('tbody');if(!b)return;
+  const list=filteredStudents(f);
+  if(!list.length){
+    b.innerHTML=`<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">◎</div><div class="empty-state-title">No students found</div><div class="empty-state-sub">${searchQ?'Try a different search term':'No students in this tier or period'}</div></div></td></tr>`;
+    return;
+  }
+  b.innerHTML=list.map(s=>{
+    const tc=s.trend==='up'?'#34d399':s.trend==='down'?'#f87171':'#7a8099';
+    const ts=s.trend==='up'?'▲':s.trend==='down'?'▼':'●';
+    const pct=Math.round(((s.ir-370)/(460-370))*100);
+    const bc=s.tier==='t3'?'#f87171':s.tier==='t2'?'#fb923c':'#34d399';
+    const geq=s.ir<400?'Gr 4–5':s.ir<415?'Gr 6':s.ir<430?'Gr 6–7':s.ir<445?'Gr 7':'Gr 7–8';
+    return `<tr onclick="selS(${s.id})" id="r-${s.id}" class="${sid===s.id?'sel':''}">
+      <td>${s.name}</td>
+      <td><span class="tb ${s.tier}">${s.tier==='t3'?'T3':s.tier==='t2'?'T2':'T1'}</span></td>
+      <td><div class="sbw"><div class="sb"><div class="sbf" style="width:${Math.max(0,Math.min(100,pct))}%;background:${bc}"></div></div><span style="font-family:var(--mono);font-size:11px">${s.ir}</span></div></td>
+      <td style="font-size:11px;color:var(--muted)">${geq}</td>
+      <td><span style="font-size:11px;color:${tc}">${ts} ${s.trend}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════
+   STUDENT DETAIL
+═══════════════════════════════════════ */
+function selS(id){sid=id;renderT(af);const s=students.find(x=>x.id===id);if(!s)return;renderDetail(s);}
+function renderDetail(s){
+  const geq=s.ir<400?'Gr 4–5':s.ir<415?'Gr 6':s.ir<430?'Gr 6–7':s.ir<445?'Gr 7':'Gr 7–8';
+  const domH=Object.entries(s.dom).map(([k,v])=>`<div class="drow"><span class="ddom">${DL[k]}</span><div class="dbar"><div class="dbarf" style="width:${v}%;background:${DC[k]}"></div></div><span class="dsc">${v}%</span></div>`).join('');
+  const tagListH=s.tags.map(t=>`<span class="qtag-rm ${TQ[t]||'qn'}">${t}<span class="rm-x" onclick="removeTag(${s.id},'${t.replace(/'/g,"\\'")}')">&times;</span></span>`).join('');
+  document.getElementById('ddetail').innerHTML=`
+    <div class="dsec" style="padding:15px 18px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div>
+          <div class="dname">${s.name}</div>
+          <div class="dmeta">
+            <span>Period ${s.pd}</span>
+            <span>iReady <strong style="color:var(--text)">${s.ir}</strong></span>
+            <span style="font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:4px;background:var(--bg3);border:1px solid var(--bmed);color:var(--muted)">${geq}</span>
+            <span>State: <strong style="color:var(--text)">${SL[s.st]}</strong></span>
+            <span class="tb ${s.tier}">${s.tier==='t3'?'Tier 3':s.tier==='t2'?'Tier 2':'Tier 1'}</span>
+          </div>
+        </div>
+        <button class="plan-btn" onclick="openPlan(${s.id})">✦ Plan for student</button>
+      </div>
+    </div>
+    <div class="dsec"><div class="dsl">Domain profile</div>${domH}</div>
+    <div class="dsec">
+      <div class="dsl">Qualitative indicators</div>
+      <div class="tag-editor">
+        <div class="tag-list-edit" id="tagList-${s.id}">${tagListH}</div>
+        <div class="tag-add-row">
+          <select class="tag-type-sel" id="tagType-${s.id}">
+            <option value="qp">Strength</option>
+            <option value="qn">Neutral</option>
+            <option value="qc">Concern</option>
+          </select>
+          <input class="tag-input" id="tagInput-${s.id}" placeholder="Add custom tag…" onkeydown="if(event.key==='Enter')addTag(${s.id})"/>
+          <button class="btn btnp" style="font-size:10px;padding:4px 10px" onclick="addTag(${s.id})">Add</button>
+        </div>
+      </div>
+      <div class="tag-bank" id="tagBank-${s.id}">
+        <div class="tag-bank-tabs" id="tagBankTabs-${s.id}">
+          ${TAG_BANK.map((c,i)=>`<button class="tbt${i===0?' on':''}" onclick="switchTagCat(${s.id},${i},this)">${c.cat}</button>`).join('')}
+        </div>
+        <div class="tag-bank-body" id="tagBankBody-${s.id}">
+          ${TAG_BANK[0].tags.map(tag=>`<span class="tag-chip ${tag.cls}${s.tags.includes(tag.t)?' added':''}" onclick="quickAddTag(${s.id},'${tag.t.replace(/'/g,"\\'")}','${tag.cls}',this)">${tag.t}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="dsec" style="padding:12px 18px">
+      <div class="dsl" style="padding:0 0 6px">Notes</div>
+      <textarea style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:8px 10px;font-family:var(--sans);resize:vertical;min-height:72px;outline:none" placeholder="Add observation notes…" onchange="saveNote(${s.id},this.value)">${s.notes||''}</textarea>
+    </div>
+    <div class="dsec" style="padding:10px 18px">
+      <div class="dsl" style="padding:0 0 6px">Recommendation</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">${s.rec}</div>
+    </div>`;
+}
+
+/* ═══════════════════════════════════════
+   TAG EDITOR
+═══════════════════════════════════════ */
+function addTag(id){
+  const s=students.find(x=>x.id===id);if(!s)return;
+  const inp=document.getElementById(`tagInput-${id}`);
+  const sel=document.getElementById(`tagType-${id}`);
+  const t=inp.value.trim().toLowerCase();
+  if(!t||s.tags.includes(t))return;
+  s.tags.push(t);if(!TQ[t])TQ[t]=sel.value;
+  inp.value='';markDirty();renderDetail(s);showToast('Tag added','#34d399');
+}
+function removeTag(id,t){
+  const s=students.find(x=>x.id===id);if(!s)return;
+  s.tags=s.tags.filter(x=>x!==t);markDirty();renderDetail(s);
+}
+function quickAddTag(id,t,cls,el){
+  const s=students.find(x=>x.id===id);if(!s)return;
+  if(s.tags.includes(t)){showToast('Tag already added','#7a8099');return;}
+  s.tags.push(t);if(!TQ[t])TQ[t]=cls;
+  el.classList.add('added');markDirty();
+  const list=document.getElementById(`tagList-${id}`);
+  if(list){const span=document.createElement('span');span.className=`qtag-rm ${cls}`;span.innerHTML=`${t}<span class="rm-x" onclick="removeTag(${id},'${t.replace(/'/g,"\\'")}')">&times;</span>`;list.appendChild(span);}
+  showToast('Tag added','#34d399');
+}
+function switchTagCat(id,idx,btn){
+  document.querySelectorAll(`#tagBankTabs-${id} .tbt`).forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const s=students.find(x=>x.id===id);if(!s)return;
+  const body=document.getElementById(`tagBankBody-${id}`);
+  if(body){body.innerHTML=TAG_BANK[idx].tags.map(tag=>`<span class="tag-chip ${tag.cls}${s.tags.includes(tag.t)?' added':''}" onclick="quickAddTag(${id},'${tag.t.replace(/'/g,"\\'")}','${tag.cls}',this)">${tag.t}</span>`).join('');}
+}
+function saveNote(id,val){
+  const s=students.find(x=>x.id===id);if(s){s.notes=val;markDirty();}
+}
+
+/* ═══════════════════════════════════════
+   STUDENT PLAN MODAL
+═══════════════════════════════════════ */
+function openPlan(id){
+  const s=students.find(x=>x.id===id);if(!s)return;
+  document.getElementById('planTitle').textContent=`Plan for ${s.name}`;
+  const domH=Object.entries(s.dom).sort((a,b)=>a[1]-b[1]).map(([k,v])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><span style="font-size:11px;color:var(--muted);width:130px;flex-shrink:0">${DL[k]}</span><div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div style="height:100%;width:${v}%;background:${DC[k]};border-radius:3px"></div></div><span style="font-size:10px;font-family:var(--mono);color:var(--dim);width:36px;text-align:right">${v}%</span></div>`).join('');
+  const priorities=Object.entries(s.dom).sort((a,b)=>a[1]-b[1]).slice(0,2).map(([k])=>DL[k]);
+  document.getElementById('planBody').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="background:var(--bg3);border-radius:8px;padding:12px"><div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">iReady Score</div><div style="font-family:var(--mono);font-size:22px;color:var(--accent)">${s.ir}</div></div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px"><div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">State Test Level</div><div style="font-size:14px;font-weight:600;color:${s.tier==='t3'?'var(--t3)':s.tier==='t2'?'var(--t2)':'var(--t1)'}">${SL[s.st]}</div></div>
+    </div>
+    <div style="margin-bottom:14px"><div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Domain profile</div>${domH}</div>
+    <div style="background:rgba(91,141,238,0.08);border:1px solid rgba(91,141,238,0.2);border-radius:8px;padding:12px;margin-bottom:14px">
+      <div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Priority focus areas</div>
+      <div style="font-size:12px;color:var(--accent)">${priorities.join(' · ')}</div>
+    </div>
+    <div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Recommendation</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.6;background:var(--bg3);border-radius:8px;padding:12px">${s.rec}</div>`;
+  document.getElementById('planOverlay').classList.add('vis');
+}
+function closePlanModal(){document.getElementById('planOverlay').classList.remove('vis');}
+
+/* ═══════════════════════════════════════
+   PERSISTENCE
+═══════════════════════════════════════ */
+const LS_KEY='mathview_v1';
+let isDirty=false;
+function saveAll(){
+  try{localStorage.setItem(LS_KEY,JSON.stringify(students));isDirty=false;updatePersistBar(true);showToast('Progress saved','#34d399');}
+  catch(e){showToast('Could not save — storage full','#f87171');}
+}
+function loadSaved(){
+  try{const raw=localStorage.getItem(LS_KEY);if(raw){const parsed=JSON.parse(raw);students.length=0;parsed.forEach(s=>students.push(s));updatePersistBar(true);return true;}}catch(e){}
+  updatePersistBar(false);return false;
+}
+function clearSaved(){
+  if(!confirm('Reset to demo data? All changes will be lost.'))return;
+  localStorage.removeItem(LS_KEY);location.reload();
+}
+function markDirty(){
+  isDirty=true;
+  const panel=document.getElementById('persistBar');panel.classList.add('unsaved');
+  document.getElementById('persistMsg').textContent='Unsaved changes';
+}
+function updatePersistBar(hasSaved){
+  const panel=document.getElementById('persistBar');
+  const dot=document.getElementById('persistDot');
+  const msg=document.getElementById('persistMsg');
+  if(hasSaved){panel.classList.remove('unsaved');dot.style.background='var(--t1)';msg.textContent=`${students.length} students saved`;}
+  else{dot.style.background='var(--dim)';msg.textContent='Demo data';}
+}
+function exportSession(){
+  const blob=new Blob([JSON.stringify({students,exported:new Date().toISOString()},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mathview_session_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  showToast('Session exported','#5b8dee');
+}
+function loadSession(file){
+  if(!file)return;const reader=new FileReader();
+  reader.onload=e=>{
+    try{const data=JSON.parse(e.target.result);const arr=data.students||data;if(!Array.isArray(arr))throw new Error();
+    students.length=0;arr.forEach(s=>students.push(s));saveAll();renderT(af);showToast(`Loaded ${arr.length} students`,'#34d399');}
+    catch(err){showToast('Invalid session file','#f87171');}
+  };reader.readAsText(file);
+}
+
+/* ═══════════════════════════════════════
+   CSV IMPORT
+═══════════════════════════════════════ */
+let csvHeaders=[],csvRows=[];
+const FIELD_MAP={name:['student name','name','full name','student'],ir:['scale score','iready score','overall scale score','score'],pd:['period','class period','section','class'],st:['performance level','pl','state score','proficiency level','level']};
+function handleFile(file){
+  if(!file)return;const reader=new FileReader();
+  reader.onload=e=>{
+    const lines=e.target.result.trim().split(/\r?\n/);
+    csvHeaders=parseCSVLine(lines[0]);
+    csvRows=lines.slice(1).filter(l=>l.trim()).map(parseCSVLine);
+    document.getElementById('importPreview').textContent=`Headers detected: ${csvHeaders.join(', ')}\nRows: ${csvRows.length}`;
+    buildColMapper();document.getElementById('colMapPanel').style.display='';
+  };reader.readAsText(file);
+}
+function parseCSVLine(line){const r=[];let cur='';let inQ=false;for(const ch of line){if(ch==='"'){inQ=!inQ;}else if(ch===','&&!inQ){r.push(cur.trim());cur='';}else cur+=ch;}r.push(cur.trim());return r;}
+function autoMatch(field){const aliases=FIELD_MAP[field]||[];return csvHeaders.findIndex(h=>aliases.some(a=>h.toLowerCase().includes(a)));}
+function buildColMapper(){
+  const tbl=document.getElementById('colMapTable');
+  const fields=[{key:'name',label:'Student Name',req:true},{key:'ir',label:'iReady Scale Score',req:true},{key:'pd',label:'Class Period',req:false},{key:'st',label:'Performance Level (1–4)',req:false}];
+  tbl.innerHTML=`<tr><th>MathView Field</th><th>Your CSV Column</th><th>Sample</th></tr>`+fields.map(f=>{
+    const match=autoMatch(f.key);
+    const opts=csvHeaders.map((h,i)=>`<option value="${i}"${i===match?' selected':''}>${h}</option>`).join('');
+    const sample=match>=0&&csvRows[0]?csvRows[0][match]:'—';
+    return `<tr><td style="color:var(--text)">${f.label}${f.req?'<span style="color:var(--t3)">*</span>':''}</td><td><select class="col-select" data-field="${f.key}"><option value="-1">— not mapped —</option>${opts}</select></td><td style="color:var(--muted);font-family:var(--mono);font-size:11px">${sample}</td></tr>`;
+  }).join('');
+}
+function applyImport(){
+  const selects=document.querySelectorAll('.col-select');const map={};
+  selects.forEach(s=>{map[s.dataset.field]=parseInt(s.value);});
+  if(map.name<0||map.ir<0){showImportStatus('Name and Score columns are required','err');return;}
+  const SLmap={'below basic':1,'basic':2,'proficient':3,'advanced':4,'1':1,'2':2,'3':3,'4':4};
+  const imported=csvRows.map((row,i)=>{
+    const name=row[map.name]||`Student ${i+1}`;
+    const ir=parseInt(row[map.ir])||420;
+    const pd=map.pd>=0?parseInt(row[map.pd])||2:2;
+    const stRaw=map.st>=0?(row[map.st]||'').toLowerCase().trim():'';
+    const st=SLmap[stRaw]||2;
+    const tier=ir<400?'t3':ir<430?'t2':'t1';
+    const existing=students.find(s=>s.name===name);
+    if(existing){existing.ir=ir;existing.pd=pd;existing.st=st;existing.tier=tier;return existing;}
+    return {id:Date.now()+i,name,tier,ir,irM:ir+12,irE:ir+22,st,trend:'flat',pd,dom:{ratios:55,algebra:50,geometry:60,stats:52,numSense:48},tags:['imported'],rec:'Review placement and add qualitative notes.',notes:''};
+  }).filter(Boolean);
+  students.length=0;imported.forEach(s=>students.push(s));saveAll();renderT(af);
+  showImportStatus(`Imported ${imported.length} students successfully`,'ok');
+  document.getElementById('colMapPanel').style.display='none';
+  setTimeout(()=>{go('roster',document.querySelector('.ni[data-v=roster]'));},1200);
+}
+function cancelImport(){document.getElementById('colMapPanel').style.display='none';document.getElementById('csvFile').value='';}
+function downloadTemplate(e){
+  e.stopPropagation();
+  const csv='Student Name,Scale Score,Class Period,Performance Level\nJane Smith,418,2,Basic\nMarcus Jones,392,3,Below Basic\nSofia Williams,445,4,Proficient';
+  const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mathview_import_template.csv';a.click();
+}
+function showImportStatus(msg,type){const el=document.getElementById('importStatus');el.textContent=msg;el.className='import-status '+type;}
+(function(){
+  const zone=document.getElementById('importZone');if(!zone)return;
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));
+  zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag');const f=e.dataTransfer.files[0];if(f&&f.name.endsWith('.csv'))handleFile(f);else showImportStatus('Please drop a .csv file','err');});
+})();
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+function showToast(msg,color){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.background=color||'#34d399';
+  t.classList.add('vis');clearTimeout(t._to);
+  t._to=setTimeout(()=>t.classList.remove('vis'),2200);
+}
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+(function(){
+  loadSaved();
+  updateKPIs();
+  inited['overview']=true;
+  initOverviewCharts();
+  // Drag+drop support for import zone already handled above
+})();
+</script>
+</body>
+</html>
