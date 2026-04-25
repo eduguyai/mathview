@@ -390,9 +390,98 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+/* ── M8: LOCK SCREEN ── */
+#lockScreen{position:fixed;inset:0;background:#0a0d14;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+#lockScreen.hidden{display:none}
+.lock-logo{font-size:22px;font-weight:700;letter-spacing:-.5px;color:#fff}
+.lock-logo span{color:var(--accent)}
+.lock-sub{font-size:11px;color:var(--dim);font-family:var(--mono);letter-spacing:.08em;margin-top:-12px}
+.lock-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 36px;display:flex;flex-direction:column;align-items:center;gap:16px;width:300px}
+.lock-prompt{font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:.05em}
+.lock-dots{display:flex;gap:10px}
+.lock-dot{width:12px;height:12px;border-radius:50%;background:var(--bg4);border:2px solid var(--bmed);transition:background .15s}
+.lock-dot.filled{background:var(--accent);border-color:var(--accent)}
+.lock-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.lock-key{background:var(--bg3);border:1px solid var(--bmed);border-radius:8px;padding:12px;font-size:16px;font-weight:600;color:var(--text);cursor:pointer;text-align:center;transition:background .1s}
+.lock-key:hover{background:var(--bg4)}
+.lock-key:active{background:var(--accent);color:#fff}
+.lock-err{font-size:11px;color:var(--t3);font-family:var(--mono);height:16px;text-align:center}
+.lock-hint{font-size:10px;color:var(--dim);text-align:center;line-height:1.5}
+#pinModal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:8000;display:flex;align-items:center;justify-content:center}
+#pinModal.hidden{display:none}
+.pin-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 32px;width:320px;display:flex;flex-direction:column;gap:14px}
+.pin-title{font-size:14px;font-weight:600;color:var(--text)}
+.pin-step{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.pin-input{background:var(--bg3);border:1px solid var(--bmed);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;font-family:var(--mono);letter-spacing:4px;width:100%;box-sizing:border-box;text-align:center}
+.pin-input:focus{outline:none;border-color:var(--accent)}
+.pin-row{display:flex;gap:8px}
+/* ── M8: PRIVACY TOGGLE ── */
+.priv-btn{display:flex;align-items:center;gap:7px;margin:6px 10px 0;padding:6px 10px;border-radius:7px;border:1px solid var(--bmed);background:transparent;color:var(--muted);font-size:11px;font-family:var(--mono);cursor:pointer;transition:all .15s;width:calc(100% - 20px)}
+.priv-btn:hover{background:var(--bg3);color:var(--text)}
+.priv-btn.active{background:rgba(91,141,238,.1);border-color:rgba(91,141,238,.35);color:var(--accent)}
+.priv-dot{width:7px;height:7px;border-radius:50%;background:var(--bmed);flex-shrink:0;transition:background .15s}
+.priv-btn.active .priv-dot{background:var(--accent)}
+body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;transition:filter .2s}
+/* ── M8: AUDIT LOG ── */
+.audit-wrap{max-height:240px;overflow-y:auto;border:1px solid var(--border);border-radius:8px}
+.audit-row{display:flex;gap:10px;align-items:baseline;padding:7px 12px;border-bottom:1px solid var(--border);font-size:10px;font-family:var(--mono)}
+.audit-row:last-child{border-bottom:none}
+.audit-ts{color:var(--dim);white-space:nowrap;flex-shrink:0;width:130px}
+.audit-evt{color:var(--muted)}
+.audit-ctx{color:var(--dim);font-size:9px;margin-left:auto}
+/* ── M8: FERPA / COMPLIANCE ── */
+.ferpa-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ferpa-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:7px;font-size:11px;line-height:1.5}
+.ferpa-yes{background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.15)}
+.ferpa-no{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.15)}
+.ferpa-icon{flex-shrink:0;font-size:13px}
+.ferpa-text{color:var(--muted)}
+.ferpa-text strong{color:var(--text);display:block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.sett-timeout{display:flex;gap:6px;flex-wrap:wrap}
+.timeout-btn{padding:4px 12px;border-radius:5px;border:1px solid var(--bmed);background:var(--bg3);color:var(--muted);font-size:10px;font-family:var(--mono);cursor:pointer;transition:all .15s}
+.timeout-btn.active{background:rgba(91,141,238,.1);border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
+<!-- LOCK SCREEN -->
+<div id="lockScreen" class="hidden">
+  <div class="lock-logo">Math<span>View</span></div>
+  <div class="lock-sub">7TH GRADE · INTERVENTION DASHBOARD</div>
+  <div class="lock-card">
+    <div class="lock-prompt" id="lockPrompt">ENTER PIN TO UNLOCK</div>
+    <div class="lock-dots" id="lockDots">
+      <div class="lock-dot" id="ld0"></div><div class="lock-dot" id="ld1"></div>
+      <div class="lock-dot" id="ld2"></div><div class="lock-dot" id="ld3"></div>
+    </div>
+    <div class="lock-pad">
+      <button class="lock-key" onclick="lockKey('1')">1</button><button class="lock-key" onclick="lockKey('2')">2</button><button class="lock-key" onclick="lockKey('3')">3</button>
+      <button class="lock-key" onclick="lockKey('4')">4</button><button class="lock-key" onclick="lockKey('5')">5</button><button class="lock-key" onclick="lockKey('6')">6</button>
+      <button class="lock-key" onclick="lockKey('7')">7</button><button class="lock-key" onclick="lockKey('8')">8</button><button class="lock-key" onclick="lockKey('9')">9</button>
+      <button class="lock-key" onclick="lockKey('back')" style="color:var(--dim);font-size:12px">⌫</button>
+      <button class="lock-key" onclick="lockKey('0')">0</button>
+      <button class="lock-key" onclick="lockKey('back')" style="color:var(--dim);font-size:12px;visibility:hidden">⌫</button>
+    </div>
+    <div class="lock-err" id="lockErr"></div>
+  </div>
+  <div class="lock-hint">Student data protected by PIN lock<br>All data stored locally — never transmitted</div>
+</div>
+<!-- PIN SETUP MODAL -->
+<div id="pinModal" class="hidden">
+  <div class="pin-card">
+    <div class="pin-title" id="pinModalTitle">Set Access PIN</div>
+    <div class="pin-step" id="pinModalStep">Create a 4-digit PIN to protect student data</div>
+    <input class="pin-input" id="pinInput1" type="password" inputmode="numeric" maxlength="4" placeholder="····" oninput="pinInputChange(1)">
+    <div id="pinConfirmRow" class="hidden">
+      <div class="pin-step">Confirm PIN</div>
+      <input class="pin-input" id="pinInput2" type="password" inputmode="numeric" maxlength="4" placeholder="····" oninput="pinInputChange(2)" style="margin-top:8px">
+    </div>
+    <div class="lock-err" id="pinErr"></div>
+    <div class="pin-row" style="justify-content:flex-end">
+      <button class="btn" onclick="closePinModal()">Cancel</button>
+      <button class="btn btnp" id="pinSaveBtn" onclick="savePIN()">Set PIN</button>
+    </div>
+  </div>
+</div>
 <div class="shell">
 
 <!-- SIDEBAR -->
@@ -421,6 +510,7 @@ tr.sel td{background:rgba(91,141,238,0.08)}
     <button class="ni" data-v="import" onclick="go('import',this)"><span class="ni-icon">⬆</span>Import Data</button>
     <button class="ni" data-v="settings" onclick="go('settings',this)"><span class="ni-icon">⚙</span>Settings</button>
   </nav>
+  <button class="priv-btn" id="privToggle" onclick="togglePrivacy()"><span class="priv-dot" id="privDot"></span><span id="privLabel">Privacy Mode</span></button>
   <div class="persist-bar">
     <div id="persistBar">
       <div class="persist-dot" id="persistDot"></div>
@@ -810,6 +900,48 @@ tr.sel td{background:rgba(91,141,238,0.08)}
           </div>
           <div style="font-size:11px;color:var(--dim);line-height:1.6">Export saves all students, groups, interventions, and settings as a JSON file. Import restores everything from a previous backup.</div>
         </div>
+        <!-- SECURITY & PRIVACY CARD -->
+        <div class="sett-card">
+          <div class="sett-title">Access Control <span class="sett-note">PIN lock · session timeout</span></div>
+          <div class="sett-grid" style="align-items:center">
+            <label class="sett-label">Access PIN</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span id="pinStatus" style="font-size:11px;font-family:var(--mono);color:var(--dim)">No PIN set</span>
+              <button class="btn" id="pinSetBtn" onclick="openPinModal(false)">Set PIN</button>
+              <button class="btn sett-danger" id="pinClearBtn" onclick="clearPIN()" style="display:none">Remove PIN</button>
+            </div>
+            <label class="sett-label">Auto-Lock After</label>
+            <div class="sett-timeout" id="timeoutBtns">
+              <button class="timeout-btn" data-t="0" onclick="setAutoLock(0,this)">Off</button>
+              <button class="timeout-btn" data-t="10" onclick="setAutoLock(10,this)">10 min</button>
+              <button class="timeout-btn" data-t="15" onclick="setAutoLock(15,this)">15 min</button>
+              <button class="timeout-btn" data-t="30" onclick="setAutoLock(30,this)">30 min</button>
+              <button class="timeout-btn" data-t="60" onclick="setAutoLock(60,this)">60 min</button>
+            </div>
+          </div>
+        </div>
+        <div class="sett-card">
+          <div class="sett-title">FERPA &amp; Data Privacy <span class="sett-note">Family Educational Rights &amp; Privacy Act</span></div>
+          <div class="ferpa-grid">
+            <div class="ferpa-item ferpa-yes"><span class="ferpa-icon">✅</span><div class="ferpa-text"><strong>Local Storage Only</strong>All student data stays in your browser. Zero cloud transmission.</div></div>
+            <div class="ferpa-item ferpa-yes"><span class="ferpa-icon">✅</span><div class="ferpa-text"><strong>No Third-Party Access</strong>No analytics, tracking, or ad networks. Data never leaves your device.</div></div>
+            <div class="ferpa-item ferpa-yes"><span class="ferpa-icon">✅</span><div class="ferpa-text"><strong>Educator-Controlled</strong>Only you access this dashboard. PIN lock adds an additional layer.</div></div>
+            <div class="ferpa-item ferpa-yes"><span class="ferpa-icon">✅</span><div class="ferpa-text"><strong>Right to Delete</strong>Use "Clear All Data" to permanently remove all student records.</div></div>
+            <div class="ferpa-item ferpa-yes"><span class="ferpa-icon">✅</span><div class="ferpa-text"><strong>Privacy Mode</strong>One-click name masking protects identity during classroom display.</div></div>
+            <div class="ferpa-item ferpa-yes"><span class="ferpa-icon">✅</span><div class="ferpa-text"><strong>No PII Transmitted</strong>Names, scores, and notes never sent to any server or API endpoint.</div></div>
+            <div class="ferpa-item ferpa-no"><span class="ferpa-icon">⚠️</span><div class="ferpa-text"><strong>Browser-Level Only</strong>Data is not encrypted at rest. Protect device with OS-level lock.</div></div>
+            <div class="ferpa-item ferpa-no"><span class="ferpa-icon">⚠️</span><div class="ferpa-text"><strong>No Multi-User Roles</strong>This is a single-educator tool. Do not share browser profiles.</div></div>
+          </div>
+          <div style="margin-top:12px;font-size:10px;color:var(--dim);line-height:1.6;font-family:var(--mono)">
+            MathView is designed for individual educator use in compliance with FERPA best practices. For district-wide deployment requiring SSO, role-based access, and encryption at rest, consult your district IT and data privacy officer.
+          </div>
+        </div>
+        <div class="sett-card">
+          <div class="sett-title" style="display:flex;align-items:center;justify-content:space-between">
+            Activity Log <button class="btn" style="font-size:10px;padding:3px 9px" onclick="clearAuditLog()">Clear Log</button>
+          </div>
+          <div class="audit-wrap" id="auditLogWrap"><div style="padding:16px;text-align:center;font-size:11px;color:var(--dim);font-family:var(--mono)">No activity recorded yet.</div></div>
+        </div>
       </div>
     </div>
 
@@ -1189,7 +1321,7 @@ function renderT(f){
     const bc=s.tier==='t3'?'#f87171':s.tier==='t2'?'#fb923c':'#34d399';
     const geq=s.ir<400?'Gr 4–5':s.ir<415?'Gr 6':s.ir<430?'Gr 6–7':s.ir<445?'Gr 7':'Gr 7–8';
     return `<tr onclick="selS(${s.id})" id="r-${s.id}" class="${sid===s.id?'sel':''}">
-      <td>${s.name}</td>
+      <td><span class="pv-name">${s.name}</span></td>
       <td><span class="tb ${s.tier}">${s.tier==='t3'?'T3':s.tier==='t2'?'T2':'T1'}</span></td>
       <td><div class="sbw"><div class="sb"><div class="sbf" style="width:${Math.max(0,Math.min(100,pct))}%;background:${bc}"></div></div><span style="font-family:var(--mono);font-size:11px">${s.ir}</span></div></td>
       <td style="font-size:11px;color:var(--muted)">${geq}</td>
@@ -1210,7 +1342,7 @@ function renderDetail(s){
     <div class="dsec" style="padding:15px 18px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
         <div>
-          <div class="dname">${s.name}</div>
+          <div class="dname pv-name">${s.name}</div>
           <div class="dmeta">
             <span>Period ${s.pd}</span>
             <span>iReady <strong style="color:var(--text)">${s.ir}</strong></span>
@@ -1985,6 +2117,7 @@ function exportJSON(){
   a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data,null,2));
   a.download=`mathview-backup-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
+  logAudit('Data exported',`${students.length} students · JSON backup`);
 }
 
 function importBackup(file){
@@ -1998,6 +2131,7 @@ function importBackup(file){
       if(d.interventions)interventions.splice(0,interventions.length,...d.interventions);
       if(d.cfg){cfg=d.cfg;localStorage.setItem('mathview_cfg',JSON.stringify(cfg));}
       saveAll();
+      logAudit('Backup imported',`${(d.students||[]).length} students restored`);
       showToast('Backup restored — reloading…','#34d399');
       setTimeout(()=>location.reload(),1200);
     }catch(ex){showToast('Invalid backup file','#f87171');}
@@ -2007,6 +2141,7 @@ function importBackup(file){
 
 function confirmClearAll(){
   if(!confirm('Clear ALL student data, groups, and interventions? This cannot be undone.'))return;
+  logAudit('All data cleared','full data wipe performed');
   ['mathview_v1','mathview_groups','mathview_ints','mathview_cfg'].forEach(k=>localStorage.removeItem(k));
   showToast('All data cleared — reloading…','#f87171');
   setTimeout(()=>location.reload(),1200);
@@ -2287,7 +2422,7 @@ function renderReports(){
     let topNeed='—';
     if(s.dom){const e=Object.entries(s.dom).sort((a,b)=>a[1]-b[1]);if(e.length)topNeed=DL[e[0][0]]||e[0][0];}
     return`<tr>
-      <td style="font-weight:500">${s.name}</td>
+      <td style="font-weight:500"><span class="pv-name">${s.name}</span></td>
       <td><span class="tb ${s.tier}">${s.tier.toUpperCase()}</span></td>
       <td style="font-family:var(--mono)">${boy}</td>
       <td style="font-family:var(--mono)">${moy}</td>
@@ -2447,7 +2582,7 @@ function renderGroupDetail(){
   if(!g){el.innerHTML='<div style="color:var(--dim);font-size:12px;text-align:center;padding:40px">← Select a group</div>';return;}
   const members=students.filter(s=>g.members.includes(s.id));
   const avail=students.filter(s=>!g.members.includes(s.id)&&(g.tier==='all'||s.tier===g.tier)&&(g.pd==='all'||s.pd===parseInt(g.pd))).slice(0,30);
-  const mRow=s=>`<div class="group-member"><span class="tb ${s.tier}" style="font-size:9px">${s.tier.toUpperCase()}</span><span class="group-member-name">${s.name}</span><span class="group-member-meta">Pd ${s.pd} · ${s.ir}</span>`;
+  const mRow=s=>`<div class="group-member"><span class="tb ${s.tier}" style="font-size:9px">${s.tier.toUpperCase()}</span><span class="group-member-name pv-name">${s.name}</span><span class="group-member-meta">Pd ${s.pd} · ${s.ir}</span>`;
   el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
     <div style="font-size:14px;font-weight:500">${g.name}</div>
     <button class="btn" style="font-size:10px;color:var(--t3)" onclick="deleteGroup(${g.id})">Delete</button>
@@ -2486,7 +2621,7 @@ function renderIntList(){
     return `<div class="int-row">
       <span class="int-badge ${ov?'int-overdue':'int-active'}">${ov?'OVERDUE':'ACTIVE'}</span>
       <div style="flex:1">
-        <div class="int-name">${s.name}</div>
+        <div class="int-name pv-name">${s.name}</div>
         <div class="int-meta">Pd ${s.pd} · ${DL[iv.domain]||iv.domain} · ${iv.freq} · Started ${iv.date}${ov?` · <span style="color:var(--t3)">${weeks}w ago</span>`:''}</div>
         ${iv.notes?`<div style="font-size:11px;color:var(--muted);margin-top:3px">${iv.notes}</div>`:''}
       </div>
@@ -2508,6 +2643,184 @@ function saveIntervention(){
   showToast('Intervention logged','#34d399');
 }
 function removeInt(id){interventions=interventions.filter(x=>x.id!==id);saveInts();renderIntList();}
+
+/* ═══════════════════════════════════════
+   M8 — SECURITY & PRIVACY
+═══════════════════════════════════════ */
+// ── AUDIT LOG ──
+let auditLog=JSON.parse(localStorage.getItem('mathview_audit')||'[]');
+function logAudit(evt,ctx){
+  const ts=new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:true});
+  auditLog.unshift({ts,evt,ctx:ctx||''});
+  if(auditLog.length>50)auditLog.length=50;
+  localStorage.setItem('mathview_audit',JSON.stringify(auditLog));
+}
+function renderAuditLog(){
+  const el=document.getElementById('auditLogWrap');
+  if(!el)return;
+  if(!auditLog.length){el.innerHTML='<div style="padding:16px;text-align:center;font-size:11px;color:var(--dim);font-family:var(--mono)">No activity recorded yet.</div>';return;}
+  el.innerHTML=auditLog.map(r=>`<div class="audit-row"><span class="audit-ts">${r.ts}</span><span class="audit-evt">${r.evt}</span><span class="audit-ctx">${r.ctx}</span></div>`).join('');
+}
+function clearAuditLog(){
+  if(!confirm('Clear all activity log entries?'))return;
+  auditLog=[];
+  localStorage.removeItem('mathview_audit');
+  renderAuditLog();
+  showToast('Activity log cleared','#5b8dee');
+}
+
+// ── PIN LOCK ──
+let lockBuffer='';
+const LOCK_KEY='mathview_pin';
+function getLockHash(){return localStorage.getItem(LOCK_KEY)||'';}
+async function hashPIN(pin){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pin));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function updateLockDots(){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('ld'+i);
+    if(d)d.classList.toggle('filled',i<lockBuffer.length);
+  }
+}
+function lockKey(k){
+  const errEl=document.getElementById('lockErr');
+  if(k==='back'){lockBuffer=lockBuffer.slice(0,-1);updateLockDots();if(errEl)errEl.textContent='';return;}
+  if(lockBuffer.length>=4)return;
+  lockBuffer+=k;
+  updateLockDots();
+  if(lockBuffer.length===4){
+    const entered=lockBuffer;
+    lockBuffer='';
+    setTimeout(()=>updateLockDots(),100);
+    hashPIN(entered).then(h=>{
+      if(h===getLockHash()){
+        document.getElementById('lockScreen').classList.add('hidden');
+        logAudit('Unlocked','PIN verified');
+        resetInactivityTimer();
+      } else {
+        if(errEl)errEl.textContent='Incorrect PIN. Try again.';
+        lockBuffer='';updateLockDots();
+      }
+    });
+  }
+}
+function lockApp(){
+  if(!getLockHash())return;
+  lockBuffer='';
+  updateLockDots();
+  const errEl=document.getElementById('lockErr');
+  if(errEl)errEl.textContent='';
+  document.getElementById('lockScreen').classList.remove('hidden');
+  logAudit('Screen locked','auto-lock or manual');
+}
+function checkPINStatus(){
+  const has=!!getLockHash();
+  const ps=document.getElementById('pinStatus');
+  const sb=document.getElementById('pinSetBtn');
+  const cb=document.getElementById('pinClearBtn');
+  if(ps)ps.textContent=has?'PIN is set ✓':'No PIN set';
+  if(ps)ps.style.color=has?'var(--t1)':'var(--dim)';
+  if(sb)sb.textContent=has?'Change PIN':'Set PIN';
+  if(cb)cb.style.display=has?'':'none';
+}
+function openPinModal(isChange){
+  document.getElementById('pinInput1').value='';
+  const inp2=document.getElementById('pinInput2');
+  if(inp2)inp2.value='';
+  const cr=document.getElementById('pinConfirmRow');
+  if(cr)cr.classList.add('hidden');
+  const pe=document.getElementById('pinErr');
+  if(pe)pe.textContent='';
+  document.getElementById('pinModalTitle').textContent=isChange?'Change Access PIN':'Set Access PIN';
+  document.getElementById('pinModalStep').textContent='Create a 4-digit PIN to protect student data';
+  document.getElementById('pinModal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('pinInput1').focus(),100);
+}
+function closePinModal(){document.getElementById('pinModal').classList.add('hidden');}
+function pinInputChange(step){
+  if(step===1&&document.getElementById('pinInput1').value.length===4){
+    const cr=document.getElementById('pinConfirmRow');
+    if(cr){cr.classList.remove('hidden');setTimeout(()=>document.getElementById('pinInput2').focus(),50);}
+  }
+}
+function savePIN(){
+  const p1=document.getElementById('pinInput1').value;
+  const p2=document.getElementById('pinInput2').value;
+  const pe=document.getElementById('pinErr');
+  if(!/^\d{4}$/.test(p1)){if(pe)pe.textContent='PIN must be exactly 4 digits.';return;}
+  if(p1!==p2){if(pe)pe.textContent='PINs do not match.';return;}
+  hashPIN(p1).then(h=>{
+    localStorage.setItem(LOCK_KEY,h);
+    closePinModal();
+    checkPINStatus();
+    showToast('PIN saved successfully','#34d399');
+    logAudit('PIN updated','access control changed');
+  });
+}
+function clearPIN(){
+  if(!confirm('Remove PIN lock? Anyone with browser access can open the dashboard.'))return;
+  localStorage.removeItem(LOCK_KEY);
+  checkPINStatus();
+  showToast('PIN removed','#fb923c');
+  logAudit('PIN removed','access control changed');
+}
+
+// ── SESSION TIMEOUT ──
+let autoLockMins=parseInt(localStorage.getItem('mathview_timeout')||'0');
+let inactivityTimer=null;
+function setAutoLock(mins,btn){
+  autoLockMins=mins;
+  localStorage.setItem('mathview_timeout',String(mins));
+  document.querySelectorAll('.timeout-btn').forEach(b=>b.classList.toggle('active',b===btn));
+  resetInactivityTimer();
+}
+function resetInactivityTimer(){
+  clearTimeout(inactivityTimer);
+  if(autoLockMins>0&&getLockHash()){
+    inactivityTimer=setTimeout(()=>lockApp(),autoLockMins*60000);
+  }
+}
+function initTimeoutUI(){
+  const saved=parseInt(localStorage.getItem('mathview_timeout')||'0');
+  autoLockMins=saved;
+  document.querySelectorAll('.timeout-btn').forEach(b=>{
+    b.classList.toggle('active',parseInt(b.dataset.t)===saved);
+  });
+}
+['mousemove','keydown','mousedown','touchstart'].forEach(ev=>{
+  document.addEventListener(ev,()=>resetInactivityTimer(),{passive:true});
+});
+
+// ── PRIVACY MODE ──
+let privacyMode=false;
+function togglePrivacy(){
+  privacyMode=!privacyMode;
+  document.body.classList.toggle('privacy-on',privacyMode);
+  const btn=document.getElementById('privToggle');
+  const lbl=document.getElementById('privLabel');
+  if(btn)btn.classList.toggle('active',privacyMode);
+  if(lbl)lbl.textContent=privacyMode?'Names Hidden':'Privacy Mode';
+  logAudit(privacyMode?'Privacy mode ON':'Privacy mode OFF','name masking');
+}
+
+// ── HOOK INTO initSettings ──
+const _origInitSettings=initSettings;
+function initSettings(){
+  _origInitSettings();
+  checkPINStatus();
+  initTimeoutUI();
+  renderAuditLog();
+}
+
+// ── STARTUP LOCK CHECK ──
+(function initLock(){
+  if(getLockHash()){
+    document.getElementById('lockScreen').classList.remove('hidden');
+  }
+  resetInactivityTimer();
+  logAudit('Session started','MathView opened');
+})();
 
 /* ═══════════════════════════════════════
    INIT
