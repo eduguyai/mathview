@@ -783,8 +783,16 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
             <button class="btn" onclick="cancelImport()">Cancel</button>
           </div>
           <div id="importStatus"></div>
+          <div id="importWarnings" style="display:none"></div>
         </div>
-        <div style="margin-top:18px;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">
+        <div style="margin-top:12px;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px">📋 Bubble Sheet Entry Form</div>
+            <div style="font-size:11px;color:var(--dim);line-height:1.5">For paper-based data collection. Print, fill in, then type scores into MathView.</div>
+          </div>
+          <button class="btn" onclick="printBubbleSheet()" style="white-space:nowrap">🖨 Print Form</button>
+        </div>
+        <div style="margin-top:12px;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">
           <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:6px">Load a previous session</div>
           <input type="file" id="sessionFile" accept=".json" style="display:none" onchange="loadSession(this.files[0])">
           <button class="btn" onclick="document.getElementById('sessionFile').click()" style="font-size:11px">Load JSON session</button>
@@ -1226,8 +1234,9 @@ function mkChart(id,cfg){const el=document.getElementById(id);if(el)return new C
 const overviewCharts={};
 function initOverviewCharts(){renderOverviewCharts(students);}
 function renderOverviewCharts(base){
-  const bands=[s=>s.ir<385,s=>s.ir>=385&&s.ir<400,s=>s.ir>=400&&s.ir<415,s=>s.ir>=415&&s.ir<430,s=>s.ir>=430&&s.ir<445,s=>s.ir>=445];
-  const distData=bands.map(fn=>base.filter(fn).length);
+  // 7 bands matching 2025-26 norms labels
+  const bands=[s=>s.ir&&s.ir<400,s=>s.ir>=400&&s.ir<415,s=>s.ir>=415&&s.ir<430,s=>s.ir>=430&&s.ir<445,s=>s.ir>=445&&s.ir<461,s=>s.ir>=461&&s.ir<487,s=>s.ir>=487];
+  const distData=bands.map(fn=>base.filter(s=>s.ir&&fn(s)).length);
   const domKeys=['numSense','algebra','ratios','stats','geometry'];
   const domLabels=['Number Sense','Algebra','Ratios','Statistics','Geometry'];
   const domColors=['#f87171','#a78bfa','#5b8dee','#fb923c','#34d399'];
@@ -1238,8 +1247,9 @@ function renderOverviewCharts(base){
   const t1d=pds.map(p=>students.filter(s=>s.pd===p&&s.tier==='t1').length);
   ['c-dist','c-gap','c-period','c-tiermov','c-domtier','c-atrisk'].forEach(id=>{if(overviewCharts[id]){overviewCharts[id].destroy();delete overviewCharts[id];}});
   // Grade-level multi-line labels for distribution
-  const distLabels=[['370–384','Gr 4–5'],['385–399','Gr 5–6'],['400–414','Gr 6'],['415–429','Gr 6–7'],['430–444','Gr 7 ✓'],['445+','Gr 7–8+']];
-  const c1=mkChart('c-dist',{type:'bar',data:{labels:distLabels,datasets:[{data:distData,backgroundColor:['#f87171','#f87171','#fb923c','#fb923c','#34d399','#34d399'],borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{title:c=>c[0].label.join(' '),label:c=>` ${c.parsed.y} students`}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#7a8099',font:{family:'DM Mono',size:9},maxRotation:0}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},stepSize:5}}}}});
+  // 2025–26 norms: Gr7 math BOY 10th pct=435, 25th=461, 50th=487; criterion-ref placement below
+  const distLabels=[['<400','≤Gr 4 · <1%ile'],['400–414','Gr 5 · ~3%ile'],['415–429','Gr 6 · ~5%ile'],['430–444','Gr 6–7 · ~10%ile'],['445–460','Approaching · ~15%ile'],['461–486','Gr 7 · 25–49%ile'],['487+','≥50th %ile']];
+  const c1=mkChart('c-dist',{type:'bar',data:{labels:distLabels,datasets:[{data:distData,backgroundColor:['#f87171','#f87171','#fb923c','#fb923c','#fb923c','#34d399','#34d399'],borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{title:c=>c[0].label.join(' '),label:c=>` ${c.parsed.y} students`}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#7a8099',font:{family:'DM Mono',size:9},maxRotation:0}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},stepSize:5}}}}});
   const c2=mkChart('c-gap',{type:'bar',data:{labels:domLabels,datasets:[{data:gapData,backgroundColor:domColors,borderRadius:4,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.x}% below proficiency`}}},scales:{x:{max:100,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},callback:v=>v+'%'}},y:{grid:{display:false},ticks:{color:'#7a8099',font:{size:11}}}}}});
   const c3=mkChart('c-period',{type:'bar',data:{labels:['Period 2','Period 3','Period 4','Period 5'],datasets:[{label:'T3',data:t3d,backgroundColor:'#f87171',borderRadius:3},{label:'T2',data:t2d,backgroundColor:'#fb923c',borderRadius:3},{label:'T1',data:t1d,backgroundColor:'#34d399',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#7a8099',font:{size:11}}},y:{stacked:true,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},stepSize:5}}}}});
   // ── 3 new overview charts ──
@@ -1365,6 +1375,34 @@ function renderDetail(s){
           <div class="goal-actual" style="color:${col}">${act||'—'}${diff?`<span style="font-size:10px;margin-left:4px">${diff}</span>`:''}</div>
           <div class="goal-target-row">Goal: <input class="goal-inp" type="number" value="${goal||''}" placeholder="—" onchange="saveGoal(${s.id},'${field}',this.value)"></div>
         </div>`;}).join('')}</div>
+    </div>
+    <div class="dsec" style="padding:12px 16px">
+      <div class="dsl" style="padding:0 0 8px">Additional Scores</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);margin-bottom:6px">State Exam (Prev. Year)</div>
+          <div style="display:flex;gap:6px;margin-bottom:4px">
+            <input type="number" class="sett-num" placeholder="Score" style="width:70px" value="${s.stateExam?.score||''}" onchange="saveExtra(${s.id},'stateExam','score',this.value)">
+            <select class="tag-type-sel" style="flex:1;padding:4px 6px" onchange="saveExtra(${s.id},'stateExam','level',this.value)">
+              <option value="">Level…</option>
+              ${['Below Basic','Basic','Approaching','Proficient','Advanced'].map(l=>`<option value="${l}"${s.stateExam?.level===l?' selected':''}>${l}</option>`).join('')}
+            </select>
+          </div>
+          <input type="text" class="sett-input" placeholder="Year (e.g. 2023–24)" style="font-size:10px;padding:4px 8px;width:100%;box-sizing:border-box" value="${s.stateExam?.year||''}" onchange="saveExtra(${s.id},'stateExam','year',this.value)">
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);margin-bottom:6px">Reading iReady</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
+            ${[['BOY','readIR'],['MOY','readIRM'],['EOY','readIRE']].map(([lbl,f])=>`<div><div style="font-size:9px;color:var(--dim);text-align:center">${lbl}</div><input type="number" class="sett-num" placeholder="—" style="width:100%;text-align:center;box-sizing:border-box" value="${s[f]||''}" onchange="saveReadScore(${s.id},'${f}',this.value)"></div>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);margin-bottom:6px">Testing Habits</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${['Strong — consistent effort','Inconsistent — varies by day','Rushes through — may underperform','Refuses / shuts down','Testing anxiety noted','Strong effort, struggles anyway'].map(h=>`<span class="tag-chip ${s.tags.includes(h.toLowerCase())?'added':'qn'}" onclick="quickAddTag(${s.id},'${h.toLowerCase()}','qn',this)" style="font-size:9px">${h}</span>`).join('')}
+        </div>
+      </div>
     </div>
     <div class="dsec">
       <div class="dsl">Qualitative indicators</div>
@@ -1534,19 +1572,31 @@ function applyImport(){
   selects.forEach(s=>{map[s.dataset.field]=parseInt(s.value);});
   if(map.name<0||map.ir<0){showImportStatus('Name and Score columns are required','err');return;}
   const SLmap={'below basic':1,'basic':2,'proficient':3,'advanced':4,'1':1,'2':2,'3':3,'4':4};
+  const warnings=[];
   const imported=csvRows.map((row,i)=>{
     const name=row[map.name]||`Student ${i+1}`;
-    const ir=parseInt(row[map.ir])||420;
+    const irRaw=map.ir>=0?parseInt(row[map.ir]):NaN;
+    const ir=isNaN(irRaw)||!irRaw?null:irRaw;
+    if(!ir)warnings.push(`${name}: no iReady BOY score — flagged for manual entry`);
+    const irMRaw=map.irM>=0?parseInt(row[map.irM]):NaN;
+    const irM=isNaN(irMRaw)||!irMRaw?null:irMRaw;
+    const irERaw=map.irE>=0?parseInt(row[map.irE]):NaN;
+    const irE=isNaN(irERaw)||!irERaw?null:irERaw;
     const pd=map.pd>=0?parseInt(row[map.pd])||2:2;
     const stRaw=map.st>=0?(row[map.st]||'').toLowerCase().trim():'';
-    const st=SLmap[stRaw]||2;
-    const tier=ir<400?'t3':ir<430?'t2':'t1';
+    const st=SLmap[stRaw]||null;
+    const tier=!ir?'t3':ir<415?'t3':ir<440?'t2':'t1';
     const existing=students.find(s=>s.name===name);
-    if(existing){existing.ir=ir;existing.pd=pd;existing.st=st;existing.tier=tier;return existing;}
-    return {id:Date.now()+i,name,tier,ir,irM:ir+12,irE:ir+22,st,trend:'flat',pd,dom:{ratios:55,algebra:50,geometry:60,stats:52,numSense:48},tags:['imported'],rec:'Review placement and add qualitative notes.',notes:''};
+    if(existing){if(ir)existing.ir=ir;if(irM)existing.irM=irM;if(irE)existing.irE=irE;if(pd)existing.pd=pd;if(st)existing.st=st;existing.tier=tier;return existing;}
+    return {id:Date.now()+i,name,tier,ir,irM,irE,st,trend:'flat',pd,dom:{ratios:null,algebra:null,geometry:null,stats:null,numSense:null},tags:ir?['imported']:['imported','⚠ score missing'],rec:'Review placement and add qualitative notes.',notes:'',stateExam:null,readIR:null,readIRM:null,readIRE:null};
   }).filter(Boolean);
   students.length=0;imported.forEach(s=>students.push(s));saveAll();renderT(af);
-  showImportStatus(`Imported ${imported.length} students successfully`,'ok');
+  logAudit('CSV imported',`${imported.length} students, ${warnings.length} flagged`);
+  if(warnings.length){
+    const warnEl=document.getElementById('importWarnings');
+    if(warnEl){warnEl.innerHTML=`<div style="margin-top:10px;padding:10px 14px;background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.25);border-radius:8px;font-size:11px;font-family:var(--mono);color:#fb923c;line-height:1.8"><strong>⚠ ${warnings.length} student(s) missing scores — flagged for manual entry:</strong><br>${warnings.join('<br>')}</div>`;warnEl.style.display='';}
+  }
+  showImportStatus(`Imported ${imported.length} students · ${warnings.length} flagged`,'ok');
   document.getElementById('colMapPanel').style.display='none';
   setTimeout(()=>{go('roster',document.querySelector('.ni[data-v=roster]'));},1200);
 }
@@ -2153,6 +2203,15 @@ function confirmClearAll(){
 function renderAlerts(){
   const panel=document.getElementById('alertsPanel');
   if(!panel)return;
+  // Priority domain banner
+  const pd=getPriorityDomain();
+  const pdHTML=pd?`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:10px;background:rgba(167,139,250,0.07);border:1px solid rgba(167,139,250,0.2);border-radius:8px;font-size:11px">
+    <span style="font-size:16px">🎯</span>
+    <div><span style="color:var(--accent2);font-weight:600">Highest-Leverage Focus: ${DL[pd.k]}</span>
+    <span style="color:var(--dim);margin-left:8px">${Math.round(pd.gap*100)}% of students below 65% · class avg ${Math.round(pd.avg)}%</span>
+    <span style="color:var(--dim);margin-left:8px">— Address this domain first for maximum grade-level impact</span></div>
+  </div>`:'';
+  panel.innerHTML=pdHTML;
   const regressing=students.filter(s=>s.irE&&s.ir&&s.irE<s.ir);
   const noInt=students.filter(s=>{
     const concerns=s.tags.filter(t=>TQ[t]==='qc').length;
@@ -2160,14 +2219,14 @@ function renderAlerts(){
   });
   const noDom=students.filter(s=>!s.dom||Object.values(s.dom).every(v=>!v||v===50));
   if(!regressing.length&&!noInt.length&&!noDom.length){
-    panel.innerHTML='<div class="alert-ok">✓ No alerts — all students on track</div>';return;
+    panel.innerHTML+=`<div class="alert-ok">✓ No alerts — all students on track</div>`;return;
   }
   const pills=[
     {arr:regressing,color:'var(--t3)',bc:'rgba(248,113,113,0.2)',bg:'rgba(248,113,113,0.06)',icon:'↘',lbl:'Regressing',sub:'EOY score below BOY'},
     {arr:noInt,color:'var(--t2)',bc:'rgba(251,146,60,0.2)',bg:'rgba(251,146,60,0.06)',icon:'⚠',lbl:'Need Intervention',sub:'2+ concerns · no plan logged'},
     {arr:noDom,color:'var(--accent)',bc:'rgba(91,141,238,0.2)',bg:'rgba(91,141,238,0.06)',icon:'◷',lbl:'Missing Domain Data',sub:'Domain scores not entered'},
   ].filter(p=>p.arr.length);
-  panel.innerHTML=`<div class="alerts-row">${pills.map(p=>`
+  panel.innerHTML+=`<div class="alerts-row">${pills.map(p=>`
     <div class="alert-pill" style="border-color:${p.bc};background:${p.bg}" onclick="alertNav(${p.arr[0].id},'${p.lbl}',${p.arr.length})">
       <div class="alert-count" style="color:${p.color}">${p.arr.length}</div>
       <div><div class="alert-lbl">${p.icon} ${p.lbl}</div><div class="alert-sub">${p.sub}</div></div>
@@ -2643,6 +2702,103 @@ function saveIntervention(){
   showToast('Intervention logged','#34d399');
 }
 function removeInt(id){interventions=interventions.filter(x=>x.id!==id);saveInts();renderIntList();}
+
+/* ═══════════════════════════════════════
+   M9 — SCORE NORMS · EXTRA FIELDS · BUBBLE SHEET
+═══════════════════════════════════════ */
+// 2025-26 Grade 7 Math norms (criterion-ref placement, not percentile)
+const IR_NORMS_7={
+  boy:{p10:436,p25:461,p50:487,p75:509},
+  moy:{p10:441,p25:466,p50:495,p75:514},
+  eoy:{p10:443,p25:470,p50:500,p75:524}
+};
+function irPercentile(score,window){
+  if(!score)return null;
+  const n=IR_NORMS_7[window]||IR_NORMS_7.boy;
+  if(score>=n.p75)return '≥75th';
+  if(score>=n.p50)return '50–74th';
+  if(score>=n.p25)return '25–49th';
+  if(score>=n.p10)return '10–24th';
+  return '<10th';
+}
+
+// Save extra fields (stateExam, readIR, etc.)
+function saveExtra(id,field,key,val){
+  const s=students.find(x=>x.id===id);if(!s)return;
+  if(!s[field]||typeof s[field]!=='object')s[field]={};
+  s[field][key]=val;markDirty();
+}
+function saveReadScore(id,field,val){
+  const s=students.find(x=>x.id===id);if(!s)return;
+  s[field]=val?parseInt(val):null;markDirty();
+}
+
+// Priority domain — lowest class average domain with at least 40% of students below 65%
+function getPriorityDomain(){
+  const keys=Object.keys(DL);
+  const scored=keys.map(k=>{
+    const vals=students.filter(s=>s.dom[k]!==null&&s.dom[k]!==undefined).map(s=>s.dom[k]);
+    if(!vals.length)return{k,avg:0,gap:0};
+    const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+    const gap=vals.filter(v=>v<65).length/vals.length;
+    return{k,avg,gap};
+  }).filter(x=>x.gap>=0.3).sort((a,b)=>a.avg-b.avg);
+  return scored[0]||null;
+}
+
+// Bubble sheet — printable offline data entry form
+function printBubbleSheet(){
+  const school=(cfg&&cfg.school)||'School';
+  const teacher=(cfg&&cfg.teacher)||'Teacher';
+  const year=(cfg&&cfg.year)||'Year';
+  const rows=students.length?students.map(s=>`
+    <tr>
+      <td class="nm">${s.name||'________________'}</td>
+      <td><div class="box"></div></td><td><div class="box"></div></td><td><div class="box"></div></td>
+      <td><div class="box"></div></td><td><div class="box"></div></td><td><div class="box"></div></td>
+      <td><div class="circles">${['T1','T2','T3'].map(t=>`<span class="circ">${t}</span>`).join('')}</div></td>
+      <td><div class="circles">${['1','2','3','4','5','6'].map(n=>`<span class="circ">${n}</span>`).join('')}</div></td>
+      <td><div class="box w50"></div></td>
+      <td><div class="circles">${['B','P','A','Adv'].map(l=>`<span class="circ">${l}</span>`).join('')}</div></td>
+    </tr>`).join(''):Array.from({length:15},(_,i)=>`<tr><td class="nm">________________</td><td><div class="box"></div></td><td><div class="box"></div></td><td><div class="box"></div></td><td><div class="box"></div></td><td><div class="box"></div></td><td><div class="box"></div></td><td><div class="circles">${['T1','T2','T3'].map(t=>`<span class="circ">${t}</span>`).join('')}</div></td><td><div class="circles">${['1','2','3','4','5','6'].map(n=>`<span class="circ">${n}</span>`).join('')}</div></td><td><div class="box w50"></div></td><td><div class="circles">${['B','P','A','Adv'].map(l=>`<span class="circ">${l}</span>`).join('')}</div></td></tr>`).join('');
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>MathView Data Entry Form</title><style>
+    body{font-family:Arial,sans-serif;font-size:10px;padding:20px;color:#000}
+    h2{font-size:14px;margin:0 0 2px}
+    .meta{font-size:10px;color:#555;margin-bottom:12px}
+    table{border-collapse:collapse;width:100%;font-size:9px}
+    th{background:#f0f0f0;padding:5px 4px;border:1px solid #ccc;text-align:center;font-size:8px;white-space:nowrap}
+    td{padding:4px;border:1px solid #ddd;vertical-align:middle}
+    td.nm{min-width:130px;font-size:9px}
+    .box{width:32px;height:18px;border:1.5px solid #333;border-radius:3px;display:inline-block}
+    .box.w50{width:50px}
+    .circles{display:flex;gap:3px;flex-wrap:wrap}
+    .circ{width:20px;height:20px;border:1.5px solid #333;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;flex-shrink:0}
+    .note{font-size:8px;color:#777;margin-top:8px}
+    @media print{.no-print{display:none}body{padding:0}}
+  </style></head><body>
+    <button class="no-print" onclick="window.print()" style="margin-bottom:12px;padding:6px 14px;cursor:pointer">🖨 Print</button>
+    <h2>MathView — Student Data Entry Form</h2>
+    <div class="meta">${school} · ${teacher} · ${year} · Printed: ${new Date().toLocaleDateString()}</div>
+    <div class="meta"><strong>Instructions:</strong> Fill score boxes with digits. Circle the correct option for Tier, Period, and State Exam level (B=Below Basic, P=Basic, A=Approaching, Adv=Advanced/Proficient).</div>
+    <table>
+      <thead><tr>
+        <th>Student Name</th>
+        <th colspan="3">iReady BOY<br>Score (_ _ _)</th>
+        <th colspan="3">iReady MOY<br>Score (_ _ _)</th>
+        <th>Tier</th>
+        <th>Period</th>
+        <th>Reading<br>BOY</th>
+        <th>State Exam<br>Level</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="note">Domain Scores (0–100) — use back of sheet or attach domain report printout</div>
+    <div class="note">MathView · ${school} · ${year} · <em>All student data stays local to your browser — never transmitted.</em></div>
+  </body></html>`);
+  w.document.close();
+  logAudit('Bubble sheet printed',`${students.length} student rows`);
+}
 
 /* ═══════════════════════════════════════
    M8 — SECURITY & PRIVACY
