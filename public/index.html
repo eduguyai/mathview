@@ -440,6 +440,72 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
 .sett-timeout{display:flex;gap:6px;flex-wrap:wrap}
 .timeout-btn{padding:4px 12px;border-radius:5px;border:1px solid var(--bmed);background:var(--bg3);color:var(--muted);font-size:10px;font-family:var(--mono);cursor:pointer;transition:all .15s}
 .timeout-btn.active{background:rgba(91,141,238,.1);border-color:var(--accent);color:var(--accent)}
+/* ── DEEPER INSIGHTS GATE ── */
+.di-gate{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);z-index:8500;display:flex;align-items:center;justify-content:center}
+.di-gate.hidden{display:none}
+.di-card{background:var(--bg2);border:1px solid var(--bmed);border-radius:14px;padding:28px 32px;width:330px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.di-card-icon{font-size:32px;margin-bottom:2px}
+.di-card-title{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--text)}
+.di-card-sub{font-size:11px;color:var(--muted);font-family:var(--mono);line-height:1.6;white-space:pre-line}
+.di-input{background:var(--bg3);border:1px solid var(--bmed);border-radius:8px;padding:10px 14px;color:var(--text);font-size:16px;font-family:var(--mono);letter-spacing:5px;width:100%;text-align:center;box-sizing:border-box}
+.di-input:focus{outline:none;border-color:var(--accent)}
+.di-err{font-size:11px;color:var(--t3);font-family:var(--mono);min-height:16px}
+.di-hint{font-size:10px;color:var(--dim);font-family:var(--mono);line-height:1.5}
+/* ── DI TABS ── */
+.di-tabs{display:flex;gap:4px;margin-bottom:18px;flex-wrap:wrap}
+.di-tab{padding:5px 16px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-family:var(--mono);cursor:pointer;transition:all .15s;white-space:nowrap}
+.di-tab:hover{border-color:var(--bmed);color:var(--text)}
+.di-tab.on{background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.35);color:var(--accent2)}
+/* ── INSIGHT CARDS (Lesson Signals) ── */
+.ins-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.ins-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.ins-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+.ins-card-label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-family:var(--mono);margin-bottom:4px}
+.ins-card-title{font-size:13px;font-weight:500;color:var(--text);line-height:1.4}
+.ins-priority{font-size:9px;font-family:var(--mono);padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.ins-high{background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.25)}
+.ins-med{background:rgba(251,146,60,0.1);color:#fb923c;border:1px solid rgba(251,146,60,0.25)}
+.ins-low{background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.25)}
+.ins-actions{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.ins-actions li{font-size:11px;color:var(--muted);line-height:1.5;padding-left:14px;position:relative}
+.ins-actions li::before{content:'→';position:absolute;left:0;color:var(--accent2);font-size:10px}
+.ins-students{display:flex;flex-wrap:wrap;gap:3px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
+.ins-student-chip{font-size:9px;font-family:var(--mono);padding:2px 6px;border-radius:3px;background:var(--bg3);color:var(--dim)}
+.ins-full{grid-column:1/-1}
+/* ── SMART GROUPS ── */
+.sg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.sg-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.sg-card-head{display:flex;align-items:center;gap:8px}
+.sg-card-icon{font-size:18px;flex-shrink:0}
+.sg-card-name{font-size:12px;font-weight:600;color:var(--text)}
+.sg-rationale{font-size:10px;color:var(--muted);font-family:var(--mono);line-height:1.5;border-left:2px solid var(--accent2);padding-left:8px}
+.sg-focus-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);font-family:var(--mono);margin-bottom:3px}
+.sg-focus{font-size:11px;color:var(--accent);font-family:var(--mono)}
+.sg-divider{height:1px;background:var(--border)}
+.sg-members{display:flex;flex-direction:column;gap:3px}
+.sg-member{display:flex;align-items:center;gap:6px;font-size:11px}
+.sg-member-name{flex:1;color:var(--text)}
+.sg-member-meta{font-size:9px;font-family:var(--mono);color:var(--dim)}
+.sg-push-btn{margin-top:auto;padding:5px 10px;border-radius:6px;border:1px solid rgba(91,141,238,0.3);background:rgba(91,141,238,0.07);color:var(--accent);font-size:10px;font-family:var(--mono);cursor:pointer;transition:background .15s;text-align:left}
+.sg-push-btn:hover{background:rgba(91,141,238,0.14)}
+/* ── STUDENT FLAGS ── */
+.flg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.flg-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px}
+.flg-card.crit{border-color:rgba(248,113,113,0.4);background:rgba(248,113,113,0.03)}
+.flg-card.high{border-color:rgba(251,146,60,0.35)}
+.flg-card-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px}
+.flg-card-meta{font-size:10px;font-family:var(--mono);color:var(--dim);margin-bottom:8px}
+.flg-concerns{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px}
+.flg-signal{font-size:11px;color:var(--muted);line-height:1.55;padding:7px 10px;background:var(--bg3);border-radius:6px;border-left:2px solid var(--t2)}
+.flg-card.crit .flg-signal{border-left-color:var(--t3)}
+.flg-card.high .flg-signal{border-left-color:var(--t2)}
+/* ── LANDSCAPE EXTRAS ── */
+.ls-extra-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.ls-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ls-bar-label{font-size:10px;color:var(--muted);width:150px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ls-bar-wrap{flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.ls-bar-fill{height:100%;border-radius:3px}
+.ls-bar-count{font-size:9px;font-family:var(--mono);color:var(--dim);width:24px;text-align:right}
 </style>
 </head>
 <body>
@@ -610,12 +676,40 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
       </div>
     </div>
 
-    <!-- QUAL DATA -->
+    <!-- DEEPER INSIGHTS -->
     <div class="view" id="view-qualdata">
-      <div class="qual-grid">
-        <div class="qual-card"><div class="qual-cat-title">Top concern tags</div><div id="qualConcernBars"></div></div>
-        <div class="qual-card"><div class="qual-cat-title">Top strength tags</div><div id="qualStrengthBars"></div></div>
-        <div class="qual-card" style="grid-column:1/-1"><div class="qual-cat-title">Flagged students — 3+ concern indicators</div><div id="qualFlagged"></div></div>
+      <div class="di-tabs">
+        <button class="di-tab on" onclick="diTab('landscape',this)">◎ Class Landscape</button>
+        <button class="di-tab" onclick="diTab('lessons',this)">📋 Lesson Signals</button>
+        <button class="di-tab" onclick="diTab('groups',this)">⊞ Smart Groups</button>
+        <button class="di-tab" onclick="diTab('flags',this)">⚑ Student Flags</button>
+      </div>
+      <!-- TAB: LANDSCAPE -->
+      <div id="di-landscape">
+        <div class="qual-grid">
+          <div class="qual-card"><div class="qual-cat-title">Top concern tags</div><div id="qualConcernBars"></div></div>
+          <div class="qual-card"><div class="qual-cat-title">Top strength tags</div><div id="qualStrengthBars"></div></div>
+        </div>
+        <div class="ls-extra-grid">
+          <div class="qual-card"><div class="qual-cat-title">Learning styles</div><div id="diLearnStyles"></div></div>
+          <div class="qual-card"><div class="qual-cat-title">Language landscape</div><div id="diLanguage"></div></div>
+          <div class="qual-card"><div class="qual-cat-title">IEP / 504 / accommodations</div><div id="diAccom"></div></div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="qual-card"><div class="qual-cat-title">Flagged students — 3+ concern indicators</div><div id="qualFlagged"></div></div>
+        </div>
+      </div>
+      <!-- TAB: LESSON SIGNALS -->
+      <div id="di-lessons" style="display:none">
+        <div id="diLessonSignals"></div>
+      </div>
+      <!-- TAB: SMART GROUPS -->
+      <div id="di-groups" style="display:none">
+        <div id="diSmartGroups"></div>
+      </div>
+      <!-- TAB: STUDENT FLAGS -->
+      <div id="di-flags" style="display:none">
+        <div id="diFlagCards"></div>
       </div>
     </div>
 
@@ -929,6 +1023,17 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
           </div>
         </div>
         <div class="sett-card">
+          <div class="sett-title">Deeper Insights Access <span class="sett-note">Proprietary analytics · code-gated</span></div>
+          <div class="sett-grid" style="align-items:center">
+            <label class="sett-label">Access Code</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span id="diCodeStatus" style="font-size:11px;font-family:var(--mono);color:var(--dim)">Not set</span>
+              <button class="btn sett-danger" id="diCodeBtn" onclick="changeDICode()" disabled style="opacity:.4">Reset Code</button>
+            </div>
+            <label class="sett-label" style="grid-column:1/-1;color:var(--dim);font-size:10px;line-height:1.6">Resetting removes the stored code hash. You will be prompted to set a new code on your next visit to Deeper Insights. The code gates access to proprietary qualitative analytics — share only with trusted collaborators.</label>
+          </div>
+        </div>
+        <div class="sett-card">
           <div class="sett-title">FERPA &amp; Data Privacy <span class="sett-note">Family Educational Rights &amp; Privacy Act</span></div>
           <div class="ferpa-grid">
             <div class="ferpa-item ferpa-yes"><span class="ferpa-icon">✅</span><div class="ferpa-text"><strong>Local Storage Only</strong>All student data stays in your browser. Zero cloud transmission.</div></div>
@@ -956,6 +1061,27 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
   </div><!-- /content -->
 </div><!-- /main -->
 </div><!-- /shell -->
+
+<!-- DEEPER INSIGHTS GATE -->
+<div class="di-gate hidden" id="diGate">
+  <div class="di-card">
+    <div class="di-card-icon">🔐</div>
+    <div class="di-card-title">Deeper Insights</div>
+    <div class="di-card-sub" id="diGateSub">Proprietary qualitative analytics engine.
+Enter your access code to continue.</div>
+    <input class="di-input" id="diCodeInput" type="password" inputmode="numeric" maxlength="6" placeholder="· · · · · ·" onkeydown="if(event.key==='Enter')diSubmitCode()" autocomplete="off">
+    <div id="diConfirmRow" style="width:100%;display:none">
+      <div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-align:center;margin-bottom:6px">Confirm code</div>
+      <input class="di-input" id="diConfirmInput" type="password" inputmode="numeric" maxlength="6" placeholder="· · · · · ·" onkeydown="if(event.key==='Enter')diSubmitCode()" autocomplete="off">
+    </div>
+    <div class="di-err" id="diGateErr"></div>
+    <div style="display:flex;gap:8px;width:100%">
+      <button class="btn" style="flex:1" onclick="diGateCancel()">Cancel</button>
+      <button class="btn btnp" style="flex:1" id="diGateBtn" onclick="diSubmitCode()">Unlock</button>
+    </div>
+    <div class="di-hint" id="diGateHint">Session unlocks until page reload</div>
+  </div>
+</div>
 
 <!-- STUDENT PLAN MODAL -->
 <div class="overlay" id="planOverlay" onclick="if(event.target===this)closePlanModal()">
@@ -1200,13 +1326,105 @@ const TITLES={
   lessons:'<em>Lesson Plans</em>',games:'Math <em>Games</em>',import:'<em>Connect</em> Your Data',settings:'<em>Settings</em>',
 };
 const inited={};
+let _diUnlocked=false,_diPending=null;
+const DI_CODE_KEY='mathview_di_hash';
+function getDIHash(){return localStorage.getItem(DI_CODE_KEY)||'';}
+
 function go(v,btn){
+  if(v==='qualdata'&&!_diUnlocked){_diPending={v,btn};openDIGate();return;}
+  _goExec(v,btn);
+}
+function _goExec(v,btn){
   document.querySelectorAll('.ni').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('on'));
   document.getElementById('view-'+v).classList.add('on');
   document.getElementById('vtitle').innerHTML=TITLES[v];
   if(!inited[v]){inited[v]=true;boot(v);}
+}
+
+function openDIGate(){
+  const hasCode=!!getDIHash();
+  const sub=document.getElementById('diGateSub');
+  const hint=document.getElementById('diGateHint');
+  const btn=document.getElementById('diGateBtn');
+  const cr=document.getElementById('diConfirmRow');
+  const inp=document.getElementById('diCodeInput');
+  const ci=document.getElementById('diConfirmInput');
+  const err=document.getElementById('diGateErr');
+  if(sub)sub.textContent=hasCode
+    ?'Proprietary qualitative analytics engine.\nEnter your access code to continue.'
+    :'First-time setup: create a 4–6 digit access code.\nYou control who can open this section.';
+  if(hint)hint.textContent=hasCode?'Session unlocks until page reload':'You can change this code later in Settings';
+  if(btn)btn.textContent=hasCode?'Unlock':'Set Code';
+  if(cr)cr.style.display=hasCode?'none':'';
+  if(inp)inp.value='';
+  if(ci)ci.value='';
+  if(err)err.textContent='';
+  document.getElementById('diGate').classList.remove('hidden');
+  setTimeout(()=>inp&&inp.focus(),100);
+}
+
+function diGateCancel(){
+  document.getElementById('diGate').classList.add('hidden');
+  _diPending=null;
+}
+
+async function diSubmitCode(){
+  const inp=document.getElementById('diCodeInput');
+  const err=document.getElementById('diGateErr');
+  const code=(inp?inp.value:'').trim();
+  if(!/^\d{4,6}$/.test(code)){if(err)err.textContent='Enter a 4–6 digit code.';return;}
+  const hasCode=!!getDIHash();
+  if(!hasCode){
+    const ci=document.getElementById('diConfirmInput');
+    const conf=(ci?ci.value:'').trim();
+    if(code!==conf){if(err)err.textContent='Codes do not match. Try again.';return;}
+    const h=await hashPIN(code);
+    localStorage.setItem(DI_CODE_KEY,h);
+    document.getElementById('diGate').classList.add('hidden');
+    _diUnlocked=true;
+    _completeDINav();
+    showToast('Deeper Insights code set','#a78bfa');
+    logAudit('Deeper Insights code created','first-time setup');
+    return;
+  }
+  hashPIN(code).then(h=>{
+    if(h===getDIHash()){
+      document.getElementById('diGate').classList.add('hidden');
+      _diUnlocked=true;
+      _completeDINav();
+      logAudit('Deeper Insights unlocked','code verified');
+    }else{
+      if(err)err.textContent='Incorrect code. Try again.';
+      inp.value='';inp.focus();
+    }
+  });
+}
+
+function _completeDINav(){
+  if(!_diPending)return;
+  const{v,btn}=_diPending;
+  _diPending=null;
+  _goExec(v,btn);
+}
+
+function changeDICode(){
+  localStorage.removeItem(DI_CODE_KEY);
+  _diUnlocked=false;
+  showToast('DI code cleared — set a new one on next visit','#fb923c');
+  logAudit('Deeper Insights code reset','via Settings');
+  checkDICodeStatus();
+}
+
+function checkDICodeStatus(){
+  const el=document.getElementById('diCodeStatus');
+  const cb=document.getElementById('diCodeBtn');
+  if(el)el.textContent=getDIHash()?'Code is set ✓':'Not set';
+  if(el)el.style.color=getDIHash()?'var(--t1)':'var(--dim)';
+  if(cb)cb.textContent=getDIHash()?'Reset Code':'(Set on first visit)';
+  if(cb)cb.disabled=!getDIHash();
+  if(cb)cb.style.opacity=getDIHash()?'1':'.4';
 }
 function boot(v){
   if(v==='overview'){initOverviewCharts();}
@@ -2590,8 +2808,34 @@ function initGrowth(){
 /* ═══════════════════════════════════════
    M2: QUAL DATA
 ═══════════════════════════════════════ */
-function initQualData(){
+/* ═══════════════════════════════════════
+   DEEPER INSIGHTS ENGINE
+═══════════════════════════════════════ */
+let diActiveTab='landscape';
+
+function diTab(tab,btn){
+  diActiveTab=tab;
+  document.querySelectorAll('.di-tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  ['landscape','lessons','groups','flags'].forEach(t=>{
+    const el=document.getElementById('di-'+t);
+    if(el)el.style.display=(t===tab)?'':'none';
+  });
+  renderDITab(tab);
+}
+
+function initQualData(){renderDITab('landscape');}
+
+function renderDITab(tab){
   const base=activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod);
+  if(tab==='landscape')renderDILandscape(base);
+  else if(tab==='lessons')renderDILessons(base);
+  else if(tab==='groups')renderDIGroups(base);
+  else if(tab==='flags')renderDIFlags(base);
+}
+
+/* ── LANDSCAPE ── */
+function renderDILandscape(base){
   const concerns={},strengths={};
   base.forEach(s=>s.tags.forEach(t=>{
     const cls=TQ[t]||'qn';
@@ -2605,9 +2849,178 @@ function initQualData(){
   if(cEl)cEl.innerHTML=topC.length?bars(topC,topC[0][1],'#f87171'):'<div style="color:var(--dim);font-size:11px">None</div>';
   const sEl=document.getElementById('qualStrengthBars');
   if(sEl)sEl.innerHTML=topS.length?bars(topS,topS[0][1],'#34d399'):'<div style="color:var(--dim);font-size:11px">None</div>';
+  // Learning styles
+  const lsTags=['visual learner','auditory learner','kinesthetic learner','read/write learner','prefers hands-on','prefers visual models','benefits from manipulatives','prefers verbal reasoning'];
+  const lsCounts=lsTags.map(t=>({t,n:base.filter(s=>s.tags.includes(t)).length})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n);
+  const lsEl=document.getElementById('diLearnStyles');
+  if(lsEl)lsEl.innerHTML=lsCounts.length?lsCounts.map(({t,n})=>`<div class="ls-bar-row"><span class="ls-bar-label" title="${t}">${t}</span><div class="ls-bar-wrap"><div class="ls-bar-fill" style="width:${Math.round(n/lsCounts[0].n*100)}%;background:#a78bfa"></div></div><span class="ls-bar-count">${n}</span></div>`).join(''):'<div style="color:var(--dim);font-size:11px">No learning style tags</div>';
+  // Language
+  const elTags=base.flatMap(s=>s.tags.filter(t=>t.startsWith('EL:')));
+  const elCounts={};elTags.forEach(t=>{elCounts[t]=(elCounts[t]||0)+1;});
+  const elArr=Object.entries(elCounts).sort((a,b)=>b[1]-a[1]);
+  const langEl=document.getElementById('diLanguage');
+  if(langEl)langEl.innerHTML=elArr.length?elArr.map(([t,n])=>`<div class="ls-bar-row"><span class="ls-bar-label">${t}</span><div class="ls-bar-wrap"><div class="ls-bar-fill" style="width:${Math.round(n/elArr[0][1]*100)}%;background:#5b8dee"></div></div><span class="ls-bar-count">${n}</span></div>`).join('')+'<div style="font-size:10px;font-family:var(--mono);color:var(--dim);margin-top:6px">'+base.filter(s=>s.tags.some(t=>t.startsWith('EL:'))).length+' total EL students</div>':'<div style="color:var(--dim);font-size:11px">No EL tags recorded</div>';
+  // Accommodations
+  const accTags=['IEP: Attention & Executive Function','IEP: Processing Disorder','IEP: Speech & Language','IEP: Emotional/Behavioral','IEP: Autism Spectrum','IEP: Other Health Impairment','504: ADHD','504: Anxiety','504: Other','extended time accommodation','preferential seating','reduced assignment load'];
+  const accCounts=accTags.map(t=>({t:t.replace('IEP: ','IEP ').replace('504: ','504 '),n:base.filter(s=>s.tags.includes(t)).length})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n);
+  const accEl=document.getElementById('diAccom');
+  if(accEl)accEl.innerHTML=accCounts.length?accCounts.map(({t,n})=>`<div class="ls-bar-row"><span class="ls-bar-label" title="${t}">${t}</span><div class="ls-bar-wrap"><div class="ls-bar-fill" style="width:${Math.round(n/accCounts[0].n*100)}%;background:#fb923c"></div></div><span class="ls-bar-count">${n}</span></div>`).join(''):'<div style="color:var(--dim);font-size:11px">No IEP/504 tags recorded</div>';
+  // Flagged
   const flagged=base.filter(s=>s.tags.filter(t=>(TQ[t]||'qn')==='qc').length>=3).sort((a,b)=>b.tags.filter(t=>(TQ[t]||'qn')==='qc').length-a.tags.filter(t=>(TQ[t]||'qn')==='qc').length);
   const fEl=document.getElementById('qualFlagged');
-  if(fEl)fEl.innerHTML=flagged.length?flagged.map(s=>`<div class="flag-row"><div><div class="flag-name">${s.name}</div><div style="font-size:10px;font-family:var(--mono);color:var(--dim)">Pd ${s.pd} · ${s.tier.toUpperCase()}</div></div><div class="flag-tags">${s.tags.filter(t=>(TQ[t]||'qn')==='qc').map(t=>`<span class="qtag-rm qc">${t}</span>`).join('')}</div></div>`).join(''):'<div style="color:var(--dim);font-size:11px;padding:8px 0">No students with 3+ concern flags.</div>';
+  if(fEl)fEl.innerHTML=flagged.length?flagged.map(s=>`<div class="flag-row"><div><div class="flag-name pv-name">${s.name}</div><div style="font-size:10px;font-family:var(--mono);color:var(--dim)">Pd ${s.pd} · ${s.tier.toUpperCase()}</div></div><div class="flag-tags">${s.tags.filter(t=>(TQ[t]||'qn')==='qc').map(t=>`<span class="qtag-rm qc">${t}</span>`).join('')}</div></div>`).join(''):'<div style="color:var(--dim);font-size:11px;padding:8px 0">No students with 3+ concern flags.</div>';
+}
+
+/* ── LESSON SIGNALS ENGINE ── */
+function generateLessonSignals(base){
+  const tc={};base.forEach(s=>s.tags.forEach(t=>{tc[t]=(tc[t]||0)+1;}));
+  const pct=t=>base.length?Math.round((tc[t]||0)/base.length*100):0;
+  const who=(...tags)=>base.filter(s=>s.tags.some(t=>tags.includes(t))).map(s=>s.name);
+  const signals=[];
+  // Math anxiety
+  const axPct=pct('math anxiety');if(axPct>=10)signals.push({priority:'high',cat:'Emotional Climate',title:`Math Anxiety in ${axPct}% of students`,actions:['Open every lesson with low-stakes warm-ups (number talks, estimation challenges)','Normalize errors publicly — model thinking aloud through mistakes','Use private whiteboards or shared boards to reduce performance pressure','Avoid cold-calling; use Think-Pair-Share or randomized partner talk'],students:who('math anxiety')});
+  // Low self-efficacy
+  const lse=base.filter(s=>s.tags.some(t=>['low self-efficacy','fixed mindset','frustrated easily','easily gives up'].includes(t)));
+  if(lse.length>=2)signals.push({priority:'high',cat:'Math Identity',title:`${lse.length} students show low math self-efficacy`,actions:['Use "yet" language — "You haven\'t mastered this yet, and here\'s the next step"','Build success experiences: scaffolded entry points before complex tasks','Document and celebrate micro-wins with specific, process-focused praise','Avoid timed tests or public performance rankings'],students:lse.map(s=>s.name)});
+  // EL students
+  const elS=base.filter(s=>s.tags.some(t=>t.startsWith('EL:')));
+  if(elS.length>=1){const ep=Math.round(elS.length/base.length*100);signals.push({priority:ep>=20?'high':'medium',cat:'Language Access',title:`${elS.length} English Learners (${ep}% of class)`,actions:['Pre-teach math vocabulary before concept introduction — use visual word walls','Provide sentence frames for written and verbal explanations throughout','Pair with bilingual peers for problem-solving stations','Use visual models, labeled diagrams, and graphic organizers consistently'],students:elS.map(s=>s.name)});}
+  // Word problems
+  const wp=base.filter(s=>s.tags.includes('struggles with word problems'));
+  if(wp.length>=2)signals.push({priority:'high',cat:'Academic Gap',title:`${wp.length} students struggle with word problems`,actions:['Teach an explicit decoding protocol (Read-Draw-Write or CUBES) — post as anchor chart','Use the 3-Read Protocol for complex tasks: context → quantities → question','Separate language decoding from math computation in early lessons','Reduce reading complexity on formative tasks while building language skills'],students:wp.map(s=>s.name)});
+  // Hands-on / kinesthetic
+  const ho=base.filter(s=>s.tags.some(t=>['prefers hands-on','kinesthetic learner','benefits from manipulatives','learns through movement'].includes(t)));
+  if(ho.length>=3)signals.push({priority:'medium',cat:'Modality',title:`${ho.length} students learn best through hands-on activities`,actions:['Include physical manipulatives (tiles, fraction bars, geometry tools) ≥2 lessons/week','Design one station per rotation that is tactile or movement-based','Offer matching, sorting, or building tasks as concept entry points','Balance direct instruction with guided discovery tasks'],students:ho.slice(0,6).map(s=>s.name)});
+  // Attendance
+  const abs=base.filter(s=>s.tags.some(t=>['high absenteeism','chronic absenteeism (10%+)','inconsistent attendance'].includes(t)));
+  if(abs.length>=2)signals.push({priority:'high',cat:'Continuity',title:`${abs.length} students at risk from attendance gaps`,actions:['Create brief "missed-you" catch-up packets aligned to current unit','Assign a peer buddy to share notes and re-explain key steps','Avoid attendance-dependent intervention sequences — use modular skill blocks','Flag chronic absenteeism to attendance counselor with data documentation'],students:abs.map(s=>s.name)});
+  // IEP/504
+  const iep=base.filter(s=>s.tags.some(t=>t.startsWith('IEP:')||t.startsWith('504:')));
+  if(iep.length>=2)signals.push({priority:'medium',cat:'Accommodations',title:`${iep.length} students have active IEP or 504 plans`,actions:['Verify all accommodations are documented and active before each benchmark','Plan chunked tasks, extended time, and reduced load proactively','Co-plan with special education partner when available — share data','Log accommodation use in intervention notes for compliance tracking'],students:iep.map(s=>s.name)});
+  // Peer tutor opportunity
+  const tut=base.filter(s=>s.tags.includes('peer tutor potential')&&s.tier==='t1');
+  const t3n=base.filter(s=>s.tier==='t3');
+  if(tut.length>=2&&t3n.length>=2)signals.push({priority:'low',cat:'Peer Learning',title:`${tut.length} students ready as peer tutors`,actions:['Pair tutors with receptive Tier 2/3 students during station rotations','Train tutors with "explain your thinking" prompts — not just answers','Provide tutors with structured question stems (e.g., "What do you notice first?")','Recognize tutors publicly — peer tutoring builds math identity for both parties'],students:tut.map(s=>s.name)});
+  // Growth mindset in T3 — high leverage
+  const gmT3=base.filter(s=>s.tags.includes('growth mindset')&&s.tier==='t3');
+  if(gmT3.length>=2)signals.push({priority:'medium',cat:'Strength-Based Opportunity',title:`${gmT3.length} Tier 3 students show growth mindset — high leverage`,actions:['These students are your highest-ROI targets — their mindset amplifies instruction','Assign challenging-but-reachable tasks to sustain intrinsic motivation','Show concrete progress data (BOY → now) so they see their own trajectory','Consider as anchor students in mixed-tier groups — their attitude is contagious'],students:gmT3.map(s=>s.name)});
+  // Low written output
+  const lwo=base.filter(s=>s.tags.some(t=>['low written output','difficulty showing work'].includes(t)));
+  if(lwo.length>=2)signals.push({priority:'medium',cat:'Communication',title:`${lwo.length} students have low written math output`,actions:['Provide sentence stems on task cards: "First I… then I… because…"','Use graphic organizers as pre-writing scaffolds before open-ended responses','Accept verbal explanation as equivalent to written on formative tasks','Grade process visibility, not just final answer — reward showing work'],students:lwo.map(s=>s.name)});
+  return signals.sort((a,b)=>({high:0,medium:1,low:2}[a.priority]-{high:0,medium:1,low:2}[b.priority]));
+}
+
+function renderDILessons(base){
+  const signals=generateLessonSignals(base);
+  const el=document.getElementById('diLessonSignals');if(!el)return;
+  if(!signals.length){el.innerHTML='<div style="color:var(--dim);font-size:12px;padding:30px;text-align:center">Add qualitative tags to students to generate lesson signals.</div>';return;}
+  const pc={high:'ins-high',medium:'ins-med',low:'ins-low'};
+  const pl={high:'HIGH PRIORITY',medium:'MODERATE',low:'STRENGTH'};
+  el.innerHTML=`<div class="ins-grid">${signals.map((s,i)=>`
+    <div class="ins-card${i===0&&signals.length%2!==0?' ins-full':''}">
+      <div class="ins-card-top">
+        <div>
+          <div class="ins-card-label">${s.cat}</div>
+          <div class="ins-card-title">${s.title}</div>
+        </div>
+        <span class="ins-priority ${pc[s.priority]}">${pl[s.priority]}</span>
+      </div>
+      <ul class="ins-actions">${s.actions.map(a=>`<li>${a}</li>`).join('')}</ul>
+      ${s.students.length?`<div class="ins-students">${s.students.slice(0,8).map(n=>`<span class="ins-student-chip pv-name">${n}</span>`).join('')}${s.students.length>8?`<span class="ins-student-chip">+${s.students.length-8} more</span>`:''}</div>`:''}
+    </div>`).join('')}</div>`;
+}
+
+/* ── SMART GROUPS ENGINE ── */
+function generateSmartGroups(base){
+  const groups=[];
+  // Near-T2 accelerators
+  const nT2=base.filter(s=>s.tier==='t3'&&s.tags.some(t=>['growth mindset','improving trend','responds to challenge'].includes(t)));
+  if(nT2.length>=2)groups.push({name:'Near-Tier 2 Accelerators',icon:'🚀',rationale:'T3 students with growth indicators — highest ROI for targeted instruction',focus:'Ratio & Algebra foundations with challenge scaffolding',members:nT2.slice(0,6)});
+  // EL cluster
+  const elG=base.filter(s=>s.tags.some(t=>t.startsWith('EL:'))&&s.tier!=='t1');
+  if(elG.length>=2)groups.push({name:'Language Access Group',icon:'🌐',rationale:'EL students benefit from shared language scaffolds and bilingual peer pairing',focus:'Visual models, math vocabulary, bilingual sentence frames',members:elG.slice(0,6)});
+  // Hands-on
+  const hog=base.filter(s=>s.tags.some(t=>['prefers hands-on','kinesthetic learner','benefits from manipulatives'].includes(t))&&s.tier!=='t1');
+  if(hog.length>=2)groups.push({name:'Manipulative Learners',icon:'🧩',rationale:'Kinesthetic learners need tactile entry points before abstract concept work',focus:'Tiles, fraction bars, sorting tasks, movement-based stations',members:hog.slice(0,6)});
+  // Attention & structure
+  const str=base.filter(s=>s.tags.some(t=>['IEP: Attention & Executive Function','504: ADHD','responds to routine','requires redirection'].includes(t)));
+  if(str.length>=2)groups.push({name:'Structure & Focus Group',icon:'🗂',rationale:'Predictable routines and chunked tasks reduce cognitive load for attention needs',focus:'Consistent entry/exit routines, chunked problems, visual task cards',members:str.slice(0,6)});
+  // Peer tutor pairs
+  const tutors=base.filter(s=>s.tags.includes('peer tutor potential')&&s.tier==='t1');
+  const receptive=base.filter(s=>s.tier==='t3'&&s.tags.some(t=>['responds to praise','growth mindset','engaged in class'].includes(t)));
+  if(tutors.length>=1&&receptive.length>=1)groups.push({name:'Peer Tutor Pairs',icon:'🤝',rationale:'Pairing high-potential T1 tutors with socially receptive T3 learners benefits both',focus:'Structured think-alouds, collaborative problem sets, explanation tasks',members:[...tutors.slice(0,3),...receptive.slice(0,3)]});
+  // Math confidence circle
+  const anx=base.filter(s=>s.tags.filter(t=>['math anxiety','low self-efficacy','fixed mindset','frustrated easily','easily gives up'].includes(t)).length>=1&&s.tier!=='t1');
+  if(anx.length>=2)groups.push({name:'Math Confidence Circle',icon:'💛',rationale:'Students with anxiety or efficacy barriers need identity-building before content acceleration',focus:'Low-stakes tasks, growth portfolios, success experiences, explicit praise',members:anx.slice(0,6)});
+  // Written communication builders
+  const lwo=base.filter(s=>s.tags.some(t=>['low written output','difficulty showing work','prefers verbal reasoning'].includes(t)));
+  if(lwo.length>=2)groups.push({name:'Math Communication Builders',icon:'✍️',rationale:'Students who struggle to show work need scaffolds for mathematical writing',focus:'Sentence stems, graphic organizers, "show your thinking" structured tasks',members:lwo.slice(0,6)});
+  return groups;
+}
+
+function renderDIGroups(base){
+  const grps=generateSmartGroups(base);
+  const el=document.getElementById('diSmartGroups');if(!el)return;
+  if(!grps.length){el.innerHTML='<div style="color:var(--dim);font-size:12px;padding:30px;text-align:center">Add qualitative tags to students to generate smart group suggestions.</div>';return;}
+  el.innerHTML=`<div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:14px;display:flex;align-items:center;gap:8px"><span>◎ Groupings generated from qualitative tag patterns</span><span style="color:var(--dim)">—</span><span style="color:var(--accent2)">Push any group directly to Group Builder →</span></div>
+  <div class="sg-grid">${grps.map((g,gi)=>`
+    <div class="sg-card">
+      <div class="sg-card-head">
+        <span class="sg-card-icon">${g.icon}</span>
+        <div class="sg-card-name">${g.name}</div>
+      </div>
+      <div class="sg-rationale">${g.rationale}</div>
+      <div><div class="sg-focus-lbl">Instructional focus</div><div class="sg-focus">${g.focus}</div></div>
+      <div class="sg-divider"></div>
+      <div class="sg-members">${g.members.map(s=>`<div class="sg-member"><span class="tb ${s.tier}" style="font-size:9px">${s.tier.toUpperCase()}</span><span class="sg-member-name pv-name">${s.name}</span><span class="sg-member-meta">Pd ${s.pd}</span></div>`).join('')}</div>
+      <button class="sg-push-btn" onclick="pushSGToGroups(${gi})">⊞ Push to Group Builder</button>
+    </div>`).join('')}</div>`;
+  // stash for push
+  window._diGroups=grps;
+}
+
+function pushSGToGroups(gi){
+  if(!window._diGroups)return;
+  const g=window._diGroups[gi];
+  const existing=groups.find(x=>x.name===g.name);
+  if(existing){showToast('Group already exists in Group Builder','#fb923c');return;}
+  const ng={id:Date.now(),name:g.name,tier:'all',pd:'all',members:g.members.map(s=>s.id),created:new Date().toISOString().slice(0,10)};
+  groups.push(ng);saveGroups();
+  inited['groups']=false;
+  showToast(`"${g.name}" added to Group Builder ✓`,'#a78bfa');
+  logAudit('Smart group pushed','Deeper Insights → Group Builder: '+g.name);
+}
+
+/* ── STUDENT FLAGS ENGINE ── */
+function generateStudentFlags(base){
+  return base.map(s=>{
+    const concerns=s.tags.filter(t=>(TQ[t]||'qn')==='qc');
+    if(concerns.length<2)return null;
+    const crisis=s.tags.some(t=>['trauma-informed flag','counselor referral pending','social isolation concerns','peer conflict reported','unstable housing flag','food insecurity flag'].includes(t));
+    const absCrit=s.tags.some(t=>['high absenteeism','chronic absenteeism (10%+)'].includes(t))&&s.tier==='t3';
+    const anxT3=s.tags.includes('math anxiety')&&s.tier==='t3';
+    let priority='standard',signal='';
+    if(crisis){priority='crit';signal='Whole-child concerns present — coordinate with counselor before academic intervention.';}
+    else if(absCrit){priority='high';signal='Attendance barriers compound math intervention — attendance outreach is prerequisite.';}
+    else if(anxT3){priority='high';signal='Anxiety may be masking mathematical ability — build relationship and safety first.';}
+    else if(concerns.length>=4){priority='high';signal='Multiple compounding barriers — prioritize weekly check-in and cross-service coordination.';}
+    else{signal='Monitor with targeted scaffolds. Review tags quarterly.';}
+    return{s,concerns,priority,signal};
+  }).filter(Boolean).sort((a,b)=>({crit:0,high:1,standard:2}[a.priority]-{crit:0,high:1,standard:2}[b.priority]));
+}
+
+function renderDIFlags(base){
+  const flags=generateStudentFlags(base);
+  const el=document.getElementById('diFlagCards');if(!el)return;
+  if(!flags.length){el.innerHTML='<div style="color:var(--dim);font-size:12px;padding:30px;text-align:center">No students with 2+ concern indicators in current filter.</div>';return;}
+  el.innerHTML=`<div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:14px">Showing ${flags.length} students with 2+ concern indicators · sorted by complexity</div>
+  <div class="flg-grid">${flags.map(({s,concerns,priority,signal})=>`
+    <div class="flg-card ${priority}">
+      <div class="flg-card-name pv-name">${s.name}</div>
+      <div class="flg-card-meta">Pd ${s.pd} · ${s.tier.toUpperCase()} · ${concerns.length} concerns</div>
+      <div class="flg-concerns">${concerns.map(t=>`<span class="qtag-rm qc">${t}</span>`).join('')}</div>
+      <div class="flg-signal">${signal}</div>
+    </div>`).join('')}</div>`;
 }
 
 /* ═══════════════════════════════════════
@@ -2967,6 +3380,7 @@ function initSettings(){
   checkPINStatus();
   initTimeoutUI();
   renderAuditLog();
+  checkDICodeStatus();
 }
 
 // ── STARTUP LOCK CHECK ──
