@@ -538,9 +538,91 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
 .coach-badge{position:absolute;top:-5px;right:-5px;background:var(--t3);color:#fff;font-size:9px;font-family:var(--mono);font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg2)}
 .coach-divider{height:1px;background:var(--border);margin:14px 0 4px;display:flex;align-items:center;gap:8px}
 .coach-section-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);font-family:var(--mono);white-space:nowrap;padding:0 6px;background:var(--bg2)}
+
+/* ══════════════════════════════════
+   MOBILE — iPhone / narrow viewport
+══════════════════════════════════ */
+.mob-menu-btn{display:none;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:18px;border-radius:7px;cursor:pointer;flex-shrink:0}
+.mob-nav-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:890;-webkit-tap-highlight-color:transparent}
+.mob-nav-backdrop.visible{display:block}
+
+@media(max-width:768px){
+  /* Shell: vertical stack */
+  .shell{flex-direction:column;min-width:100%;overflow-x:hidden}
+
+  /* Sidebar: fixed drawer */
+  .sidebar{
+    position:fixed;top:0;left:0;height:100vh;width:240px;
+    z-index:900;transform:translateX(-100%);
+    transition:transform .25s cubic-bezier(.4,0,.2,1);
+    box-shadow:4px 0 24px rgba(0,0,0,.4)
+  }
+  .sidebar.mob-open{transform:translateX(0)}
+
+  /* Main: full width */
+  .main{min-width:0;width:100%;flex:1}
+
+  /* Topbar: show hamburger */
+  .mob-menu-btn{display:flex}
+  .topbar{padding:0 12px;gap:10px}
+  .vtitle{font-size:15px}
+  .coach-toggle-btn span:nth-child(2){display:none}
+
+  /* Subbar: stack search + periods */
+  .subbar{flex-direction:column;align-items:stretch;gap:7px;padding:8px 12px}
+  .pd-row{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;margin-left:0;flex-wrap:nowrap}
+  .pd-row::-webkit-scrollbar{display:none}
+  .search-wrap{width:100%}
+  #globalSearch{width:100%}
+
+  /* Content padding */
+  .content{padding:0}
+  .view.on{padding:14px 12px}
+
+  /* KPI: 2×2 */
+  .kpi-row{grid-template-columns:repeat(2,1fr);gap:10px}
+  .kpi-val{font-size:22px}
+
+  /* Charts: single column */
+  .chart-grid{grid-template-columns:1fr;gap:10px}
+
+  /* Roster: single column */
+  .roster-shell{grid-template-columns:1fr}
+
+  /* Coach: bottom sheet */
+  .coach-panel{
+    position:fixed;bottom:0;left:0;right:0;
+    width:100% !important;height:60vh;
+    border-left:none;border-top:1px solid var(--bmed);
+    transform:translateY(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);
+    overflow:hidden;min-width:0
+  }
+  .coach-panel.open{transform:translateY(0);width:100% !important}
+  .coach-panel .coach-head,.coach-panel .coach-body{min-width:0}
+  .coach-body{overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+  /* Touch targets */
+  .btn,.ni,.pd-btn{min-height:40px}
+  .ni{padding:9px 14px}
+
+  /* DI tabs: scroll */
+  .di-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;padding-bottom:2px}
+  .di-tabs::-webkit-scrollbar{display:none}
+
+  /* Groups grid */
+  .groups-grid{grid-template-columns:1fr !important}
+
+  /* Smart groups grid */
+  .sg-grid{grid-template-columns:1fr !important}
+
+  /* Misc */
+  .demo-banner{flex-direction:column;align-items:flex-start;gap:6px}
+  .persist-btns{flex-wrap:wrap}
+}
 </style>
 </head>
 <body>
+<div class="mob-nav-backdrop" id="mobNavBackdrop" onclick="closeMobileNav()"></div>
 <!-- LOCK SCREEN -->
 <div id="lockScreen" class="hidden">
   <div class="lock-logo">Math<span>View</span></div>
@@ -625,6 +707,7 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
 <!-- MAIN -->
 <div class="main">
   <div class="topbar">
+    <button class="mob-menu-btn" id="mobMenuBtn" onclick="toggleMobileNav()" aria-label="Menu">☰</button>
     <div class="vtitle" id="vtitle">Intervention <em>Overview</em></div>
     <button class="coach-toggle-btn" id="coachToggleBtn" onclick="toggleCoach()">
       <span>◉</span><span>Coach</span>
@@ -3628,6 +3711,25 @@ function setPeriod(p,btn){_origSetPeriod(p,btn);renderCoach(_coachView);}
   document.getElementById('coachToggleBtn').classList.add('on');
   renderCoach('overview');
 })();
+
+/* ── MOBILE NAV ── */
+function toggleMobileNav(){
+  const sb=document.querySelector('.sidebar');
+  const bd=document.getElementById('mobNavBackdrop');
+  const open=sb.classList.toggle('mob-open');
+  bd.classList.toggle('visible',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeMobileNav(){
+  document.querySelector('.sidebar').classList.remove('mob-open');
+  document.getElementById('mobNavBackdrop').classList.remove('visible');
+  document.body.style.overflow='';
+}
+// Close mobile nav when a nav item is tapped
+document.querySelectorAll('.ni').forEach(btn=>btn.addEventListener('click',()=>{
+  if(window.innerWidth<=768)closeMobileNav();
+}));
+
 </script>
 </body>
 </html>
