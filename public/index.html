@@ -714,13 +714,25 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
     <!-- DEEPER INSIGHTS -->
     <div class="view" id="view-qualdata">
       <div class="di-tabs">
-        <button class="di-tab on" onclick="diTab('landscape',this)">◎ Class Landscape</button>
+        <button class="di-tab on" onclick="diTab('groups',this)">⊞ Smart Groups</button>
         <button class="di-tab" onclick="diTab('lessons',this)">📋 Lesson Signals</button>
-        <button class="di-tab" onclick="diTab('groups',this)">⊞ Smart Groups</button>
         <button class="di-tab" onclick="diTab('flags',this)">⚑ Student Flags</button>
+        <button class="di-tab" onclick="diTab('landscape',this)">◎ Class Landscape</button>
+      </div>
+      <!-- TAB: SMART GROUPS -->
+      <div id="di-groups">
+        <div id="diSmartGroups"></div>
+      </div>
+      <!-- TAB: LESSON SIGNALS -->
+      <div id="di-lessons" style="display:none">
+        <div id="diLessonSignals"></div>
+      </div>
+      <!-- TAB: STUDENT FLAGS -->
+      <div id="di-flags" style="display:none">
+        <div id="diFlagCards"></div>
       </div>
       <!-- TAB: LANDSCAPE -->
-      <div id="di-landscape">
+      <div id="di-landscape" style="display:none">
         <div class="qual-grid">
           <div class="qual-card"><div class="qual-cat-title">Top concern tags</div><div id="qualConcernBars"></div></div>
           <div class="qual-card"><div class="qual-cat-title">Top strength tags</div><div id="qualStrengthBars"></div></div>
@@ -733,18 +745,6 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
         <div style="margin-top:14px">
           <div class="qual-card"><div class="qual-cat-title">Flagged students — 3+ concern indicators</div><div id="qualFlagged"></div></div>
         </div>
-      </div>
-      <!-- TAB: LESSON SIGNALS -->
-      <div id="di-lessons" style="display:none">
-        <div id="diLessonSignals"></div>
-      </div>
-      <!-- TAB: SMART GROUPS -->
-      <div id="di-groups" style="display:none">
-        <div id="diSmartGroups"></div>
-      </div>
-      <!-- TAB: STUDENT FLAGS -->
-      <div id="di-flags" style="display:none">
-        <div id="diFlagCards"></div>
       </div>
     </div>
 
@@ -2863,7 +2863,7 @@ function initGrowth(){
 /* ═══════════════════════════════════════
    DEEPER INSIGHTS ENGINE
 ═══════════════════════════════════════ */
-let diActiveTab='landscape';
+let diActiveTab='groups';
 
 function diTab(tab,btn){
   diActiveTab=tab;
@@ -2876,7 +2876,7 @@ function diTab(tab,btn){
   renderDITab(tab);
 }
 
-function initQualData(){renderDITab('landscape');}
+function initQualData(){renderDITab('groups');}
 
 function renderDITab(tab){
   const base=activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod);
@@ -3447,7 +3447,7 @@ function initSettings(){
 /* ═══════════════════════════════════════
    COACHING SUITE
 ═══════════════════════════════════════ */
-let coachOpen=false,_coachView='overview';
+let coachOpen=true,_coachView='overview';
 
 function toggleCoach(){
   coachOpen=!coachOpen;
@@ -3481,17 +3481,18 @@ function renderCoach(v){
 
 // Helper: nav shortcut for action buttons
 function _cnav(v){const b=document.querySelector(`.ni[data-v="${v}"]`);if(b)go(v,b);}
+function _pn(ns){return ns.map(n=>`<span class="pv-name">${n}</span>`).join(', ');}
 
 const COACH_GEN={
   overview(base){
     const c=[];
     const down=base.filter(s=>s.tier==='t3'&&s.trend==='down');
-    if(down.length)c.push({priority:'urgent',cat:'Intervention Risk',title:`${down.length} Tier 3 student${down.length>1?'s':''} trending downward`,body:`${down.map(s=>s.name.split(' ')[0]).slice(0,4).join(', ')} — declining trajectories require intervention adjustment now.`,action:'View Roster',fn:"_cnav('roster')"});
+    if(down.length)c.push({priority:'urgent',cat:'Intervention Risk',title:`${down.length} Tier 3 student${down.length>1?'s':''} trending downward`,body:`${_pn(down.map(s=>s.name.split(' ')[0]).slice(0,4))} — declining trajectories require intervention adjustment now.`,action:'View Roster',fn:"_cnav('roster')"});
     const doms=['numSense','algebra','ratios','stats','geometry'];
     const gaps=doms.map(d=>({d,pct:base.length?Math.round(base.filter(s=>s.dom&&s.dom[d]<70).length/base.length*100):0})).sort((a,b)=>b.pct-a.pct);
     if(gaps[0]&&gaps[0].pct>35)c.push({priority:'focus',cat:'Domain Priority',title:`${DL[gaps[0].d]} is your class's largest gap`,body:`${gaps[0].pct}% of students below 70% proficiency. Lead small groups with this domain this week.`,action:'View Domains',fn:"_cnav('domains')"});
     const nearUp=base.filter(s=>(s.tier==='t3'&&s.ir>=405)||(s.tier==='t2'&&s.ir>=433));
-    if(nearUp.length>=2)c.push({priority:'focus',cat:'Tier Movement',title:`${nearUp.length} students near a tier boundary`,body:`${nearUp.map(s=>s.name.split(' ')[0]).slice(0,4).join(', ')} — within reach of moving up. A focused 3-week push now has outsized impact.`});
+    if(nearUp.length>=2)c.push({priority:'focus',cat:'Tier Movement',title:`${nearUp.length} students near a tier boundary`,body:`${_pn(nearUp.map(s=>s.name.split(' ')[0]).slice(0,4))} — within reach of moving up. A focused 3-week push now has outsized impact.`});
     const absT3=base.filter(s=>s.tier==='t3'&&s.tags&&s.tags.some(t=>['high absenteeism','chronic absenteeism (10%+)'].includes(t)));
     if(absT3.length)c.push({priority:'urgent',cat:'Attendance + Math',title:`${absT3.length} T3 student${absT3.length>1?'s':''} with critical absenteeism`,body:'Attendance outreach is prerequisite to math intervention. Contact families before adjusting academic support.'});
     const untagged=base.filter(s=>!s.tags||!s.tags.length);
@@ -3501,11 +3502,11 @@ const COACH_GEN={
   roster(base){
     const c=[];
     const down=base.filter(s=>s.tier==='t3'&&s.trend==='down');
-    if(down.length)c.push({priority:'urgent',cat:'Immediate Attention',title:`${down.length} T3 student${down.length>1?'s':''} on a downward trend`,body:`${down.map(s=>s.name.split(' ')[0]).join(', ')} — click each student to review their domain profile and update the intervention plan.`});
+    if(down.length)c.push({priority:'urgent',cat:'Immediate Attention',title:`${down.length} T3 student${down.length>1?'s':''} on a downward trend`,body:`${_pn(down.map(s=>s.name.split(' ')[0]))} — click each student to review their domain profile and update the intervention plan.`});
     const nearT2=base.filter(s=>s.tier==='t3'&&s.ir>=406&&s.ir<415);
-    if(nearT2.length)c.push({priority:'focus',cat:'Near Tier 2',title:`${nearT2.length} student${nearT2.length>1?'s':''} within striking distance`,body:`${nearT2.map(s=>s.name.split(' ')[0]).join(', ')} — a targeted 3-week domain push could move the tier by next benchmark.`});
+    if(nearT2.length)c.push({priority:'focus',cat:'Near Tier 2',title:`${nearT2.length} student${nearT2.length>1?'s':''} within striking distance`,body:`${_pn(nearT2.map(s=>s.name.split(' ')[0]))} — a targeted 3-week domain push could move the tier by next benchmark.`});
     const gmT3=base.filter(s=>s.tier==='t3'&&s.tags&&s.tags.includes('growth mindset'));
-    if(gmT3.length)c.push({priority:'focus',cat:'Leverage Point',title:`${gmT3.length} T3 students with growth mindset`,body:`${gmT3.map(s=>s.name.split(' ')[0]).join(', ')} — their mindset amplifies instruction. These are your highest-ROI targets.`});
+    if(gmT3.length)c.push({priority:'focus',cat:'Leverage Point',title:`${gmT3.length} T3 students with growth mindset`,body:`${_pn(gmT3.map(s=>s.name.split(' ')[0]))} — their mindset amplifies instruction. These are your highest-ROI targets.`});
     const noNotes=base.filter(s=>!s.notes||!s.notes.trim());
     if(noNotes.length>base.length*.65)c.push({priority:'tip',cat:'Documentation',title:`${noNotes.length} students have no notes`,body:'Brief student notes (1–2 sentences) improve intervention continuity across marking periods.'});
     return c;
@@ -3526,11 +3527,11 @@ const COACH_GEN={
     const c=[];
     const scored=base.filter(s=>s.ir&&s.irE);
     const gainers=scored.map(s=>({s,g:s.irE-s.ir})).sort((a,b)=>b.g-a.g);
-    if(gainers[0]&&gainers[0].g>18)c.push({priority:'focus',cat:'Celebrate & Escalate',title:`${gainers[0].s.name.split(' ')[0]} gained ${gainers[0].g} pts BOY→EOY`,body:`Top mover in your class. Document this trajectory for admin as an evidence of intervention effectiveness.`});
+    if(gainers[0]&&gainers[0].g>18)c.push({priority:'focus',cat:'Celebrate & Escalate',title:`<span class="pv-name">${gainers[0].s.name.split(' ')[0]}</span> gained ${gainers[0].g} pts BOY→EOY`,body:`Top mover in your class. Document this trajectory for admin as an evidence of intervention effectiveness.`});
     const stalled=base.filter(s=>s.tier==='t3'&&s.ir&&s.irE&&s.irE-s.ir<5);
-    if(stalled.length)c.push({priority:'urgent',cat:'Stalled Progress',title:`${stalled.length} T3 student${stalled.length>1?'s':''} gained fewer than 5 points`,body:`${stalled.map(s=>s.name.split(' ')[0]).slice(0,4).join(', ')} — minimal growth despite intervention. Review strategy alignment; change approach before next cycle.`});
+    if(stalled.length)c.push({priority:'urgent',cat:'Stalled Progress',title:`${stalled.length} T3 student${stalled.length>1?'s':''} gained fewer than 5 points`,body:`${_pn(stalled.map(s=>s.name.split(' ')[0]).slice(0,4))} — minimal growth despite intervention. Review strategy alignment; change approach before next cycle.`});
     const upTrend=base.filter(s=>s.trend==='up'&&s.tier!=='t1');
-    if(upTrend.length)c.push({priority:'tip',cat:'Momentum',title:`${upTrend.length} non-T1 students trending upward`,body:`${upTrend.map(s=>s.name.split(' ')[0]).slice(0,5).join(', ')} — note what's working and maintain intervention intensity.`});
+    if(upTrend.length)c.push({priority:'tip',cat:'Momentum',title:`${upTrend.length} non-T1 students trending upward`,body:`${_pn(upTrend.map(s=>s.name.split(' ')[0]).slice(0,5))} — note what's working and maintain intervention intensity.`});
     const nearT1=base.filter(s=>s.tier==='t2'&&s.irE&&s.irE>=438);
     if(nearT1.length)c.push({priority:'focus',cat:'Tier Reclassification',title:`${nearT1.length} T2 student${nearT1.length>1?'s':''} may be ready for Tier 1`,body:'EOY scores suggest exit-eligible students. Document for reclassification discussion at next data meeting.',action:'View Reports',fn:"_cnav('reports')"});
     return c;
@@ -3543,15 +3544,15 @@ const COACH_GEN={
     const noTags=base.filter(s=>!s.tags||!s.tags.length);
     if(noTags.length)c.push({priority:'tip',cat:'Tag Coverage',title:`${noTags.length} students have zero qualitative tags`,body:'Tags power every insight in this section. Even 2–3 tags per student unlocks significantly more coaching.'});
     const sg=generateSmartGroups(base);
-    if(sg.length)c.push({priority:'tip',cat:'Smart Groups Ready',title:`${sg.length} smart group${sg.length>1?'s':''} generated from your data`,body:'Visit Smart Groups to see qualitatively-clustered groupings and push them directly to Group Builder.',action:'Smart Groups',fn:"diTab('groups',document.querySelectorAll('.di-tab')[2])"});
+    if(sg.length)c.push({priority:'tip',cat:'Smart Groups Ready',title:`${sg.length} smart group${sg.length>1?'s':''} generated from your data`,body:'Visit Smart Groups to see qualitatively-clustered groupings and push them directly to Group Builder.',action:'Smart Groups',fn:"diTab('groups',document.querySelectorAll('.di-tab')[0])"});
     const flags=generateStudentFlags(base).filter(f=>f.priority==='crit');
-    if(flags.length)c.push({priority:'urgent',cat:'Critical Flags',title:`${flags.length} student${flags.length>1?'s':''} with whole-child concerns`,body:`${flags.map(f=>f.s.name.split(' ')[0]).join(', ')} — counselor coordination recommended before academic intervention.`,action:'Student Flags',fn:"diTab('flags',document.querySelectorAll('.di-tab')[3])"});
+    if(flags.length)c.push({priority:'urgent',cat:'Critical Flags',title:`${flags.length} student${flags.length>1?'s':''} with whole-child concerns`,body:`${_pn(flags.map(f=>f.s.name.split(' ')[0]))} — counselor coordination recommended before academic intervention.`,action:'Student Flags',fn:"diTab('flags',document.querySelectorAll('.di-tab')[2])"});
     return c;
   },
   groups(base){
     const c=[];
     const highNoGroup=base.filter(s=>s.tier==='t3'&&!groups.some(g=>g.members&&g.members.includes(s.id)));
-    if(highNoGroup.length)c.push({priority:'urgent',cat:'Ungrouped T3 Students',title:`${highNoGroup.length} T3 student${highNoGroup.length>1?'s':''} not in any group`,body:`${highNoGroup.map(s=>s.name.split(' ')[0]).slice(0,4).join(', ')} — T3 students need a structured small-group placement for RTI/MTSS compliance.`,action:'Auto-Generate from Tags',fn:"_cnav('qualdata')"});
+    if(highNoGroup.length)c.push({priority:'urgent',cat:'Ungrouped T3 Students',title:`${highNoGroup.length} T3 student${highNoGroup.length>1?'s':''} not in any group`,body:`${_pn(highNoGroup.map(s=>s.name.split(' ')[0]).slice(0,4))} — T3 students need a structured small-group placement for RTI/MTSS compliance.`,action:'Auto-Generate from Tags',fn:"_cnav('qualdata')"});
     if(!groups.length)c.push({priority:'focus',cat:'Get Started',title:'No groups created yet',body:'Use Smart Groups in Deeper Insights to auto-generate qualitatively-clustered groups, or create one manually above.',action:'Deeper Insights',fn:"_cnav('qualdata')"});
     const large=groups.filter(g=>g.members&&g.members.length>8);
     if(large.length)c.push({priority:'tip',cat:'Group Size',title:`${large.length} group${large.length>1?'s':''} exceed 8 members`,body:'Research supports 4–6 students per targeted intervention group. Consider splitting: '+large.map(g=>g.name).join(', ')+'.'});
@@ -3565,7 +3566,7 @@ const COACH_GEN={
     const stale=interventions.filter(i=>{if(!i.date)return false;return(today-new Date(i.date))/(864e5)>14;});
     if(stale.length)c.push({priority:'urgent',cat:'Stale Logs',title:`${stale.length} intervention${stale.length>1?'s':''} not updated in 14+ days`,body:'Stale logs reduce RTI accountability and make data meetings harder. Log a progress note for each this week.'});
     const t3NoInt=base.filter(s=>s.tier==='t3'&&!interventions.some(i=>i.studentId===s.id));
-    if(t3NoInt.length)c.push({priority:'focus',cat:'Missing Coverage',title:`${t3NoInt.length} T3 student${t3NoInt.length>1?'s':''} have no intervention logged`,body:`${t3NoInt.map(s=>s.name.split(' ')[0]).slice(0,4).join(', ')} — Tier 3 students must have an active intervention plan on record for MTSS compliance.`});
+    if(t3NoInt.length)c.push({priority:'focus',cat:'Missing Coverage',title:`${t3NoInt.length} T3 student${t3NoInt.length>1?'s':''} have no intervention logged`,body:`${_pn(t3NoInt.map(s=>s.name.split(' ')[0]).slice(0,4))} — Tier 3 students must have an active intervention plan on record for MTSS compliance.`});
     if(!interventions.length)c.push({priority:'tip',cat:'Get Started',title:'No interventions logged yet',body:"Logging interventions creates a data trail for RTI/MTSS compliance, IEP coordination, and admin reporting."});
     const domGaps=Object.keys(DL).map(d=>({d,pct:base.length?Math.round(base.filter(s=>s.dom&&s.dom[d]<70).length/base.length*100):0})).sort((a,b)=>b.pct-a.pct);
     c.push({priority:'tip',cat:'Domain Alignment',title:`Log interventions against ${DL[domGaps[0].d]} (${domGaps[0].pct}% below 70%)`,body:'Aligning intervention logs to the weakest domain helps you track strategy effectiveness by skill area over time.'});
@@ -3588,7 +3589,7 @@ const COACH_GEN={
     const t3=base.filter(s=>s.tier==='t3'&&s.ir&&s.irE);
     if(t3.length){const avg=Math.round(t3.reduce((s,x)=>s+(x.irE-x.ir),0)/t3.length);c.push({priority:avg>12?'focus':'tip',cat:'T3 Growth Summary',title:`T3 students averaged +${avg} points BOY→EOY`,body:avg>12?'Above-average growth for T3 — current intervention strategy is working. Document and maintain intensity.':'Moderate growth. Review whether intervention frequency or domain alignment needs adjustment.'});}
     const flat=base.filter(s=>s.tier!=='t1'&&s.ir&&s.irM&&Math.abs(s.irM-s.ir)<3);
-    if(flat.length)c.push({priority:'focus',cat:'Flat Mid-Year',title:`${flat.length} students showed near-zero BOY→MOY growth`,body:`${flat.map(s=>s.name.split(' ')[0]).slice(0,4).join(', ')} — flat scores at MOY are an early warning sign. Review intervention alignment.`});
+    if(flat.length)c.push({priority:'focus',cat:'Flat Mid-Year',title:`${flat.length} students showed near-zero BOY→MOY growth`,body:`${_pn(flat.map(s=>s.name.split(' ')[0]).slice(0,4))} — flat scores at MOY are an early warning sign. Review intervention alignment.`});
     const domAvgs=Object.keys(DL).map(d=>({d,avg:base.length?Math.round(base.reduce((s,x)=>s+(x.dom&&x.dom[d]||0),0)/base.length):0})).sort((a,b)=>a.avg-b.avg);
     c.push({priority:'tip',cat:'Watch List',title:`Monitor ${DL[domAvgs[0].d]} — class avg ${domAvgs[0].avg}%`,body:'This domain appears consistently in risk analysis. Use the Domain Breakdown charts to identify which period and tier need the most targeted focus.'});
     return c;
@@ -3598,7 +3599,7 @@ const COACH_GEN={
     const t3pct=Math.round(base.filter(s=>s.tier==='t3').length/Math.max(base.length,1)*100);
     if(t3pct>25)c.push({priority:'focus',cat:'Admin Narrative',title:`${t3pct}% of students are in Tier 3`,body:'Above typical school-wide averages. Use this data to advocate for additional intervention resources, co-teacher time, or smaller class sizes.'});
     const big=base.filter(s=>s.ir&&s.irE&&s.irE-s.ir>=15);
-    if(big.length)c.push({priority:'tip',cat:'Success Evidence',title:`${big.length} students gained 15+ points BOY→EOY`,body:`${big.map(s=>s.name.split(' ')[0]).slice(0,4).join(', ')} — document as evidence of intervention effectiveness for RTI/MTSS reports.`});
+    if(big.length)c.push({priority:'tip',cat:'Success Evidence',title:`${big.length} students gained 15+ points BOY→EOY`,body:`${_pn(big.map(s=>s.name.split(' ')[0]).slice(0,4))} — document as evidence of intervention effectiveness for RTI/MTSS reports.`});
     const t2near=base.filter(s=>s.tier==='t2'&&s.irE&&s.irE>=437);
     if(t2near.length)c.push({priority:'focus',cat:'Tier Reclassification',title:`${t2near.length} T2 student${t2near.length>1?'s':''} may be ready for Tier 1`,body:'EOY scores suggest exit-eligible students. Document trajectory for placement review at next data meeting.',action:'View Growth',fn:"_cnav('growth')"});
     c.push({priority:'tip',cat:'Export Reminder',title:'Export before end of grading period',body:'Use Export CSV to share domain gap summaries with your instructional coach or include in progress reports.',action:'Export CSV',fn:"exportCSV()"});
@@ -3621,7 +3622,9 @@ function setPeriod(p,btn){_origSetPeriod(p,btn);renderCoach(_coachView);}
   updateKPIs();
   inited['overview']=true;
   initOverviewCharts();
-  // Drag+drop support for import zone already handled above
+  document.getElementById('coachPanel').classList.add('open');
+  document.getElementById('coachToggleBtn').classList.add('on');
+  renderCoach('overview');
 })();
 </script>
 </body>
