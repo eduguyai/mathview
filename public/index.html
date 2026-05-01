@@ -507,8 +507,9 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
 .ls-bar-fill{height:100%;border-radius:3px}
 .ls-bar-count{font-size:9px;font-family:var(--mono);color:var(--dim);width:24px;text-align:right}
 /* ── COACHING PANEL ── */
-.coach-panel{position:fixed;top:0;right:0;width:300px;height:100vh;background:var(--bg2);border-left:1px solid var(--bmed);z-index:600;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:-4px 0 24px rgba(0,0,0,.3)}
-.coach-panel.open{transform:translateX(0)}
+.coach-panel{width:0;min-width:0;overflow:hidden;height:100vh;background:var(--bg2);border-left:0 solid var(--bmed);flex-shrink:0;display:flex;flex-direction:column;transition:width .25s cubic-bezier(.4,0,.2,1),border-left-width .25s}
+.coach-panel .coach-head,.coach-panel .coach-body{min-width:300px}
+.coach-panel.open{width:300px;border-left-width:1px;overflow:visible}
 .coach-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2)}
 .coach-head-left{display:flex;align-items:center;gap:8px}
 .coach-logo{font-size:13px;font-weight:600;color:var(--text);font-family:var(--sans)}
@@ -1095,6 +1096,22 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
 
   </div><!-- /content -->
 </div><!-- /main -->
+
+<!-- COACHING PANEL -->
+<div class="coach-panel" id="coachPanel">
+  <div class="coach-head">
+    <div class="coach-head-left">
+      <div>
+        <div class="coach-logo">◉ <span>Coach</span></div>
+        <div class="coach-view-lbl" id="coachViewLbl">OVERVIEW</div>
+      </div>
+    </div>
+    <button class="coach-close" onclick="toggleCoach()">✕</button>
+  </div>
+  <div class="coach-body" id="coachCards">
+    <div class="coach-empty">Open a view to see<br>context-aware coaching.</div>
+  </div>
+</div>
 </div><!-- /shell -->
 
 <!-- DEEPER INSIGHTS GATE -->
@@ -1129,21 +1146,6 @@ Enter your access code to continue.</div>
   </div>
 </div>
 
-<!-- COACHING PANEL -->
-<div class="coach-panel" id="coachPanel">
-  <div class="coach-head">
-    <div class="coach-head-left">
-      <div>
-        <div class="coach-logo">◉ <span>Coach</span></div>
-        <div class="coach-view-lbl" id="coachViewLbl">OVERVIEW</div>
-      </div>
-    </div>
-    <button class="coach-close" onclick="toggleCoach()">✕</button>
-  </div>
-  <div class="coach-body" id="coachCards">
-    <div class="coach-empty">Open a view to see<br>context-aware coaching.</div>
-  </div>
-</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
