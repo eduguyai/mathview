@@ -619,6 +619,25 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
   .demo-banner{flex-direction:column;align-items:flex-start;gap:6px}
   .persist-btns{flex-wrap:wrap}
 }
+
+/* ── OUTCOME ATTRIBUTION ── */
+.out-btn{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:5px;border:1px solid var(--border);background:transparent;font-size:9px;font-family:var(--mono);color:var(--muted);cursor:pointer;transition:all .15s}
+.out-btn:hover{border-color:var(--bmed);color:var(--text)}
+.out-btn.eff{background:rgba(52,211,153,0.12);border-color:rgba(52,211,153,0.35);color:var(--t1)}
+.out-btn.par{background:rgba(251,146,60,0.12);border-color:rgba(251,146,60,0.35);color:var(--t2)}
+.out-btn.ineff{background:rgba(248,113,113,0.12);border-color:rgba(248,113,113,0.35);color:var(--t3)}
+.eff-summary{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:none}
+/* ── CO-OCCURRENCE ── */
+.cooc-section{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.cooc-card{background:var(--bg3);border:1px solid rgba(167,139,250,0.2);border-radius:8px;padding:12px;margin-bottom:8px}
+.cooc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px}
+.cooc-tag{font-size:10px;font-family:var(--mono);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);color:var(--accent2);padding:2px 8px;border-radius:4px}
+.cooc-tag+.cooc-tag::before{content:'×';color:var(--dim);font-size:9px;margin-right:6px}
+.cooc-protocol{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:6px}
+.cooc-students{display:flex;gap:4px;flex-wrap:wrap}
+/* ── NARRATIVE ── */
+.narrative-box{background:var(--bg3);border:1px solid rgba(91,141,238,0.2);border-radius:8px;padding:14px;margin-top:12px;font-size:12px;color:var(--muted);line-height:1.7;display:none}
+.narrative-btn{width:100%;margin-top:10px}
 </style>
 </head>
 <body>
@@ -809,7 +828,7 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
       </div>
       <!-- TAB: LESSON SIGNALS -->
       <div id="di-lessons" style="display:none">
-        <div id="diLessonSignals"></div>
+        <div id="diLessonSignals"></div><div id="diCoocSection"></div>
       </div>
       <!-- TAB: STUDENT FLAGS -->
       <div id="di-flags" style="display:none">
@@ -858,6 +877,7 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
             <div style="font-size:11px;color:var(--muted)">Active intervention logs</div>
             <button class="btn btnp" style="font-size:11px" onclick="openIntForm()">+ Log intervention</button>
           </div>
+          <div class="eff-summary" id="efficacySummary"></div>
           <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden"><div id="intList"></div></div>
         </div>
         <div class="int-form" id="intForm">
@@ -1847,8 +1867,17 @@ function openPlan(id){
       <div style="font-size:12px;color:var(--accent)">${priorities.join(' · ')}</div>
     </div>
     <div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Recommendation</div>
-    <div style="font-size:12px;color:var(--muted);line-height:1.6;background:var(--bg3);border-radius:8px;padding:12px">${s.rec}</div>`;
+    <div style="font-size:12px;color:var(--muted);line-height:1.6;background:var(--bg3);border-radius:8px;padding:12px">${s.rec}</div>
+    <button class="btn narrative-btn" onclick="toggleNarrative(${s.id})">◈ Generate MTSS Narrative</button>
+    <div class="narrative-box" id="narrativeBox-${s.id}"></div>`;
   document.getElementById('planOverlay').classList.add('vis');
+}
+function toggleNarrative(id){
+  const box=document.getElementById(`narrativeBox-${id}`);if(!box)return;
+  const s=students.find(x=>x.id===id);if(!s)return;
+  if(box.style.display==='block'){box.style.display='none';return;}
+  box.style.display='block';
+  if(!box.textContent.trim())box.textContent=generateClinicalNarrative(s);
 }
 function closePlanModal(){document.getElementById('planOverlay').classList.remove('vis');}
 
@@ -3047,6 +3076,20 @@ function generateLessonSignals(base){
   return signals.sort((a,b)=>({high:0,medium:1,low:2}[a.priority]-{high:0,medium:1,low:2}[b.priority]));
 }
 
+function renderCoOccurrenceSection(base){
+  const el=document.getElementById('diCoocSection');if(!el)return;
+  const pairs=generateCoOccurrences(base);
+  if(!pairs.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="cooc-section">
+    <div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">⊗ Compound Barrier Patterns</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Students carrying co-occurring concern tags require compound intervention protocols — single-barrier approaches have reduced efficacy.</div>
+    ${pairs.map(p=>`<div class="cooc-card">
+      <div class="cooc-tags"><span class="cooc-tag">"${p.tags[0]}"</span><span class="cooc-tag">"${p.tags[1]}"</span><span style="font-size:10px;font-family:var(--mono);color:var(--dim);margin-left:auto">${p.count} students</span></div>
+      <div class="cooc-protocol">${getCoocProtocol(p.tags)}</div>
+      <div class="cooc-students">${p.students.slice(0,6).map(s=>`<span class="ins-student-chip pv-name">${s.name.split(' ')[0]}</span>`).join('')}${p.students.length>6?`<span class="ins-student-chip">+${p.students.length-6}</span>`:''}</div>
+    </div>`).join('')}
+  </div>`;
+}
 function renderDILessons(base){
   const signals=generateLessonSignals(base);
   const el=document.getElementById('diLessonSignals');if(!el)return;
@@ -3065,6 +3108,7 @@ function renderDILessons(base){
       <ul class="ins-actions">${s.actions.map(a=>`<li>${a}</li>`).join('')}</ul>
       ${s.students.length?`<div class="ins-students">${s.students.slice(0,8).map(n=>`<span class="ins-student-chip pv-name">${n}</span>`).join('')}${s.students.length>8?`<span class="ins-student-chip">+${s.students.length-8} more</span>`:''}</div>`:''}
     </div>`).join('')}</div>`;
+  renderCoOccurrenceSection(base);
 }
 
 /* ── SMART GROUPS ENGINE ── */
@@ -3217,7 +3261,7 @@ function initInterventions(){
     sel.innerHTML=base.map(s=>`<option value="${s.id}">${s.name} (Pd ${s.pd} · ${s.tier.toUpperCase()})</option>`).join('');
   }
   const d=document.getElementById('intDate');if(d&&!d.value)d.value=new Date().toISOString().slice(0,10);
-  renderIntList();
+  renderIntList();renderEfficacySummary();
 }
 function renderIntList(){
   const el=document.getElementById('intList');if(!el)return;
@@ -3234,7 +3278,14 @@ function renderIntList(){
         <div class="int-meta">Pd ${s.pd} · ${DL[iv.domain]||iv.domain} · ${iv.freq} · Started ${iv.date}${ov?` · <span style="color:var(--t3)">${weeks}w ago</span>`:''}</div>
         ${iv.notes?`<div style="font-size:11px;color:var(--muted);margin-top:3px">${iv.notes}</div>`:''}
       </div>
-      <button class="btn" style="font-size:9px;padding:2px 7px;color:var(--dim)" onclick="removeInt(${iv.id})">✕</button>
+      <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-top:5px">
+        <span style="font-size:9px;font-family:var(--mono);color:var(--dim)">Outcome:</span>
+        <button class="out-btn ${iv.outcome==='effective'?'eff':''}" onclick="setOutcome(${iv.id},'effective')">✓ Effective</button>
+        <button class="out-btn ${iv.outcome==='partial'?'par':''}" onclick="setOutcome(${iv.id},'partial')">~ Partial</button>
+        <button class="out-btn ${iv.outcome==='ineffective'?'ineff':''}" onclick="setOutcome(${iv.id},'ineffective')">✗ Ineffective</button>
+        ${iv.tagSnapshot&&iv.tagSnapshot.length?`<span style="font-size:9px;font-family:var(--mono);color:var(--dim);margin-left:4px">Tags at logging: ${iv.tagSnapshot.slice(0,3).join(', ')}${iv.tagSnapshot.length>3?' +more':''}</span>`:''}
+      </div>
+      <button class="btn" style="font-size:9px;padding:2px 7px;color:var(--dim);margin-top:4px" onclick="removeInt(${iv.id})">✕</button>
     </div>`;
   }).join('');
 }
@@ -3246,12 +3297,103 @@ function saveIntervention(){
   const date=document.getElementById('intDate').value;
   const notes=document.getElementById('intNotes').value.trim();
   if(!sid||!date){showToast('Select student and date','#f87171');return;}
-  interventions.push({id:Date.now(),sid,domain,freq,date,notes});
+  const _ivs=students.find(x=>x.id===sid);const tagSnapshot=_ivs?[...(_ivs.tags||[])]:[];
+  interventions.push({id:Date.now(),sid,domain,freq,date,notes,outcome:null,tagSnapshot});
   saveInts();renderIntList();
   document.getElementById('intNotes').value='';
   showToast('Intervention logged','#34d399');
 }
-function removeInt(id){interventions=interventions.filter(x=>x.id!==id);saveInts();renderIntList();}
+function removeInt(id){interventions=interventions.filter(x=>x.id!==id);saveInts();renderIntList();renderEfficacySummary();}
+
+function setOutcome(id,outcome){
+  const iv=interventions.find(x=>x.id===id);
+  if(!iv)return;
+  iv.outcome=iv.outcome===outcome?null:outcome; // toggle off if same
+  iv.outcomeDate=new Date().toISOString().slice(0,10);
+  saveInts();renderIntList();renderEfficacySummary();
+}
+function renderEfficacySummary(){
+  const el=document.getElementById('efficacySummary');if(!el)return;
+  const tracked=interventions.filter(i=>i.outcome);
+  if(!tracked.length){el.style.display='none';return;}
+  const eff=tracked.filter(i=>i.outcome==='effective').length;
+  const par=tracked.filter(i=>i.outcome==='partial').length;
+  const ineff=tracked.filter(i=>i.outcome==='ineffective').length;
+  const pct=Math.round(eff/tracked.length*100);
+  // Tag efficacy: which tags appear most in effective interventions
+  const tagEff={};
+  tracked.filter(i=>i.outcome==='effective'&&i.tagSnapshot).forEach(i=>i.tagSnapshot.forEach(t=>{tagEff[t]=(tagEff[t]||0)+1;}));
+  const topTag=Object.entries(tagEff).sort((a,b)=>b[1]-a[1])[0];
+  el.style.display='block';
+  el.innerHTML=`<div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px">Outcome Attribution</div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:6px">
+    <span style="font-size:12px;color:var(--t1)">✓ ${eff} effective</span>
+    <span style="font-size:12px;color:var(--t2)">~ ${par} partial</span>
+    <span style="font-size:12px;color:var(--t3)">✗ ${ineff} ineffective</span>
+    <span style="font-size:12px;color:var(--muted)">${pct}% effective rate</span>
+  </div>
+  ${topTag?`<div style="font-size:11px;color:var(--muted)">Highest-yield profile: students tagged <span style="color:var(--accent2)">"${topTag[0]}"</span> show the most effective intervention outcomes (${topTag[1]} record${topTag[1]>1?'s':''}).</div>`:''}`;
+}
+function generateCoOccurrences(base){
+  const counts={},studs={};
+  base.forEach(s=>{
+    const tags=(s.tags||[]).filter(t=>(TQ[t]||'qn')!=='qp');
+    for(let i=0;i<tags.length;i++)for(let j=i+1;j<tags.length;j++){
+      const k=[tags[i],tags[j]].sort().join('||');
+      counts[k]=(counts[k]||0)+1;
+      (studs[k]=studs[k]||new Set()).add(s.id);
+    }
+  });
+  return Object.entries(counts).filter(([,n])=>n>=2).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,count])=>({
+    tags:k.split('||'),count,
+    students:[...studs[k]].map(id=>base.find(s=>s.id===id)).filter(Boolean)
+  }));
+}
+const COOC_PROTOCOLS={
+  'high absenteeism||math anxiety':'Dual-barrier protocol: Attendance outreach is prerequisite. Once present, use confidence-building micro-win sequences — not remediation drills — to avoid reinforcing avoidance. Brief, high-success math tasks rebuild engagement.',
+  'math anxiety||word problem difficulty':'Anxiety-decoding compound: Separate language decoding from mathematical reasoning. Teach "Read-Draw-Write" protocol with low-stakes entry. Explicitly normalize confusion as part of learning.',
+  'high absenteeism||low self-efficacy':'Attendance-identity compound: Student likely disconnects from math identity when absent. Use peer buddy system and "missed-you" catch-up that emphasizes belonging, not deficit.',
+  'EL: Spanish||word problem difficulty':'Language-access compound: Provide pre-taught math vocabulary with visual anchors before every word problem. Allow home-language annotation. Bilingual problem restatement is an accommodation, not simplification.',
+  'math anxiety||IEP: math':'Anxiety-accommodation compound: IEP accommodations must be delivered in a low-pressure context. Chunked tasks with extended time reduce both anxiety and cognitive load simultaneously.',
+};
+function getCoocProtocol(tags){
+  const k1=[...tags].sort().join('||');
+  if(COOC_PROTOCOLS[k1])return COOC_PROTOCOLS[k1];
+  return `Co-occurring barriers "${tags[0]}" and "${tags[1]}" require a compound intervention addressing both simultaneously. Single-barrier approaches will have reduced efficacy for these students.`;
+}
+function generateClinicalNarrative(s){
+  const tierLabel={t3:'Tier 3 (Intensive Support)',t2:'Tier 2 (Strategic Support)',t1:'Tier 1 (Benchmark)'}[s.tier]||s.tier;
+  const concern=(s.tags||[]).filter(t=>(TQ[t]||'qn')!=='qp');
+  const strength=(s.tags||[]).filter(t=>(TQ[t]||'qp')==='qp');
+  const elTags=(s.tags||[]).filter(t=>t.startsWith('EL:'));
+  const iepTags=(s.tags||[]).filter(t=>t.startsWith('IEP:')||t.startsWith('504:'));
+  const weakDoms=Object.entries(s.dom||{}).sort((a,b)=>a[1]-b[1]).slice(0,2).map(([k])=>DL[k]);
+  const growth=s.ir&&s.irE?s.irE-s.ir:null;
+  const intList=interventions.filter(i=>i.sid===s.id);
+  const effInt=intList.filter(i=>i.outcome==='effective');
+  let n=`${s.name} is a 7th-grade mathematics student currently performing at the ${tierLabel} level`;
+  if(s.ir)n+=` with an iReady benchmark score of ${s.ir}`;
+  if(growth!==null)n+=`, reflecting ${growth>=0?'+':''}${growth} points of measurable growth from the beginning of year`;
+  n+='. ';
+  if(weakDoms.length)n+=`Primary academic deficits are concentrated in ${weakDoms.join(' and ')}, representing the highest-priority domains for targeted instructional intervention. `;
+  if(concern.length)n+=`Teacher observation has identified the following barriers to academic progress: ${concern.slice(0,4).join(', ')}. `;
+  if(strength.length)n+=`Documented learning strengths include ${strength.slice(0,3).join(', ')}, which should be leveraged as entry points in instructional planning. `;
+  if(elTags.length)n+=`This student is identified as an English Learner${elTags[0].replace('EL:','').trim()?` (${elTags[0].replace('EL:','').trim()})`:''}. Language scaffolds, visual vocabulary supports, and bilingual mathematical representations are required throughout instruction. `;
+  if(iepTags.length)n+=`Active ${iepTags.map(t=>t.split(':')[0]).join('/')} accommodations are documented and must be implemented consistently across all instructional settings for compliance. `;
+  if(intList.length){
+    n+=`${intList.length} intervention${intList.length>1?'s have':' has'} been logged for this student`;
+    if(effInt.length)n+=`, with ${effInt.length} marked effective`;
+    const rec=intList.sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+    n+=`. Current intervention targets ${DL[rec.domain]||rec.domain} at a frequency of ${rec.freq}. `;
+  } else {
+    n+=`No formal interventions have been logged for this student to date. `;
+  }
+  if(s.tier==='t3')n+=`MTSS Recommendation: Immediate enrollment in an intensive small-group pull-out program (3–5x/week) targeting ${weakDoms[0]||'core mathematics skills'}. Formal MTSS team coordination recommended within 10 school days.`;
+  else if(s.tier==='t2')n+=`MTSS Recommendation: Strategic small-group support (2–3x/week) with progress monitoring every 3 weeks. Review for tier reclassification at next benchmark cycle.`;
+  else n+=`MTSS Recommendation: Continue core instruction with enrichment opportunities. Monitor quarterly for sustained benchmark-level performance.`;
+  return n;
+}
+
 
 /* ═══════════════════════════════════════
    M9 — SCORE NORMS · EXTRA FIELDS · BUBBLE SHEET
