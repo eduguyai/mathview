@@ -3082,7 +3082,7 @@ function renderCoOccurrenceSection(base){
   if(!pairs.length){el.innerHTML='';return;}
   el.innerHTML=`<div class="cooc-section">
     <div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">⊗ Compound Barrier Patterns</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Students carrying co-occurring concern tags require compound intervention protocols — single-barrier approaches have reduced efficacy.</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Students with multiple co-occurring concern indicators often respond better to compound intervention protocols that address both patterns simultaneously.</div>
     ${pairs.map(p=>`<div class="cooc-card">
       <div class="cooc-tags"><span class="cooc-tag">"${p.tags[0]}"</span><span class="cooc-tag">"${p.tags[1]}"</span><span style="font-size:10px;font-family:var(--mono);color:var(--dim);margin-left:auto">${p.count} students</span></div>
       <div class="cooc-protocol">${getCoocProtocol(p.tags)}</div>
@@ -3337,7 +3337,7 @@ function renderEfficacySummary(){
 function generateCoOccurrences(base){
   const counts={},studs={};
   base.forEach(s=>{
-    const tags=(s.tags||[]).filter(t=>(TQ[t]||'qn')!=='qp');
+    const tags=(s.tags||[]).filter(t=>TQ[t]==='qc');
     for(let i=0;i<tags.length;i++)for(let j=i+1;j<tags.length;j++){
       const k=[tags[i],tags[j]].sort().join('||');
       counts[k]=(counts[k]||0)+1;
@@ -3359,7 +3359,7 @@ const COOC_PROTOCOLS={
 function getCoocProtocol(tags){
   const k1=[...tags].sort().join('||');
   if(COOC_PROTOCOLS[k1])return COOC_PROTOCOLS[k1];
-  return `Co-occurring barriers "${tags[0]}" and "${tags[1]}" require a compound intervention addressing both simultaneously. Single-barrier approaches will have reduced efficacy for these students.`;
+  return `Students with both "${tags[0]}" and "${tags[1]}" present together may need a compound approach — address both indicators in tandem rather than sequentially for stronger outcomes.`;
 }
 function generateClinicalNarrative(s){
   const tierLabel={t3:'Tier 3 (Intensive Support)',t2:'Tier 2 (Strategic Support)',t1:'Tier 1 (Benchmark)'}[s.tier]||s.tier;
