@@ -86,6 +86,28 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
 .kpi-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:4px}
 .kpi-sub{font-size:10px;color:var(--dim);font-family:var(--mono);margin-top:2px}
 
+/* ── GRADE EQUIVALENT STRIP ── */
+.ge-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:4px}
+.ge-tile{border-radius:10px;padding:12px 14px;border-top:3px solid transparent;border:1px solid var(--border)}
+.ge-tile-band{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);font-family:var(--mono);margin-bottom:3px}
+.ge-tile-val{font-family:var(--mono);font-size:26px;font-weight:400;line-height:1;margin-bottom:3px}
+.ge-tile-label{font-size:10px;color:var(--muted);margin-bottom:5px}
+.ge-tile-badge{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:4px;display:inline-block;background:var(--bg3)}
+/* ── QUALITATIVE INSIGHTS PANEL ── */
+.qi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qi-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.qi-title{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-family:var(--mono);margin-bottom:10px}
+.qi-tag-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.qi-tag-name{font-size:10px;color:var(--text);width:160px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qi-bar-wrap{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.qi-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+.qi-score{font-family:var(--mono);font-size:10px;color:var(--dim);width:50px;text-align:right;flex-shrink:0}
+.tier-def-row{padding:10px;border-radius:7px;margin-bottom:8px;border:1px solid var(--border)}
+.tier-def-row:last-child{margin-bottom:0}
+.tier-def-label{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.tier-def-desc{font-size:10px;color:var(--dim);margin-bottom:5px;line-height:1.5}
+.tier-tag-pill{font-size:9px;padding:2px 6px;border-radius:4px;display:inline-block;margin:2px}
+
 /* ── CHARTS GRID ── */
 .chart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
 .chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
@@ -583,6 +605,13 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
   .kpi-row{grid-template-columns:repeat(2,1fr);gap:10px}
   .kpi-val{font-size:22px}
 
+  /* Grade equivalents: 2 columns on mobile */
+  .ge-strip{grid-template-columns:repeat(2,1fr);gap:8px}
+
+  /* Qualitative insights: single column on mobile */
+  .qi-grid{grid-template-columns:1fr;gap:10px}
+  .qi-tag-name{width:120px}
+
   /* Charts: single column */
   .chart-grid{grid-template-columns:1fr;gap:10px}
 
@@ -775,6 +804,10 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
         <div class="chart-card"><div class="chart-title">Domain Strength by Tier</div><div class="chart-wrap"><canvas id="c-domtier"></canvas></div></div>
         <div class="chart-card"><div class="chart-title">At-Risk Students by Period</div><div class="chart-wrap"><canvas id="c-atrisk"></canvas></div></div>
       </div>
+      <!-- GRADE EQUIVALENT BREAKDOWN -->
+      <div id="gePanel" style="margin-bottom:18px"></div>
+      <!-- QUALITATIVE INSIGHTS PANEL -->
+      <div id="qualInsightsPanel" style="margin-bottom:18px"></div>
     </div>
 
     <!-- ROSTER -->
@@ -1644,6 +1677,135 @@ function renderOverviewCharts(base){
   if(c4)overviewCharts['c-tiermov']=c4;
   if(c5)overviewCharts['c-domtier']=c5;
   if(c6)overviewCharts['c-atrisk']=c6;
+  renderQualInsights(base);
+}
+
+/* ═══════════════════════════════════════
+   QUALITATIVE INSIGHTS — OVERVIEW
+═══════════════════════════════════════ */
+function renderQualInsights(base){
+  // ── GRADE EQUIVALENTS ──
+  const gePanel=document.getElementById('gePanel');
+  if(gePanel){
+    const geBands=[
+      {range:'< 400',ge:'Grade 4–5 Level',tier:'Tier 3',color:'#f87171',bg:'rgba(248,113,113,0.07)',fn:s=>s.ir&&s.ir<400},
+      {range:'400–414',ge:'Grade 6 Level',tier:'Tier 3',color:'#f87171',bg:'rgba(248,113,113,0.05)',fn:s=>s.ir>=400&&s.ir<415},
+      {range:'415–429',ge:'Grade 6–7 Level',tier:'Tier 3',color:'#f87171',bg:'rgba(248,113,113,0.03)',fn:s=>s.ir>=415&&s.ir<430},
+      {range:'430–444',ge:'Grade 7 Level',tier:'Tier 2',color:'#fb923c',bg:'rgba(251,146,60,0.06)',fn:s=>s.ir>=430&&s.ir<445},
+      {range:'445+',ge:'Grade 7–8 Level',tier:'Tier 1',color:'#34d399',bg:'rgba(52,211,153,0.07)',fn:s=>s.ir&&s.ir>=445},
+    ];
+    const irBase=base.filter(s=>s.ir);
+    const total=irBase.length||1;
+    gePanel.innerHTML=`
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);font-family:var(--mono);margin-bottom:10px">◈ Grade Equivalents — iReady Score Bands</div>
+      <div class="ge-strip">
+        ${geBands.map(b=>{
+          const n=irBase.filter(b.fn).length;
+          const pct=Math.round(n/total*100);
+          return`<div class="ge-tile" style="border-top:3px solid ${b.color};background:${b.bg}">
+            <div class="ge-tile-band">${b.range}</div>
+            <div class="ge-tile-val" style="color:${b.color}">${n}</div>
+            <div class="ge-tile-label">${b.ge}</div>
+            <div class="ge-tile-badge" style="color:${b.color}">${b.tier} &middot; ${pct}%</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  // ── QUALITATIVE INSIGHTS ──
+  const qiPanel=document.getElementById('qualInsightsPanel');
+  if(!qiPanel)return;
+
+  const irBase2=base.filter(s=>s.ir);
+  const classAvgIr=irBase2.length?Math.round(irBase2.reduce((a,s)=>a+s.ir,0)/irBase2.length):0;
+
+  // Tag-to-performance: for each concern tag, compute avg iReady and T3 %
+  const tagData={};
+  base.forEach(s=>{
+    (s.tags||[]).forEach(t=>{
+      if(TQ[t]==='qc'){
+        if(!tagData[t])tagData[t]={scores:[],t3:0,n:0};
+        tagData[t].n++;
+        if(s.ir)tagData[t].scores.push(s.ir);
+        if(s.tier==='t3')tagData[t].t3++;
+      }
+    });
+  });
+  const tagRows=Object.entries(tagData)
+    .filter(([,d])=>d.n>=2)
+    .map(([t,d])=>({
+      tag:t,
+      avg:d.scores.length?Math.round(d.scores.reduce((a,v)=>a+v,0)/d.scores.length):0,
+      t3pct:Math.round(d.t3/d.n*100),
+      n:d.n
+    }))
+    .sort((a,b)=>a.avg-b.avg)
+    .slice(0,8);
+
+  const scoreMin=tagRows.length?Math.min(...tagRows.map(r=>r.avg)):400;
+  const scoreMax=tagRows.length?Math.max(...tagRows.map(r=>r.avg)):460;
+  const scoreRange=Math.max(scoreMax-scoreMin,1);
+
+  // Tier movement: top concern tags among T3 students
+  const t3TagCounts={};
+  base.filter(s=>s.tier==='t3').forEach(s=>(s.tags||[]).forEach(t=>{
+    if(TQ[t]==='qc')t3TagCounts[t]=(t3TagCounts[t]||0)+1;
+  }));
+  const topT3Concerns=Object.entries(t3TagCounts).sort((a,b)=>b[1]-a[1]).slice(0,6);
+
+  // Near-boundary students (T3 near T2 line, T2 near T1 line) + their positive tags
+  const nearBdy=base.filter(s=>(s.tier==='t3'&&s.ir>=405)||(s.tier==='t2'&&s.ir>=433));
+  const posNear={};
+  nearBdy.forEach(s=>(s.tags||[]).forEach(t=>{if(TQ[t]==='qp')posNear[t]=(posNear[t]||0)+1;}));
+  const topPosNear=Object.entries(posNear).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+  const noDataMsg='<span style="font-size:10px;color:var(--dim)">Add qualitative tags in the Roster to populate this insight.</span>';
+
+  qiPanel.innerHTML=`
+  <div style="font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);font-family:var(--mono);margin-bottom:10px">⊗ Qualitative Data Analytics</div>
+  <div class="qi-grid">
+
+    <!-- LEFT: Tag-performance correlation -->
+    <div class="qi-card">
+      <div class="qi-title">Concern Tag → Avg iReady Score</div>
+      <div style="font-size:10px;color:var(--dim);margin-bottom:10px">Class avg: <strong style="font-family:var(--mono);color:var(--text)">${classAvgIr}</strong> &nbsp;·&nbsp; Tags sorted by lowest avg score (most impactful first)</div>
+      ${tagRows.length?tagRows.map(r=>{
+        const barW=Math.round(((r.avg-scoreMin)/scoreRange)*75+10);
+        const col=r.avg<415?'#f87171':r.avg<440?'#fb923c':'#34d399';
+        const delta=r.avg-classAvgIr;
+        const deltaStr=(delta>0?'+':'')+delta;
+        return`<div class="qi-tag-row">
+          <div class="qi-tag-name" title="${r.tag} (${r.n} students)">${r.tag}</div>
+          <div class="qi-bar-wrap"><div class="qi-bar-fill" style="width:${barW}%;background:${col}"></div></div>
+          <div class="qi-score">${r.avg} <span style="color:${delta<0?'#f87171':'#34d399'};font-size:9px">${deltaStr}</span></div>
+        </div>`;
+      }).join(''):noDataMsg}
+      ${tagRows.length?`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:9px;color:var(--dim);line-height:1.6">Tags with the <span style="color:#f87171">lowest avg scores</span> are the strongest qualitative predictors of Tier 3 placement. Students carrying 2+ of these simultaneously have the highest intervention priority.</div>`:''}
+    </div>
+
+    <!-- RIGHT: Tier movement definitions -->
+    <div class="qi-card">
+      <div class="qi-title">Tier Movement — Qualitative Definitions</div>
+
+      <div class="tier-def-row" style="background:rgba(248,113,113,0.05)">
+        <div class="tier-def-label" style="color:#f87171">⬤ Tier 3 · Score &lt; 415 · Intensive Support</div>
+        <div class="tier-def-desc">Students below iReady 415, requiring intensive daily intervention. Concern tags most associated with T3 <em>retention</em> (staying T3 despite support):</div>
+        <div>${topT3Concerns.length?topT3Concerns.map(([t,n])=>`<span class="tier-tag-pill" style="background:rgba(248,113,113,0.12);color:#f87171">${t}<span style="opacity:.6"> ×${n}</span></span>`).join(''):noDataMsg}</div>
+      </div>
+
+      <div class="tier-def-row" style="background:rgba(251,146,60,0.05)">
+        <div class="tier-def-label" style="color:#fb923c">⬤ Tier 2 · Score 415–439 · Strategic Support</div>
+        <div class="tier-def-desc">Students within range of the T2→T1 boundary (430+) who also show growth-oriented qualitative indicators are strongest candidates for reduced support intensity. T2 students with <span style="color:#34d399">growth mindset</span>, <span style="color:#34d399">improving trend</span>, or <span style="color:#34d399">high engagement</span> tags should be monitored for upward movement.</div>
+      </div>
+
+      <div class="tier-def-row" style="background:rgba(52,211,153,0.05)">
+        <div class="tier-def-label" style="color:#34d399">⬤ Upward Mobility Signals · ${nearBdy.length} near-boundary students</div>
+        <div class="tier-def-desc">Positive qualitative tags seen in students currently within 15 points of moving up a tier — the highest-leverage targets for a focused intervention push:</div>
+        <div>${topPosNear.length?topPosNear.map(([t,n])=>`<span class="tier-tag-pill" style="background:rgba(52,211,153,0.12);color:#34d399">${t}<span style="opacity:.6"> ×${n}</span></span>`).join(''):noDataMsg}</div>
+      </div>
+
+    </div>
+  </div>`;
 }
 
 /* ═══════════════════════════════════════
