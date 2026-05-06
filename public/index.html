@@ -438,6 +438,23 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 .modal-close:hover{color:var(--text)}
 .modal-body{padding:18px 22px}
 /* ── M4: REPORTS ── */
+.rpt-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:6px}
+.rpt-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;cursor:default}
+.rpt-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.rpt-icon{font-size:22px;line-height:1;flex-shrink:0}
+.rpt-audiences{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.rpt-aud{font-size:8px;font-weight:700;padding:2px 6px;border-radius:10px;background:var(--bg4);color:var(--dim);font-family:'DM Mono',monospace;letter-spacing:.04em;text-transform:uppercase}
+.rpt-aud.teacher{background:rgba(91,141,238,0.12);color:var(--accent)}
+.rpt-aud.admin{background:rgba(167,139,250,0.12);color:var(--accent2)}
+.rpt-aud.parent{background:rgba(52,211,153,0.12);color:var(--t1)}
+.rpt-name{font-size:13px;font-weight:700;color:var(--fg)}
+.rpt-desc{font-size:11px;color:var(--dim);line-height:1.5;flex:1}
+.rpt-footer{display:flex;align-items:center;justify-content:space-between;margin-top:2px}
+.rpt-pages{font-size:9px;color:var(--dim);font-family:'DM Mono',monospace}
+.rpt-print-btn{font-size:10px;font-weight:600;padding:5px 14px;border-radius:6px;border:1px solid var(--accent);color:var(--accent);background:transparent;cursor:pointer;font-family:inherit}
+.rpt-print-btn:hover{background:rgba(91,141,238,0.1)}
+@media(max-width:900px){.rpt-gallery{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.rpt-gallery{grid-template-columns:1fr}}
 .rep-tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
 .rep-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
 .rep-card-label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-family:var(--mono);margin-bottom:10px}
@@ -1041,6 +1058,10 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
 
     <!-- REPORTS -->
     <div class="view" id="view-reports">
+      <!-- PRINTABLE REPORT GALLERY -->
+      <div id="repGallery"></div>
+      <!-- DATA PREVIEW SECTION -->
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);margin:20px 0 10px">Class Data Preview</div>
       <div class="rep-tier-grid" id="repTierCards"></div>
       <div class="rep-table-wrap">
         <div class="rep-table-head">
@@ -2963,7 +2984,283 @@ function saveGoal(id,field,val){
 /* ═══════════════════════════════════════
    M4: REPORTS
 ═══════════════════════════════════════ */
-function initReports(){renderReports();}
+/* ═══════════════════════════════════════
+   PRINTABLE REPORTS ENGINE
+═══════════════════════════════════════ */
+const RPT_CATALOG=[
+  {id:'snapshot',icon:'📋',name:'Class Snapshot',desc:'One-page overview: tier distribution, domain gaps, priority domain, and at-risk highlights. Ideal for quick sharing at a team meeting.',pages:'1 page',audiences:['teacher','admin']},
+  {id:'mtss',icon:'📂',name:'MTSS Intervention Log',desc:'Full intervention record by student — domain focus, frequency, date, and session count. Satisfies MTSS documentation requirements.',pages:'1–2 pages',audiences:['teacher','admin']},
+  {id:'progress',icon:'📈',name:'Student Progress Report',desc:'BOY → MOY → EOY iReady trajectory and domain profile per student. Suitable for parent conferences and progress monitoring.',pages:'1 page / student',audiences:['teacher','parent']},
+  {id:'tierdist',icon:'🏫',name:'Grade-Level Tier Report',desc:'Tier breakdown by period, class averages, growth summary, and MTSS status. Designed for principal walkthroughs and cabinet meetings.',pages:'1 page',audiences:['admin']},
+  {id:'domains',icon:'⬡',name:'Domain Gap Analysis',desc:'All 5 domains: class average, % below proficiency, Tier 3 avg, and lowest-performing students per domain. For curriculum planning.',pages:'1 page',audiences:['teacher','admin']},
+  {id:'atrisk',icon:'⚑',name:'At-Risk Student Report',desc:'Tier 3 students with concern tags, intervention status, score trajectory, and flags. For AP and principal review.',pages:'1–2 pages',audiences:['admin']},
+];
+
+function renderReportGallery(){
+  const el=document.getElementById('repGallery');
+  if(!el)return;
+  el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg)">Print Reports</span>
+    <span style="font-size:10px;color:var(--dim);font-family:'DM Mono',monospace">Opens print-ready view — save as PDF or send directly</span>
+  </div>
+  <div class="rpt-gallery">
+    ${RPT_CATALOG.map(r=>`<div class="rpt-card">
+      <div class="rpt-card-top">
+        <span class="rpt-icon">${r.icon}</span>
+        <div class="rpt-audiences">${r.audiences.map(a=>`<span class="rpt-aud ${a}">${a}</span>`).join('')}</div>
+      </div>
+      <div class="rpt-name">${r.name}</div>
+      <div class="rpt-desc">${r.desc}</div>
+      <div class="rpt-footer">
+        <span class="rpt-pages">${r.pages}</span>
+        <button class="rpt-print-btn" onclick="printReport('${r.id}')">Print / PDF →</button>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function printReport(type){
+  const teacher=settings&&settings.teacherName?settings.teacherName:'Teacher';
+  const school=settings&&settings.school?settings.school:'';
+  const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const domKeys=['numSense','algebra','ratios','stats','geometry'];
+  const DL2={numSense:'Number Sense',algebra:'Algebra',ratios:'Ratios',stats:'Statistics',geometry:'Geometry'};
+  const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length):0;
+  const tierLabel={t3:'Tier 3',t2:'Tier 2',t1:'Tier 1'};
+
+  const CSS=`
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;font-size:11pt;color:#111;background:#fff;padding:24px 32px}
+    h1{font-size:18pt;font-weight:700;color:#111;margin-bottom:2px}
+    h2{font-size:12pt;font-weight:700;color:#333;margin:16px 0 6px;border-bottom:1.5px solid #ddd;padding-bottom:4px}
+    h3{font-size:10pt;font-weight:700;color:#555;margin:10px 0 4px}
+    .header{margin-bottom:20px;padding-bottom:12px;border-bottom:2.5px solid #111}
+    .meta{font-size:9pt;color:#555;margin-top:4px}
+    table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:9pt}
+    th{background:#f0f0f0;font-weight:700;padding:5px 8px;text-align:left;border:1px solid #ccc;font-size:8.5pt;text-transform:uppercase;letter-spacing:.04em}
+    td{padding:5px 8px;border:1px solid #ddd;vertical-align:top}
+    tr:nth-child(even)td{background:#fafafa}
+    .badge{display:inline-block;padding:1px 6px;border-radius:10px;font-size:8pt;font-weight:700}
+    .t3{background:#fee2e2;color:#b91c1c}
+    .t2{background:#ffedd5;color:#c2410c}
+    .t1{background:#d1fae5;color:#065f46}
+    .urgent{background:#fee2e2;color:#b91c1c}
+    .kpi-row{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+    .kpi{flex:1;min-width:100px;padding:12px 14px;border:1px solid #ddd;border-radius:6px;text-align:center}
+    .kpi-val{font-size:22pt;font-weight:700;line-height:1}
+    .kpi-lbl{font-size:8.5pt;color:#555;margin-top:3px}
+    .domain-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+    .domain-box{flex:1;min-width:120px;padding:10px 12px;border:1px solid #ddd;border-radius:6px}
+    .domain-name{font-size:8pt;font-weight:700;text-transform:uppercase;color:#555;letter-spacing:.04em}
+    .domain-val{font-size:16pt;font-weight:700;margin:3px 0}
+    .domain-sub{font-size:8pt;color:#777}
+    .bar-bg{height:5px;background:#e5e7eb;border-radius:3px;margin-top:6px;overflow:hidden}
+    .bar-fill{height:100%;border-radius:3px}
+    .flag{color:#b91c1c;font-weight:700}
+    .section{margin-bottom:18px}
+    .pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+    .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:8pt;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}
+    .pill.concern{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+    .pill.positive{background:#d1fae5;color:#065f46;border-color:#a7f3d0}
+    .no-print{display:block;text-align:center;margin-bottom:20px}
+    @media print{.no-print{display:none!important}body{padding:0} @page{margin:1.5cm}}
+    .page-break{page-break-after:always;margin-bottom:24px}
+    .footer{margin-top:20px;padding-top:8px;border-top:1px solid #ddd;font-size:8pt;color:#888;text-align:center}
+  `;
+
+  const header=(title,subtitle)=>`
+    <div class="no-print">
+      <button onclick="window.print()" style="padding:10px 28px;font-size:12pt;font-weight:700;background:#111;color:#fff;border:none;border-radius:6px;cursor:pointer;margin-right:10px">🖨 Print / Save as PDF</button>
+      <button onclick="window.close()" style="padding:10px 20px;font-size:12pt;background:#f3f4f6;border:1px solid #ccc;border-radius:6px;cursor:pointer">Close</button>
+    </div>
+    <div class="header">
+      <h1>${title}</h1>
+      <div class="meta">${subtitle || ''} · ${school} · Generated by MathView · ${today}</div>
+    </div>`;
+
+  let body='';
+
+  if(type==='snapshot'){
+    const t3=students.filter(s=>s.tier==='t3'),t2=students.filter(s=>s.tier==='t2'),t1=students.filter(s=>s.tier==='t1');
+    const boyAvg=avg(students.map(s=>s.ir).filter(Boolean));
+    const pd=getPriorityDomain();
+    const concerns={};
+    students.forEach(s=>s.tags.filter(t=>TQ[t]==='qc').forEach(t=>{concerns[t]=(concerns[t]||0)+1;}));
+    const topConcerns=Object.entries(concerns).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const atRisk=students.filter(s=>s.tier==='t3'&&s.tags.filter(t=>TQ[t]==='qc').length>=2);
+    const domRows=domKeys.map(k=>{
+      const ss=students.filter(s=>s.dom&&s.dom[k]);
+      const a=ss.length?avg(ss.map(s=>s.dom[k])):0;
+      const b=ss.length?Math.round(ss.filter(s=>s.dom[k]<65).length/ss.length*100):0;
+      const color=a>=70?'#059669':a>=55?'#d97706':'#dc2626';
+      return `<tr><td style="font-weight:600">${DL2[k]}</td><td style="color:${color};font-weight:700">${a}%</td><td>${b}%</td><td style="color:${b>50?'#dc2626':'#374151'}">${b>60?'⚠ High Priority':b>40?'Moderate Gap':'On Track'}</td></tr>`;
+    }).join('');
+
+    body=`
+      <div class="section">
+        <div class="kpi-row">
+          <div class="kpi"><div class="kpi-val">${students.length}</div><div class="kpi-lbl">Total Students</div></div>
+          <div class="kpi"><div class="kpi-val" style="color:#b91c1c">${t3.length}</div><div class="kpi-lbl">Tier 3 — Intensive</div></div>
+          <div class="kpi"><div class="kpi-val" style="color:#c2410c">${t2.length}</div><div class="kpi-lbl">Tier 2 — Strategic</div></div>
+          <div class="kpi"><div class="kpi-val" style="color:#065f46">${t1.length}</div><div class="kpi-lbl">Tier 1 — Benchmark</div></div>
+          <div class="kpi"><div class="kpi-val">${boyAvg||'—'}</div><div class="kpi-lbl">Avg BOY iReady</div></div>
+        </div>
+      </div>
+      <h2>Domain Gap Summary</h2>
+      <table><thead><tr><th>Domain</th><th>Class Avg</th><th>% Below Proficiency</th><th>Status</th></tr></thead><tbody>${domRows}</tbody></table>
+      ${pd?`<p style="margin-bottom:12px;padding:8px 12px;background:#fef3c7;border-left:3px solid #d97706;border-radius:4px;font-size:10pt"><strong>🎯 Highest-Leverage Focus: ${DL2[pd.k]}</strong> — ${Math.round(pd.gap*100)}% of students below proficiency. Class avg: ${Math.round(pd.avg)}%. Address this domain first for maximum impact.</p>`:''}
+      <h2>Concern Tag Frequency</h2>
+      <div class="pill-row">${topConcerns.map(([t,n])=>`<span class="pill concern">${t} (${n})</span>`).join('')}</div>
+      <h2 style="margin-top:16px">At-Risk Students (T3 with 2+ Concern Tags)</h2>
+      ${atRisk.length?`<table><thead><tr><th>Student</th><th>iReady BOY</th><th>Top Concerns</th><th>Interventions Logged</th></tr></thead><tbody>
+        ${atRisk.map(s=>{const ints=interventions.filter(i=>i.sid===s.id).length;const cc=s.tags.filter(t=>TQ[t]==='qc');return`<tr><td style="font-weight:600">${s.name}</td><td>${s.ir||'—'}</td><td>${cc.slice(0,3).join(', ')}</td><td>${ints||'<span class="flag">⚠ None</span>'}</td></tr>`}).join('')}
+      </tbody></table>`:'<p style="color:#555">No students currently flagged at this level.</p>'}`;
+  }
+
+  if(type==='mtss'){
+    const sorted=[...students].sort((a,b)=>{const ta={t3:0,t2:1,t1:2};return ta[a.tier]-ta[b.tier]||a.name.localeCompare(b.name);});
+    const rows=sorted.map(s=>{
+      const ints=interventions.filter(i=>i.sid===s.id);
+      const last=ints.length?ints.slice(-1)[0]:'';
+      const domains=[...new Set(ints.map(i=>DL2[i.domain]||i.domain))].join(', ')||'—';
+      const freqs=[...new Set(ints.map(i=>i.freq))].filter(Boolean).join(', ')||'—';
+      const flag=s.tier==='t3'&&!ints.length?'<span class="flag">⚠ No plan</span>':'';
+      return`<tr><td style="font-weight:600">${s.name}</td><td><span class="badge ${s.tier}">${tierLabel[s.tier]}</span></td><td>${ints.length}${flag}</td><td>${domains}</td><td>${freqs}</td><td>${last?last.date:'—'}</td><td style="max-width:160px;font-size:8pt">${last?last.notes||'—':'—'}</td></tr>`;
+    }).join('');
+    const covered=students.filter(s=>interventions.some(i=>i.sid===s.id)).length;
+    const uncoveredT3=students.filter(s=>s.tier==='t3'&&!interventions.some(i=>i.sid===s.id));
+    body=`
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-val">${interventions.length}</div><div class="kpi-lbl">Total Sessions Logged</div></div>
+        <div class="kpi"><div class="kpi-val">${covered}</div><div class="kpi-lbl">Students Served</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:${uncoveredT3.length>0?'#b91c1c':'#065f46'}">${uncoveredT3.length}</div><div class="kpi-lbl">T3 Without Plan</div></div>
+      </div>
+      ${uncoveredT3.length?`<p style="padding:8px 12px;background:#fee2e2;border-left:3px solid #dc2626;border-radius:4px;margin-bottom:12px;font-size:10pt"><strong>⚠ MTSS Gap:</strong> The following Tier 3 students have no intervention logged: ${uncoveredT3.map(s=>s.name).join(', ')}</p>`:''}
+      <h2>Intervention Log — All Students</h2>
+      <table><thead><tr><th>Student</th><th>Tier</th><th>Sessions</th><th>Domains</th><th>Frequency</th><th>Last Logged</th><th>Most Recent Notes</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  if(type==='tierdist'){
+    const pds=[2,3,4,5];
+    const rows=pds.map(p=>{
+      const ps=students.filter(s=>s.pd===p);
+      const t3=ps.filter(s=>s.tier==='t3').length,t2=ps.filter(s=>s.tier==='t2').length,t1=ps.filter(s=>s.tier==='t1').length;
+      const boyA=avg(ps.map(s=>s.ir).filter(Boolean));
+      const eoyA=avg(ps.map(s=>s.irE).filter(Boolean));
+      const growth=boyA&&eoyA?((eoyA-boyA)>0?'+':'')+(eoyA-boyA):'—';
+      const served=ps.filter(s=>interventions.some(i=>i.sid===s.id)).length;
+      return`<tr><td style="font-weight:600">Period ${p}</td><td>${ps.length}</td><td style="color:#b91c1c;font-weight:700">${t3} (${ps.length?Math.round(t3/ps.length*100):0}%)</td><td style="color:#c2410c;font-weight:700">${t2} (${ps.length?Math.round(t2/ps.length*100):0}%)</td><td style="color:#065f46;font-weight:700">${t1} (${ps.length?Math.round(t1/ps.length*100):0}%)</td><td>${boyA||'—'}</td><td>${eoyA||'—'}</td><td style="color:${eoyA>boyA?'#065f46':'#b91c1c'}">${growth}</td><td>${served}/${ps.length}</td></tr>`;
+    }).join('');
+    const allT3=students.filter(s=>s.tier==='t3').length;
+    const intCoverage=students.filter(s=>interventions.some(i=>i.sid===s.id)).length;
+    body=`
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-val">${students.length}</div><div class="kpi-lbl">Total Students</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:#b91c1c">${allT3}</div><div class="kpi-lbl">Tier 3 (Intensive)</div></div>
+        <div class="kpi"><div class="kpi-val">${avg(students.map(s=>s.ir).filter(Boolean))||'—'}</div><div class="kpi-lbl">Avg BOY iReady</div></div>
+        <div class="kpi"><div class="kpi-val">${avg(students.map(s=>s.irE).filter(Boolean))||'—'}</div><div class="kpi-lbl">Avg EOY iReady</div></div>
+        <div class="kpi"><div class="kpi-val">${intCoverage}</div><div class="kpi-lbl">Students w/ Intervention</div></div>
+      </div>
+      <h2>Tier Distribution by Period</h2>
+      <table><thead><tr><th>Period</th><th>Total</th><th>Tier 3</th><th>Tier 2</th><th>Tier 1</th><th>Avg BOY</th><th>Avg EOY</th><th>Growth</th><th>Served</th></tr></thead><tbody>${rows}</tbody></table>
+      <h2>MTSS Status Summary</h2>
+      <p style="font-size:10pt;line-height:1.7">${intCoverage} of ${students.length} students (${students.length?Math.round(intCoverage/students.length*100):0}%) have at least one intervention logged. ${interventions.length} total intervention sessions are on record across all students and periods.</p>`;
+  }
+
+  if(type==='domains'){
+    const cols=domKeys.map((k,i)=>{
+      const ss=students.filter(s=>s.dom&&s.dom[k]);
+      const a=ss.length?avg(ss.map(s=>s.dom[k])):0;
+      const b=ss.length?Math.round(ss.filter(s=>s.dom[k]<65).length/ss.length*100):0;
+      const t3avg=avg(students.filter(s=>s.tier==='t3'&&s.dom&&s.dom[k]).map(s=>s.dom[k]));
+      const t2avg=avg(students.filter(s=>s.tier==='t2'&&s.dom&&s.dom[k]).map(s=>s.dom[k]));
+      const lowest=[...ss].sort((a,b)=>a.dom[k]-b.dom[k]).slice(0,3);
+      const color=a>=70?'#065f46':a>=55?'#c2410c':'#b91c1c';
+      return`<tr><td style="font-weight:700">${DL2[k]}</td><td style="color:${color};font-weight:700">${a}%</td><td>${b}%</td><td>${t3avg||'—'}%</td><td>${t2avg||'—'}%</td><td style="font-size:8.5pt">${lowest.map(s=>`${s.name} (${s.dom[k]}%)`).join(', ')}</td></tr>`;
+    }).join('');
+    body=`
+      <h2>Domain Performance — All Students</h2>
+      <table><thead><tr><th>Domain</th><th>Class Avg</th><th>% Below Prof.</th><th>T3 Avg</th><th>T2 Avg</th><th>Lowest Performers</th></tr></thead><tbody>${cols}</tbody></table>
+      <h2>Domain Performance by Period</h2>
+      <table><thead><tr><th>Period</th>${domKeys.map(k=>`<th>${DL2[k]}</th>`).join('')}</tr></thead><tbody>
+      ${[2,3,4,5].map(p=>{const ps=students.filter(s=>s.pd===p);return`<tr><td style="font-weight:600">Period ${p}</td>${domKeys.map(k=>{const a=avg(ps.filter(s=>s.dom&&s.dom[k]).map(s=>s.dom[k]));const c=a>=70?'#065f46':a>=55?'#c2410c':'#b91c1c';return`<td style="color:${c};font-weight:600">${a||'—'}%</td>`}).join('')}</tr>`;}).join('')}
+      </tbody></table>`;
+  }
+
+  if(type==='atrisk'){
+    const atr=students.filter(s=>s.tier==='t3').sort((a,b)=>(a.ir||999)-(b.ir||999));
+    const rows=atr.map(s=>{
+      const ints=interventions.filter(i=>i.sid===s.id);
+      const concerns=s.tags.filter(t=>TQ[t]==='qc');
+      const pos=s.tags.filter(t=>TQ[t]==='qp');
+      const growth=(s.ir&&s.irE)?((s.irE-s.ir>0?'+':'')+(s.irE-s.ir)):'—';
+      const gcolor=(s.ir&&s.irE)?(s.irE>s.ir?'#065f46':'#b91c1c'):'#555';
+      const flag=!ints.length?'<span class="flag">⚠ No intervention</span>':ints.length>=8&&!ints.some(i=>i.outcome==='improved')?'<span class="flag">⚠ Stalled</span>':'';
+      return`<tr>
+        <td style="font-weight:600">${s.name}</td>
+        <td>${s.pd?'Pd '+s.pd:'—'}</td>
+        <td>${s.ir||'—'}</td><td>${s.irM||'—'}</td><td>${s.irE||'—'}</td>
+        <td style="color:${gcolor};font-weight:600">${growth}</td>
+        <td style="font-size:8.5pt">${concerns.slice(0,3).join(', ')||'—'}</td>
+        <td>${ints.length} ${flag}</td>
+      </tr>`;
+    }).join('');
+    const noInt=atr.filter(s=>!interventions.some(i=>i.sid===s.id));
+    body=`
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-val" style="color:#b91c1c">${atr.length}</div><div class="kpi-lbl">Tier 3 Students</div></div>
+        <div class="kpi"><div class="kpi-val">${avg(atr.map(s=>s.ir).filter(Boolean))||'—'}</div><div class="kpi-lbl">Avg BOY iReady</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:${noInt.length>0?'#b91c1c':'#065f46'}">${noInt.length}</div><div class="kpi-lbl">Without Intervention Plan</div></div>
+      </div>
+      ${noInt.length?`<p style="padding:8px 12px;background:#fee2e2;border-left:3px solid #dc2626;border-radius:4px;margin-bottom:12px;font-size:10pt"><strong>⚠ Action Required:</strong> ${noInt.map(s=>s.name).join(', ')} — Tier 3 students with no intervention on record.</p>`:''}
+      <h2>Tier 3 Student Detail</h2>
+      <table><thead><tr><th>Student</th><th>Period</th><th>BOY</th><th>MOY</th><th>EOY</th><th>Growth</th><th>Top Concerns</th><th>Interventions</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  if(type==='progress'){
+    const sorted=[...students].sort((a,b)=>{const ta={t3:0,t2:1,t1:2};return ta[a.tier]-ta[b.tier]||a.name.localeCompare(b.name);});
+    body=sorted.map((s,idx)=>{
+      const ints=interventions.filter(i=>i.sid===s.id);
+      const growth=(s.ir&&s.irE)?((s.irE-s.ir>0?'+':'')+(s.irE-s.ir)):'—';
+      const gcolor=(s.ir&&s.irE)?(s.irE>s.ir?'#065f46':'#b91c1c'):'#555';
+      const domRows=Object.entries(s.dom||{}).filter(([k,v])=>v).sort((a,b)=>a[1]-b[1]).map(([k,v])=>{
+        const c=v>=70?'#065f46':v>=55?'#c2410c':'#b91c1c';
+        return`<tr><td>${DL2[k]||k}</td><td style="color:${c};font-weight:700">${v}%</td><td style="color:${c}">${v>=70?'On Track':v>=55?'Approaching':'Below'}</td></tr>`;
+      }).join('');
+      const concerns=s.tags.filter(t=>TQ[t]==='qc');
+      const strengths=s.tags.filter(t=>TQ[t]==='qp');
+      const pgBreak=idx<sorted.length-1?'<div class="page-break"></div>':'';
+      return`<div>
+        <h2 style="font-size:14pt;border-bottom:2px solid #111;margin-bottom:10px">${s.name} <span class="badge ${s.tier}" style="font-size:9pt;margin-left:8px">${tierLabel[s.tier]}</span> ${s.pd?`<span style="font-size:9pt;color:#555;margin-left:6px">Period ${s.pd}</span>`:''}</h2>
+        <div class="kpi-row" style="gap:10px">
+          <div class="kpi"><div class="kpi-val">${s.ir||'—'}</div><div class="kpi-lbl">BOY iReady</div></div>
+          <div class="kpi"><div class="kpi-val">${s.irM||'—'}</div><div class="kpi-lbl">MOY iReady</div></div>
+          <div class="kpi"><div class="kpi-val">${s.irE||'—'}</div><div class="kpi-lbl">EOY iReady</div></div>
+          <div class="kpi"><div class="kpi-val" style="color:${gcolor}">${growth}</div><div class="kpi-lbl">Total Growth</div></div>
+          <div class="kpi"><div class="kpi-val">${ints.length}</div><div class="kpi-lbl">Interventions Logged</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><h3>Domain Scores</h3><table><thead><tr><th>Domain</th><th>Score</th><th>Status</th></tr></thead><tbody>${domRows||'<tr><td colspan="3" style="color:#888">No domain data</td></tr>'}</tbody></table></div>
+          <div><h3>Qualitative Profile</h3>
+            ${strengths.length?`<p style="font-size:9pt;margin-bottom:6px"><strong>Strengths:</strong></p><div class="pill-row" style="margin-bottom:10px">${strengths.slice(0,4).map(t=>`<span class="pill positive">${t}</span>`).join('')}</div>`:''}
+            ${concerns.length?`<p style="font-size:9pt;margin-bottom:6px"><strong>Concerns:</strong></p><div class="pill-row">${concerns.slice(0,4).map(t=>`<span class="pill concern">${t}</span>`).join('')}</div>`:''}
+          </div>
+        </div>
+        ${ints.length?`<h3 style="margin-top:10px">Recent Interventions</h3><table><thead><tr><th>Date</th><th>Domain</th><th>Frequency</th><th>Notes</th></tr></thead><tbody>${ints.slice(-5).map(i=>`<tr><td>${i.date||'—'}</td><td>${DL2[i.domain]||i.domain||'—'}</td><td>${i.freq||'—'}</td><td style="font-size:8.5pt">${i.notes||'—'}</td></tr>`).join('')}</tbody></table>`:'<p style="font-size:9pt;color:#b91c1c;margin-top:10px">⚠ No interventions logged for this student.</p>'}
+        ${s.notes?`<h3 style="margin-top:10px">Teacher Notes</h3><p style="font-size:10pt;color:#374151">${s.notes}</p>`:''}
+      </div>${pgBreak}`;
+    }).join('');
+  }
+
+  const titles={snapshot:'Class Snapshot',mtss:'MTSS Intervention Log',tierdist:'Grade-Level Tier Report',domains:'Domain Gap Analysis',atrisk:'At-Risk Student Report',progress:'Student Progress Report'};
+  const subtitles={snapshot:`${teacher} · All Periods`,mtss:`${teacher} · MTSS Documentation`,tierdist:`${teacher} · Administrator Review`,domains:`${teacher} · Curriculum Planning`,atrisk:`${teacher} · AP / Administrator Review`,progress:`${teacher} · Parent Conference Edition`};
+  const w=window.open('','_blank','width=900,height=700');
+  if(!w){alert('Pop-ups blocked. Please allow pop-ups for this site.');return;}
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${titles[type]||'Report'} — MathView</title><style>${CSS}</style></head><body>${header(titles[type],subtitles[type])}${body}<div class="footer">MathView · ${school} · ${today} · Data is private and stored locally only.</div></body></html>`);
+  w.document.close();
+}
+
+function initReports(){renderReportGallery();renderReports();}
 
 function renderReports(){
   const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length):0;
