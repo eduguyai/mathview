@@ -3020,8 +3020,8 @@ function renderReportGallery(){
 }
 
 function printReport(type){
-  const teacher=settings&&settings.teacherName?settings.teacherName:'Teacher';
-  const school=settings&&settings.school?settings.school:'';
+  const teacher=(typeof cfg!=='undefined'&&cfg.teacher)?cfg.teacher:'Teacher';
+  const school=(typeof cfg!=='undefined'&&cfg.school)?cfg.school:'';
   const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   const domKeys=['numSense','algebra','ratios','stats','geometry'];
   const DL2={numSense:'Number Sense',algebra:'Algebra',ratios:'Ratios',stats:'Statistics',geometry:'Geometry'};
