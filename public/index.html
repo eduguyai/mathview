@@ -355,6 +355,41 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 .alert-count{font-family:var(--mono);font-size:22px;font-weight:400;line-height:1;min-width:28px}
 .alert-lbl{font-size:12px;font-weight:600;color:var(--text)}
 .alert-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:1px}
+.pl-section{margin-top:18px}
+.pl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.pl-title{font-size:12px;font-weight:700;color:var(--fg);letter-spacing:.05em;text-transform:uppercase}
+.pl-priority-badge{font-size:10px;font-family:'DM Mono',monospace;padding:3px 10px;border-radius:12px;background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.3)}
+.pl-tabs{display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:16px;flex-wrap:nowrap;overflow-x:auto}
+.pl-tab{flex:1;padding:7px 4px;font-size:10px;font-weight:600;text-align:center;cursor:pointer;background:transparent;border:none;color:var(--dim);font-family:inherit;white-space:nowrap;min-width:80px;letter-spacing:.03em;text-transform:uppercase;transition:background .15s,color .15s;border-right:1px solid var(--border)}
+.pl-tab:last-child{border-right:none}
+.pl-tab.on{color:var(--fg);background:var(--bg3)}
+.pl-tab .pl-tab-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.pl-body{display:none}
+.pl-body.on{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pl-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.pl-card-full{grid-column:1/-1}
+.pl-card-title{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.pl-scope-text{font-size:12px;color:var(--text);line-height:1.6}
+.pl-priority-strip{padding:10px 14px;border-radius:8px;margin-bottom:12px;border-left:3px solid}
+.pl-priority-strip.urgent{background:rgba(248,113,113,0.07);border-color:#f87171}
+.pl-priority-strip.strong{background:rgba(251,146,60,0.07);border-color:#fb923c}
+.pl-priority-strip.ok{background:rgba(52,211,153,0.07);border-color:#34d399}
+.pl-priority-text{font-size:12px;font-weight:600;color:var(--fg);margin-bottom:2px}
+.pl-priority-sub{font-size:11px;color:var(--dim);font-family:'DM Mono',monospace}
+.pl-strategy-list{list-style:none;padding:0;margin:0}
+.pl-strategy-list li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.5}
+.pl-strategy-list li:last-child{border-bottom:none}
+.pl-strat-num{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--accent);margin-top:1px}
+.pl-misc-item{padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.5}
+.pl-misc-item:last-child{border-bottom:none}
+.pl-misc-tag{display:inline-block;font-size:9px;font-weight:700;color:#fb923c;background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.2);padding:1px 6px;border-radius:10px;margin-right:6px;vertical-align:middle}
+.pl-resource-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.pl-resource-row:last-child{border-bottom:none}
+.pl-resource-icon{flex-shrink:0;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.pl-resource-name{font-size:12px;font-weight:600;color:var(--fg)}
+.pl-resource-desc{font-size:10px;color:var(--dim)}
+.pl-resource-type{font-size:9px;font-family:'DM Mono',monospace;color:var(--accent);font-weight:600;margin-left:auto;white-space:nowrap}
+@media(max-width:768px){.pl-body.on{grid-template-columns:1fr}.pl-card-full{grid-column:1}}
 .recs-section{margin-bottom:18px}
 .recs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .recs-title{font-size:12px;font-weight:700;color:var(--fg);letter-spacing:.04em;text-transform:uppercase}
@@ -749,7 +784,7 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
     <button class="ni on" data-v="overview" onclick="go('overview',this)"><span class="ni-icon">◎</span>Overview</button>
     <button class="ni" data-v="roster" onclick="go('roster',this)"><span class="ni-icon">◈</span>Roster</button>
     <div class="sdiv"></div>
-    <button class="ni" data-v="domains" onclick="go('domains',this)"><span class="ni-icon">⬡</span>Domains</button>
+    <button class="ni" data-v="domains" onclick="go('domains',this)"><span class="ni-icon">⬡</span>Skill Domains</button>
     <button class="ni" data-v="growth" onclick="go('growth',this)"><span class="ni-icon">↗</span>Growth</button>
     <button class="ni" data-v="qualdata" onclick="go('qualdata',this)"><span class="ni-icon">◷</span>Deeper Insights</button>
     <button class="ni" data-v="analytics" onclick="go('analytics',this)"><span class="ni-icon">📈</span>Deep Analytics</button>
@@ -861,6 +896,8 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
     <div class="view" id="view-domains">
       <div class="dom-grid" id="domCards"></div>
       <div class="chart-card"><div class="chart-title">Domain proficiency by period (avg %)</div><div id="heatGrid" style="overflow-x:auto"></div></div>
+      <!-- PROFESSIONAL LEARNING PANEL -->
+      <div id="domPLPanel"></div>
     </div>
 
     <!-- GROWTH -->
@@ -3014,6 +3051,208 @@ function saveInts(){localStorage.setItem('mathview_ints',JSON.stringify(interven
 /* ═══════════════════════════════════════
    M2: DOMAINS
 ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   SKILL DOMAINS — PROFESSIONAL LEARNING
+═══════════════════════════════════════ */
+const DOM_PL = {
+  numSense:{
+    label:'Number Sense',color:'#f87171',emoji:'🔢',
+    scope:'Integers, rational numbers, absolute value, number lines, comparing and ordering numbers, operations with fractions and decimals. Foundation for all other domains.',
+    strategies:[
+      {title:'Number Talks (10–15 min)',desc:'Project a computation problem and cold-call 3–4 strategies. Focus on place value reasoning and fraction benchmarks. Research shows consistent number talks shift student thinking from procedural to conceptual in 6–8 weeks.'},
+      {title:'Open Number Lines',desc:'Have students place fractions, negatives, and decimals on a blank number line before any instruction. Surfaces misconceptions about magnitude and spacing instantly — no materials needed.'},
+      {title:'Estimation 180 Routine',desc:'Steve Wyborney\'s estimation tasks build number sense daily. 3 minutes. Students anchor to benchmarks (0, ½, 1) before computing — dramatically reduces computation errors.'},
+      {title:'Fraction ↔ Decimal ↔ Percent Cards',desc:'Sorting tasks where students match equivalent representations. Generates productive discourse. Laminate one set per group; reuse all year.'},
+      {title:'Integer Battle (Card Game)',desc:'Students draw two cards — one positive, one negative — and determine which is greater using absolute value reasoning. 5-minute warm-up that builds fluency without drill-and-kill.'},
+    ],
+    misconceptions:[
+      {label:'Negative × Negative','text':'"A negative times a negative is negative." Students overgeneralize. Use the pattern approach: 3×(−2)=−6, 2×(−2)=−4, 1×(−2)=−2, 0×(−2)=0 … so (−1)×(−2) must = +2.'},
+      {label:'Fraction Division','text':'"You always multiply by the reciprocal but I don\'t know why." Build understanding with measurement division: how many ½-cup scoops are in 2½ cups? Then connect to algorithm.'},
+      {label:'Adding Fractions','text':'Students add numerators AND denominators: ½ + ⅓ = 2/5. Fraction bars showing ½ and ⅓ side-by-side — can you fit both in one whole? — correct this in one session.'},
+    ],
+    resources:[
+      {icon:'🔢',name:'Number Talks by Sherry Parrish',desc:'Grade-specific number string sequences — copy directly to slides',type:'Book'},
+      {icon:'🌐',name:'Estimation180.com',desc:'3-minute daily estimation tasks, all free, printable answer reveals',type:'Free Web'},
+      {icon:'🎯',name:'NCTM Illuminations — Fraction Models',desc:'Interactive fraction bar tool, works on projector/chromebooks',type:'Free Tool'},
+    ]
+  },
+  algebra:{
+    label:'Algebra',color:'#a78bfa',emoji:'⚖',
+    scope:'Writing and evaluating expressions, solving one- and two-step equations and inequalities, proportional relationships, slope and unit rate, linear equations from tables and graphs.',
+    strategies:[
+      {title:'Algebra Tiles for Equation Balance',desc:'Physical or virtual algebra tiles (NCTM) make the "balance" metaphor concrete. Students see that adding 3 to both sides maintains equality — foundational for multi-step work. Especially effective for students with IEP: Processing Disorder.'},
+      {title:'Connecting Representations (Tables → Graphs → Equations)',desc:'Give each group a proportional situation as a table. They build the graph, then write the equation. Seeing all three forms side-by-side is the single most high-leverage algebra intervention at grade 7.'},
+      {title:'Error Analysis Tasks',desc:'Show worked solutions with ONE deliberate error. Students identify and correct it. More effective than additional practice problems — requires students to reason about structure, not just execute.'},
+      {title:'Clothesline Math',desc:'Hang a rope across the classroom. Give students cards with expressions (2x, x+3, 7…). They place cards in order, debating relative position. Builds expression understanding without computation pressure.'},
+      {title:'Which One Doesn\'t Belong? (WODB)',desc:'Show 4 equations or graphs. Each one "doesn\'t belong" for a different valid reason. Builds mathematical argument skills + algebraic reasoning simultaneously.'},
+    ],
+    misconceptions:[
+      {label:'Variable Confusion','text':'"x means multiply." Students interpret 3x as "3 times x" only when reminded. Consistent language — "3 groups of x" or "x repeated 3 times" — and avoiding "x" as a multiplication sign helps.'},
+      {label:'Distributing Negatives','text':'−(x − 4) becomes −x − 4 instead of −x + 4. Rewrite as −1(x − 4) and use distributive property explicitly every time until fluent.'},
+      {label:'Inequality Flip','text':'Students forget to reverse inequality when multiplying/dividing by a negative. Teach with number line: "If 2 < 5, what happens when I multiply both sides by −1?" Let them discover the flip.'},
+    ],
+    resources:[
+      {icon:'📊',name:'Desmos Teacher Activities',desc:'100s of algebra activities with built-in pacing. Card sorts and marbleslides are most engaging',type:'Free Tool'},
+      {icon:'🎯',name:'MARS Algebra Tasks (MARS Shell Centre)',desc:'Rich algebraic reasoning tasks aligned to CCSS grade 7',type:'Free PDF'},
+      {icon:'🧱',name:'Virtual Algebra Tiles (NCTM)',desc:'Free browser-based tiles, works on chromebooks and projected',type:'Free Tool'},
+    ]
+  },
+  ratios:{
+    label:'Ratios & Proportions',color:'#5b8dee',emoji:'⚖️',
+    scope:'Ratios, unit rates, proportional relationships, scale drawings, percent, percent change/error, simple interest. Bridge between arithmetic and algebraic thinking.',
+    strategies:[
+      {title:'Double Number Lines',desc:'The single most research-backed tool for ratio/proportion. Draw two parallel number lines — one for each quantity. Students see the multiplicative relationship visually before writing any equation. Far more effective than cross-multiplication for conceptual understanding.'},
+      {title:'Ratio Tables with Scaling',desc:'Start every proportion problem with a table. Scale up AND down — finding unit rate by scaling to 1. Students who struggle with equations often succeed immediately with tables.'},
+      {title:'Percent Benchmark Cards',desc:'10% of any number = move decimal. Build from there: 5% = half of 10%, 15% = 10% + 5%, 20% = double 10%. Students who can\'t compute 18% tip mentally CAN estimate with benchmarks.'},
+      {title:'Context Before Algorithm',desc:'Shopping, recipes, maps, and sports statistics are all ratio contexts students encounter. Always launch with a real context before abstracting. "If 3 shirts cost $45, what does 1 shirt cost?" before introducing the proportion equation.'},
+      {title:'Percent Change Anchor Chart',desc:'"Percent change = (change ÷ original) × 100." The key misconception is dividing by the new value. Anchoring to "original" with a mnemonic — "Start with what you STARTED with" — reduces this error by ~70% in the first two weeks.'},
+    ],
+    misconceptions:[
+      {label:'Part : Part vs Part : Whole','text':'"3 boys to 4 girls" means 3/7 are boys, not 3/4. Use Venn-style boxes to physically separate part:part from the whole before any fraction work.'},
+      {label:'Additive Ratio Thinking','text':'"If the ratio of A:B is 2:3, and I add 1 to each, the ratio stays the same." Draw ratio bars to show that adding equal amounts changes the ratio.'},
+      {label:'Cross-Multiply ≠ Understanding','text':'Students cross-multiply correctly but cannot set up the proportion. Insist on ratio table FIRST, then show cross-multiply as a shortcut — not a first step.'},
+    ],
+    resources:[
+      {icon:'📐',name:'Open Middle — Ratio Problems',desc:'Low-floor high-ceiling ratio tasks with multiple entry points',type:'Free Web'},
+      {icon:'📊',name:'Desmos — Double Number Lines',desc:'Interactive DNL tool, great for whole-class instruction',type:'Free Tool'},
+      {icon:'🌐',name:'YouCubed Ratio Tasks (Jo Boaler)',desc:'Visual ratio tasks that emphasize multiple representations',type:'Free Web'},
+    ]
+  },
+  stats:{
+    label:'Statistics & Probability',color:'#fb923c',emoji:'📊',
+    scope:'Statistical questioning, sampling, data distributions, dot plots, histograms, box plots, measures of center (mean, median, mode, MAD), theoretical vs. experimental probability, compound events.',
+    strategies:[
+      {title:'Statistical Question vs. Non-Statistical Question Sort',desc:'The hardest concept in Grade 7 stats. Give students 20 questions, they sort into statistical (has variability) vs. not. "How tall am I?" is NOT statistical. "How tall are 7th graders?" IS. 15-minute card sort, massive impact.'},
+      {title:'CODAP (free data analysis tool)',desc:'concord.org/codap — students drag-drop CSV data and create dot plots, histograms, box plots. Students engage with REAL data (census, sports, weather). 3× more effective than hand-drawn graphs for understanding distribution shape.'},
+      {title:'Mean as Balance Point',desc:'Use a physical balance or seesaw model. Place cubes on a number line — where does it balance? That\'s the mean. Develops true understanding vs. "add and divide" procedural memory that erodes quickly.'},
+      {title:'Tree Diagrams for Compound Events',desc:'Always start with organized lists (2 coins: HH, HT, TH, TT), then tree diagrams, then multiplication rule. Students who skip the organized list phase cannot recover the multiplication rule under test pressure.'},
+      {title:'Census at School Data Projects',desc:'censusatschool.fathom.info — students complete a real survey, compare class data to national data. Naturally generates all 7 stats tasks: center, spread, shape, comparison, sampling.'},
+    ],
+    misconceptions:[
+      {label:'Mean vs. Median','text':'"The average IS the middle number." Explicitly contrast: 1, 2, 3, 4, 100 — mean is ~22, median is 3. Which is a "better" description of the data? Use both, every time.'},
+      {label:'Probability > 1','text':'Students add probabilities for compound events without the sample space. 50% chance of rain + 50% chance of wind = 100% chance of both? Tree diagrams cure this.'},
+      {label:'Biased Sample','text':'Students accept convenience samples as representative. "I asked my friends" — why is this biased? Short discussion, big impact on understanding statistical validity.'},
+    ],
+    resources:[
+      {icon:'📊',name:'CODAP (Free Data Tool)',desc:'Browser-based data analysis — no install, works on Chromebooks',type:'Free Tool'},
+      {icon:'🌐',name:'Census at School',desc:'Real student-generated data for authentic statistics projects',type:'Free Web'},
+      {icon:'🎲',name:'NCTM — Probability Simulations',desc:'Virtual coin flips, spinners, and dice for experimental probability',type:'Free Tool'},
+    ]
+  },
+  geometry:{
+    label:'Geometry',color:'#34d399',emoji:'📐',
+    scope:'Scale drawings, geometric figures, angle relationships (supplementary, complementary, vertical, adjacent), triangles, area and circumference of circles, surface area and volume of 3D figures.',
+    strategies:[
+      {title:'GeoGebra for Angle Relationships',desc:'GeoGebra.org — students drag angle pairs and observe relationships in real time. Vertical angles, supplementary pairs, and angle sums become empirical discoveries rather than rules to memorize. 20 minutes in a lab replaces 3 days of direct instruction on angle rules.'},
+      {title:'Pi Discovery Lab',desc:'Students measure circumference and diameter of 5 circular objects. They compute C÷d each time. They discover π. Eliminates the most common geometry misconception (C = 2r, not 2πr) because students derived the relationship themselves.'},
+      {title:'Scale Drawing Projects',desc:'Design a dream bedroom at 1 inch = 2 feet scale. Students apply scale factor, unit conversion, and area simultaneously. Highly engaging — connections to architecture, game design, blueprints.'},
+      {title:'3D Net Unfolding',desc:'Print or fold nets for prisms, pyramids, and cylinders. Physical manipulation dramatically improves surface area performance. Students who struggle with abstract nets succeed when they can fold/unfold the shape.'},
+      {title:'Angle Relationship Warm-Up Sequence',desc:'Start each class with ONE missing-angle problem for 2 weeks. Supplementary, vertical, then triangle sum, then compound. Spaced practice over 10 days outperforms a single 2-day lesson by a significant margin.'},
+    ],
+    misconceptions:[
+      {label:'Area vs. Perimeter','text':'"Area is the outside, perimeter is the inside." Consistently use "fencing" (perimeter) vs. "carpet" (area) as concrete anchors. Never use just formulas — always connect to the physical context first.'},
+      {label:'Circumference Formula','text':'C = πd is simpler, but C = 2πr is taught first. Students mix up r and d. Teach BOTH in the same lesson, explicitly: "d = 2r, so these are the same formula written differently." Use d first.'},
+      {label:'Surface Area Counting','text':'Students count faces but miss that opposite faces are identical. Net folding removes this completely — students see duplicated faces before applying any formula.'},
+    ],
+    resources:[
+      {icon:'📐',name:'GeoGebra Geometry',desc:'Free browser-based geometry tool — angle exploration, transformations, constructions',type:'Free Tool'},
+      {icon:'🌐',name:'Desmos Geometry',desc:'Interactive geometry activities including scale drawings and angle challenges',type:'Free Tool'},
+      {icon:'📦',name:'NCTM — 3D Net Explorer',desc:'Virtual net folding for prisms, pyramids, and cylinders',type:'Free Tool'},
+    ]
+  }
+};
+
+function plTab(domKey){
+  const domKeys=['numSense','algebra','ratios','stats','geometry'];
+  domKeys.forEach(k=>{
+    const tab=document.getElementById('plt-'+k);
+    const body=document.getElementById('plb-'+k);
+    if(tab)tab.classList.toggle('on',k===domKey);
+    if(body)body.classList.toggle('on',k===domKey);
+  });
+}
+
+function renderDomainPL(base){
+  const panel=document.getElementById('domPLPanel');
+  if(!panel)return;
+  const domKeys=['numSense','algebra','ratios','stats','geometry'];
+  // Compute priority order by % below proficiency
+  const domData=domKeys.map(k=>{
+    const ss=base.filter(s=>s.dom&&s.dom[k]);
+    const avg=ss.length?Math.round(ss.reduce((s,x)=>s+x.dom[k],0)/ss.length):0;
+    const belowPct=base.length?Math.round(base.filter(s=>s.dom&&s.dom[k]<65).length/base.length*100):0;
+    return {k,avg,belowPct};
+  }).sort((a,b)=>b.belowPct-a.belowPct);
+
+  const priorityDom=domData[0];
+  const pl=DOM_PL;
+  const domOrder=domData.map(d=>d.k); // sorted by need
+
+  // Build tabs in priority order
+  const tabs=domOrder.map((k,idx)=>{
+    const d=domData.find(x=>x.k===k);
+    const info=pl[k];
+    const dotColor=d.belowPct>60?'#f87171':d.belowPct>40?'#fb923c':'#34d399';
+    return `<button class="pl-tab${idx===0?' on':''}" id="plt-${k}" onclick="plTab('${k}')">
+      <span class="pl-tab-dot" style="background:${dotColor}"></span>${info.label}
+    </button>`;
+  }).join('');
+
+  // Build body panels in priority order
+  const bodies=domOrder.map((k,idx)=>{
+    const d=domData.find(x=>x.k===k);
+    const info=pl[k];
+    const priorityLevel=d.belowPct>60?'urgent':d.belowPct>40?'strong':'ok';
+    const priorityText=d.belowPct>60?`High Priority — ${d.belowPct}% of students below proficiency (avg ${d.avg}%)`
+      :d.belowPct>40?`Moderate Gap — ${d.belowPct}% below proficiency (avg ${d.avg}%)`
+      :`On Track — ${d.belowPct}% below proficiency (avg ${d.avg}%)`;
+    const priorityAction=d.belowPct>60?'Lead with this domain in pull groups and small-group instruction this week.'
+      :d.belowPct>40?'Schedule targeted small-group work on this domain in the next 2 weeks.'
+      :'Maintain current pace. Use enrichment tasks for students performing above benchmark.';
+
+    return `<div class="pl-body${idx===0?' on':''}" id="plb-${k}">
+      <div class="pl-card pl-card-full">
+        <div class="pl-priority-strip ${priorityLevel}">
+          <div class="pl-priority-text">${info.emoji} ${info.label}: ${priorityText}</div>
+          <div class="pl-priority-sub">${priorityAction}</div>
+        </div>
+        <div class="pl-card-title">Grade 7 Scope</div>
+        <div class="pl-scope-text">${info.scope}</div>
+      </div>
+      <div class="pl-card">
+        <div class="pl-card-title">High-Leverage Instructional Strategies</div>
+        <ul class="pl-strategy-list">
+          ${info.strategies.map((s,i)=>`<li><span class="pl-strat-num">${i+1}</span><div><strong>${s.title}</strong><br>${s.desc}</div></li>`).join('')}
+        </ul>
+      </div>
+      <div class="pl-card">
+        <div class="pl-card-title">Common Misconceptions to Watch For</div>
+        ${info.misconceptions.map(m=>`<div class="pl-misc-item"><span class="pl-misc-tag">WATCH</span><strong>${m.label}</strong> — ${m.text}</div>`).join('')}
+        <div style="margin-top:14px">
+          <div class="pl-card-title">Free Resources & Tools</div>
+          ${info.resources.map(r=>`<div class="pl-resource-row">
+            <div class="pl-resource-icon" style="background:var(--bg4)">${r.icon}</div>
+            <div style="flex:1;min-width:0">
+              <div class="pl-resource-name">${r.name}</div>
+              <div class="pl-resource-desc">${r.desc}</div>
+            </div>
+            <div class="pl-resource-type">${r.type}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  panel.innerHTML=`<div class="pl-section">
+    <div class="pl-header">
+      <span class="pl-title">Professional Learning by Domain</span>
+      <span class="pl-priority-badge">Priority: ${pl[priorityDom.k].label} (${priorityDom.belowPct}% below proficiency)</span>
+    </div>
+    <div class="pl-tabs">${tabs}</div>
+    ${bodies}
+  </div>`;
+}
+
 function initDomains(){
   const domKeys=['numSense','algebra','ratios','stats','geometry'];
   const domLabels=['Number Sense','Algebra','Ratios','Statistics','Geometry'];
@@ -3044,6 +3283,7 @@ function initDomains(){
     }).join('');
     heat.innerHTML=`<table class="heat-table"><thead><tr><th></th>${domLabels.map(l=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
   }
+  renderDomainPL(base);
 }
 
 /* ═══════════════════════════════════════
