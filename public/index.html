@@ -355,6 +355,34 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 .alert-count{font-family:var(--mono);font-size:22px;font-weight:400;line-height:1;min-width:28px}
 .alert-lbl{font-size:12px;font-weight:600;color:var(--text)}
 .alert-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:1px}
+.recs-section{margin-bottom:18px}
+.recs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.recs-title{font-size:12px;font-weight:700;color:var(--fg);letter-spacing:.04em;text-transform:uppercase}
+.recs-count{font-size:10px;color:var(--dim);font-family:'DM Mono',monospace}
+.rec-card{display:flex;align-items:stretch;gap:0;margin-bottom:8px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.07);background:var(--card)}
+.rec-card:last-child{margin-bottom:0}
+.rec-left-bar{width:4px;flex-shrink:0}
+.rec-urgent .rec-left-bar{background:#f87171}
+.rec-priority .rec-left-bar{background:#fb923c}
+.rec-opportunity .rec-left-bar{background:#34d399}
+.rec-body{flex:1;padding:12px 14px;min-width:0}
+.rec-top{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.rec-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:12px;font-family:'DM Mono',monospace;letter-spacing:.06em}
+.rec-badge-urgent{background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3)}
+.rec-badge-priority{background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid rgba(251,146,60,0.3)}
+.rec-badge-opportunity{background:rgba(52,211,153,0.12);color:#34d399;border:1px solid rgba(52,211,153,0.25)}
+.rec-category{font-size:10px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.rec-headline{font-size:13px;font-weight:600;color:var(--fg);line-height:1.4;margin-bottom:4px}
+.rec-evidence{font-size:10px;color:var(--dim);font-family:'DM Mono',monospace;line-height:1.5}
+.rec-action-wrap{display:flex;align-items:center;padding:0 14px;flex-shrink:0}
+.rec-action-btn{font-size:10px;font-weight:600;padding:5px 12px;border-radius:6px;border:1px solid;cursor:pointer;white-space:nowrap;background:transparent;font-family:inherit}
+.rec-action-urgent{color:#f87171;border-color:rgba(248,113,113,0.4)}
+.rec-action-urgent:hover{background:rgba(248,113,113,0.1)}
+.rec-action-priority{color:#fb923c;border-color:rgba(251,146,60,0.4)}
+.rec-action-priority:hover{background:rgba(251,146,60,0.1)}
+.rec-action-opportunity{color:#34d399;border-color:rgba(52,211,153,0.3)}
+.rec-action-opportunity:hover{background:rgba(52,211,153,0.08)}
+@media(max-width:768px){.rec-action-wrap{padding:0 10px 10px 14px;align-items:flex-end;align-self:stretch}.rec-card{flex-wrap:wrap}.rec-action-wrap{padding:0 14px 12px}}
 .alert-ok{display:flex;align-items:center;gap:8px;margin-bottom:18px;padding:10px 14px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:8px;color:var(--t1);font-size:12px}
 /* ── M5: GOALS ── */
 .goal-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -790,6 +818,7 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
         <span class="demo-banner-link" onclick="go('import',document.querySelector('.ni[data-v=import]'))">Import real data →</span>
         <button class="demo-banner-close" onclick="dismissDemoBanner()" title="Dismiss">✕</button>
       </div>
+      <div id="recsPanel"></div>
       <div id="alertsPanel"></div>
       <div class="chart-grid">
         <div class="chart-card"><div class="chart-title">iReady Score Distribution — Grade Equivalents</div><div class="chart-wrap"><canvas id="c-dist"></canvas></div></div>
@@ -1663,6 +1692,7 @@ function renderOverviewCharts(base){
   if(c4)overviewCharts['c-tiermov']=c4;
   if(c5)overviewCharts['c-domtier']=c5;
   if(c6)overviewCharts['c-atrisk']=c6;
+  renderRecommendations(base);
   renderQualInsights(base);
 }
 
@@ -2700,6 +2730,148 @@ function confirmClearAll(){
 /* ═══════════════════════════════════════
    M5: ALERTS
 ═══════════════════════════════════════ */
+function renderRecommendations(base){
+  const panel=document.getElementById('recsPanel');
+  if(!panel)return;
+  const recs=[];
+  const now=Date.now();
+  const ago30=now-30*24*60*60*1000;
+  const domKeys=['numSense','algebra','ratios','stats','geometry'];
+  const DL2={numSense:'Number Sense',algebra:'Algebra',ratios:'Ratios',stats:'Statistics',geometry:'Geometry'};
+
+  // 1. URGENT: T3 + 3+ concern tags + zero interventions ever
+  const escalate=base.filter(s=>s.tier==='t3'&&s.tags.filter(t=>TQ[t]==='qc').length>=3&&!interventions.some(i=>i.sid===s.id));
+  if(escalate.length){
+    const tc={};escalate.forEach(s=>s.tags.filter(t=>TQ[t]==='qc').forEach(t=>{tc[t]=(tc[t]||0)+1;}));
+    const top=Object.entries(tc).sort((a,b)=>b[1]-a[1])[0];
+    const irs=escalate.filter(x=>x.ir);
+    const avg=irs.length?Math.round(irs.reduce((s,x)=>s+x.ir,0)/irs.length):'—';
+    recs.push({level:'urgent',category:'Whole-Child Escalation',
+      headline:`${escalate.length} student${escalate.length>1?'s need':'needs'} immediate multi-tiered support — Tier 3 with 3+ concern tags and no intervention on record`,
+      evidence:`Most common concern: "${top[0]}" (${top[1]} students) · Avg iReady: ${avg}`,
+      action:'View students',fn:`recs_nav('escalate')`});
+  }
+
+  // 2. URGENT: EOY regression
+  const regressing=base.filter(s=>s.irE&&s.ir&&s.irE<s.ir);
+  if(regressing.length){
+    const avgDrop=Math.round(regressing.reduce((s,x)=>s+(x.ir-x.irE),0)/regressing.length);
+    recs.push({level:'urgent',category:'Score Regression',
+      headline:`${regressing.length} student${regressing.length>1?'s':''}' EOY score is below BOY — intervention approach needs immediate review`,
+      evidence:`Average score drop: ${avgDrop} points · Review frequency and domain alignment of current interventions`,
+      action:'Review roster',fn:`recs_nav('regressing')`});
+  }
+
+  // 3. PRIORITY: T3 with no intervention in past 30 days
+  const unservedT3=base.filter(s=>{
+    if(s.tier!=='t3')return false;
+    return !interventions.some(i=>i.sid===s.id&&new Date(i.date).getTime()>ago30);
+  });
+  if(unservedT3.length){
+    const pds=[...new Set(unservedT3.map(s=>s.pd))].sort();
+    recs.push({level:'priority',category:'Unserved Students',
+      headline:`${unservedT3.length} Tier 3 student${unservedT3.length>1?'s have':'has'} no intervention logged in the past 30 days`,
+      evidence:`Periods: ${pds.map(p=>'P'+p).join(', ')} · MTSS documentation and compliance may be at risk`,
+      action:'Log interventions',fn:`recs_nav('unservedT3')`});
+  }
+
+  // 4. PRIORITY: Group pull opportunity — 3+ students sharing concern tag + weak domain
+  (()=>{
+    const tc={};
+    base.forEach(s=>s.tags.filter(t=>TQ[t]==='qc').forEach(t=>{if(!tc[t])tc[t]=[];tc[t].push(s);}));
+    let best=null,bestN=0;
+    Object.entries(tc).forEach(([tag,ss])=>{
+      if(ss.length<3)return;
+      domKeys.forEach(dk=>{
+        const weak=ss.filter(s=>s.dom&&s.dom[dk]&&s.dom[dk]<65);
+        if(weak.length>=3&&weak.length>bestN){bestN=weak.length;best={tag,dk,students:weak};}
+      });
+    });
+    if(best){
+      const avd=Math.round(best.students.filter(s=>s.dom[best.dk]).reduce((s,x)=>s+x.dom[best.dk],0)/best.students.filter(s=>s.dom[best.dk]).length||0);
+      recs.push({level:'priority',category:'Group Pull Opportunity',
+        headline:`${bestN} students share "${best.tag}" and weak ${DL2[best.dk]} — ready for a targeted pull group`,
+        evidence:`Avg ${DL2[best.dk]}: ${avd}% · Log one session for all using the ⚡ Group Log in Interventions`,
+        action:'Open Group Log',fn:`recs_nav('grouplog')`});
+    }
+  })();
+
+  // 5. PRIORITY: Near-boundary T2 (within 15 pts of T1) with positive tags
+  const nearBoundary=base.filter(s=>s.tier==='t2'&&s.ir>=425&&s.ir<440&&s.tags.some(t=>TQ[t]==='qp'));
+  if(nearBoundary.length){
+    const avIR=Math.round(nearBoundary.filter(x=>x.ir).reduce((s,x)=>s+x.ir,0)/nearBoundary.filter(x=>x.ir).length||0);
+    recs.push({level:'priority',category:'Tier Movement Opportunity',
+      headline:`${nearBoundary.length} student${nearBoundary.length>1?'s are':'is'} within 15 points of Tier 1 exit with positive qualitative signals`,
+      evidence:`Avg iReady: ${avIR} · Positive indicators suggest readiness — focused push could move these students to T1`,
+      action:'View students',fn:`recs_nav('nearBoundary')`});
+  }
+
+  // 6. OPPORTUNITY: Dominant weak domain among T3
+  (()=>{
+    const t3=base.filter(s=>s.tier==='t3');if(!t3.length)return;
+    let worst=null,worstPct=0;
+    domKeys.forEach(dk=>{
+      const pct=t3.filter(s=>s.dom&&s.dom[dk]&&s.dom[dk]<65).length/t3.length;
+      if(pct>worstPct){worstPct=pct;worst=dk;}
+    });
+    if(worst&&worstPct>0.45){
+      const arr=t3.filter(s=>s.dom&&s.dom[worst]);
+      const avd=arr.length?Math.round(arr.reduce((s,x)=>s+x.dom[worst],0)/arr.length):0;
+      recs.push({level:'opportunity',category:'Domain Priority',
+        headline:`${Math.round(worstPct*100)}% of Tier 3 students are below proficiency in ${DL2[worst]} — highest-leverage intervention target`,
+        evidence:`Tier 3 avg ${DL2[worst]}: ${avd}% · Aligning pull group content to this domain maximizes impact per session`,
+        action:'View domains',fn:`recs_nav('domains')`});
+    }
+  })();
+
+  // 7. OPPORTUNITY: Stalled interventions — 8+ sessions, no 'improved' outcome
+  const stalled=base.filter(s=>{
+    const ints=interventions.filter(i=>i.sid===s.id);
+    return ints.length>=8&&!ints.some(i=>i.outcome==='improved');
+  });
+  if(stalled.length){
+    const avgSess=Math.round(stalled.map(s=>interventions.filter(i=>i.sid===s.id).length).reduce((a,b)=>a+b,0)/stalled.length);
+    recs.push({level:'opportunity',category:'Intervention Review',
+      headline:`${stalled.length} student${stalled.length>1?'s have':'has'} 8+ logged sessions with no recorded progress — time to reassess the approach`,
+      evidence:`Avg sessions logged: ${avgSess} · Consider alternative strategies, intensification, or specialist referral`,
+      action:'Review interventions',fn:`recs_nav('stalled')`});
+  }
+
+  if(!recs.length){panel.innerHTML='';return;}
+
+  panel.innerHTML=`<div class="recs-section">
+    <div class="recs-header">
+      <span class="recs-title">Recommended Actions</span>
+      <span class="recs-count">${recs.length} item${recs.length>1?'s':''}</span>
+    </div>
+    ${recs.map(r=>`<div class="rec-card rec-${r.level}">
+      <div class="rec-left-bar"></div>
+      <div class="rec-body">
+        <div class="rec-top">
+          <span class="rec-badge rec-badge-${r.level}">${r.level.toUpperCase()}</span>
+          <span class="rec-category">${r.category}</span>
+        </div>
+        <div class="rec-headline">${r.headline}</div>
+        <div class="rec-evidence">${r.evidence}</div>
+      </div>
+      <div class="rec-action-wrap">
+        <button class="rec-action-btn rec-action-${r.level}" onclick="${r.fn}">${r.action} →</button>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function recs_nav(type){
+  if(type==='grouplog'){
+    go('interventions',document.querySelector('.ni[data-v=interventions]'));
+    setTimeout(()=>setIntMode('group'),150);return;
+  }
+  if(type==='domains'){
+    go('domains',document.querySelector('.ni[data-v=domains]'));return;
+  }
+  go('roster',document.querySelector('.ni[data-v=roster]'));
+}
+
 function renderAlerts(){
   const panel=document.getElementById('alertsPanel');
   if(!panel)return;
