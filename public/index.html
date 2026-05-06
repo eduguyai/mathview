@@ -2747,7 +2747,7 @@ function renderRecommendations(base){
     const irs=escalate.filter(x=>x.ir);
     const avg=irs.length?Math.round(irs.reduce((s,x)=>s+x.ir,0)/irs.length):'—';
     recs.push({level:'urgent',category:'Whole-Child Escalation',
-      headline:`${escalate.length} student${escalate.length>1?'s need':'needs'} immediate multi-tiered support — Tier 3 with 3+ concern tags and no intervention on record`,
+      headline:`${escalate.length} student${escalate.length>1?'s need':' needs'} immediate multi-tiered support — Tier 3 with 3+ concern tags and no intervention on record`,
       evidence:`Most common concern: "${top[0]}" (${top[1]} students) · Avg iReady: ${avg}`,
       action:'View students',fn:`recs_nav('escalate')`});
   }
@@ -2757,7 +2757,7 @@ function renderRecommendations(base){
   if(regressing.length){
     const avgDrop=Math.round(regressing.reduce((s,x)=>s+(x.ir-x.irE),0)/regressing.length);
     recs.push({level:'urgent',category:'Score Regression',
-      headline:`${regressing.length} student${regressing.length>1?'s':''}' EOY score is below BOY — intervention approach needs immediate review`,
+      headline:`${regressing.length} student${regressing.length>1?"s' EOY scores are":"'s EOY score is"} below BOY — intervention approach needs immediate review`,
       evidence:`Average score drop: ${avgDrop} points · Review frequency and domain alignment of current interventions`,
       action:'Review roster',fn:`recs_nav('regressing')`});
   }
@@ -2770,7 +2770,7 @@ function renderRecommendations(base){
   if(unservedT3.length){
     const pds=[...new Set(unservedT3.map(s=>s.pd))].sort();
     recs.push({level:'priority',category:'Unserved Students',
-      headline:`${unservedT3.length} Tier 3 student${unservedT3.length>1?'s have':'has'} no intervention logged in the past 30 days`,
+      headline:`${unservedT3.length} Tier 3 student${unservedT3.length>1?'s have':' has'} no intervention logged in the past 30 days`,
       evidence:`Periods: ${pds.map(p=>'P'+p).join(', ')} · MTSS documentation and compliance may be at risk`,
       action:'Log interventions',fn:`recs_nav('unservedT3')`});
   }
@@ -2801,7 +2801,7 @@ function renderRecommendations(base){
   if(nearBoundary.length){
     const avIR=Math.round(nearBoundary.filter(x=>x.ir).reduce((s,x)=>s+x.ir,0)/nearBoundary.filter(x=>x.ir).length||0);
     recs.push({level:'priority',category:'Tier Movement Opportunity',
-      headline:`${nearBoundary.length} student${nearBoundary.length>1?'s are':'is'} within 15 points of Tier 1 exit with positive qualitative signals`,
+      headline:`${nearBoundary.length} student${nearBoundary.length>1?'s are':' is'} within 15 points of Tier 1 exit with positive qualitative signals`,
       evidence:`Avg iReady: ${avIR} · Positive indicators suggest readiness — focused push could move these students to T1`,
       action:'View students',fn:`recs_nav('nearBoundary')`});
   }
@@ -2832,7 +2832,7 @@ function renderRecommendations(base){
   if(stalled.length){
     const avgSess=Math.round(stalled.map(s=>interventions.filter(i=>i.sid===s.id).length).reduce((a,b)=>a+b,0)/stalled.length);
     recs.push({level:'opportunity',category:'Intervention Review',
-      headline:`${stalled.length} student${stalled.length>1?'s have':'has'} 8+ logged sessions with no recorded progress — time to reassess the approach`,
+      headline:`${stalled.length} student${stalled.length>1?'s have':' has'} 8+ logged sessions with no recorded progress — time to reassess the approach`,
       evidence:`Avg sessions logged: ${avgSess} · Consider alternative strategies, intensification, or specialist referral`,
       action:'Review interventions',fn:`recs_nav('stalled')`});
   }
