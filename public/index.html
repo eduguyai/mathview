@@ -635,6 +635,25 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
 .out-btn.par{background:rgba(251,146,60,0.12);border-color:rgba(251,146,60,0.35);color:var(--t2)}
 .out-btn.ineff{background:rgba(248,113,113,0.12);border-color:rgba(248,113,113,0.35);color:var(--t3)}
 .eff-summary{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:none}
+/* ── INT FORM TABS ── */
+.int-mode-tabs{display:flex;gap:0;margin-bottom:14px;border-radius:7px;overflow:hidden;border:1px solid var(--border)}
+.int-mode-tab{flex:1;padding:6px 0;font-size:11px;font-family:var(--mono);background:transparent;border:none;color:var(--muted);cursor:pointer;transition:background .15s,color .15s;text-align:center}
+.int-mode-tab.on{background:var(--accent);color:#fff}
+/* ── GROUP MEMBER PILLS ── */
+.grp-pill-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;max-height:72px;overflow-y:auto}
+.grp-pill{font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(91,141,238,0.1);color:var(--accent);border:1px solid rgba(91,141,238,0.2);font-family:var(--mono)}
+/* ── VOICE BUTTON ── */
+.voice-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:5px;border:1px solid var(--border);background:transparent;font-size:10px;font-family:var(--mono);color:var(--muted);cursor:pointer;transition:all .15s;margin-left:6px}
+.voice-btn:hover{border-color:rgba(91,141,238,0.4);color:var(--accent)}
+.voice-btn.listening{border-color:rgba(248,113,113,0.5);color:var(--t3);background:rgba(248,113,113,0.07);animation:pulse-border 1s infinite}
+@keyframes pulse-border{0%,100%{border-color:rgba(248,113,113,0.5)}50%{border-color:rgba(248,113,113,1)}}
+/* ── INTENT BAR ── */
+.intent-bar{background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.25);border-radius:7px;padding:8px 12px;margin-top:8px;font-size:11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.intent-bar-lbl{color:var(--t1);font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em}
+.intent-chip{font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(52,211,153,0.12);color:var(--t1);font-family:var(--mono)}
+/* ── SG LOG BTN ── */
+.sg-log-btn{padding:5px 10px;border-radius:6px;border:1px solid rgba(52,211,153,0.3);background:rgba(52,211,153,0.07);color:var(--t1);font-size:10px;font-family:var(--mono);cursor:pointer;transition:background .15s;text-align:left;margin-top:4px}
+.sg-log-btn:hover{background:rgba(52,211,153,0.14)}
 /* ── CO-OCCURRENCE ── */
 .cooc-section{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
 .cooc-card{background:var(--bg3);border:1px solid rgba(167,139,250,0.2);border-radius:8px;padding:12px;margin-bottom:8px}
@@ -908,19 +927,47 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
           <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden"><div id="intList"></div></div>
         </div>
         <div class="int-form" id="intForm">
-          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px">Log intervention</div>
-          <div class="int-field"><div class="int-label">Student</div><select class="int-select" id="intStudent"></select></div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px">Log intervention</div>
+          <!-- Mode tabs -->
+          <div class="int-mode-tabs">
+            <button class="int-mode-tab on" id="tabSingle" onclick="setIntMode('single')">Single Student</button>
+            <button class="int-mode-tab" id="tabGroup" onclick="setIntMode('group')">Group</button>
+          </div>
+          <!-- Single student -->
+          <div id="intSingleSection">
+            <div class="int-field"><div class="int-label">Student</div><select class="int-select" id="intStudent"></select></div>
+          </div>
+          <!-- Group selector -->
+          <div id="intGroupSection" style="display:none">
+            <div class="int-field">
+              <div class="int-label">Select group</div>
+              <select class="int-select" id="intGroupSel" onchange="previewGroupMembers()"></select>
+            </div>
+            <div id="intGroupPreview" class="grp-pill-wrap" style="margin-bottom:10px"></div>
+          </div>
+          <!-- Shared fields -->
           <div class="int-field"><div class="int-label">Focus domain</div>
             <select class="int-select" id="intDomain">
               <option value="numSense">Number Sense</option><option value="algebra">Algebra</option>
-              <option value="ratios">Ratios & Proportions</option><option value="stats">Statistics</option><option value="geometry">Geometry</option>
+              <option value="ratios">Ratios &amp; Proportions</option><option value="stats">Statistics</option><option value="geometry">Geometry</option>
             </select></div>
           <div class="int-field"><div class="int-label">Frequency</div>
             <select class="int-select" id="intFreq">
               <option>1x/week</option><option>2x/week</option><option selected>3x/week</option><option>Daily</option><option>As needed</option>
             </select></div>
           <div class="int-field"><div class="int-label">Start date</div><input type="date" class="int-text" id="intDate"></div>
-          <div class="int-field"><div class="int-label">Notes</div><textarea class="int-text" id="intNotes" rows="3" placeholder="Strategy, materials, co-teacher…" style="resize:vertical"></textarea></div>
+          <div class="int-field">
+            <div class="int-label" style="display:flex;align-items:center">Notes
+              <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice-to-text">🎤 <span id="voiceBtnLbl">Speak</span></button>
+            </div>
+            <textarea class="int-text" id="intNotes" rows="3" placeholder="Strategy, materials, co-teacher…" style="resize:vertical" oninput="clearIntentBar()"></textarea>
+            <div id="intentBar" style="display:none" class="intent-bar">
+              <span class="intent-bar-lbl">Detected</span>
+              <span id="intentChips"></span>
+              <button class="btn btnp" style="font-size:10px;padding:2px 10px;margin-left:auto" onclick="applyIntent()">Apply →</button>
+              <button class="btn" style="font-size:10px;padding:2px 8px" onclick="dismissIntent()">✕</button>
+            </div>
+          </div>
           <button class="btn btnp" style="width:100%" onclick="saveIntervention()">Save</button>
         </div>
       </div>
@@ -3047,7 +3094,10 @@ function renderDIGroups(base){
       <div><div class="sg-focus-lbl">Instructional focus</div><div class="sg-focus">${g.focus}</div></div>
       <div class="sg-divider"></div>
       <div class="sg-members">${g.members.map(s=>`<div class="sg-member"><span class="tb ${s.tier}" style="font-size:9px">${s.tier.toUpperCase()}</span><span class="sg-member-name pv-name">${s.name}</span><span class="sg-member-meta">Pd ${s.pd}</span></div>`).join('')}</div>
-      <button class="sg-push-btn" onclick="pushSGToGroups(${gi})">⊞ Push to Group Builder</button>
+      <div style="display:flex;gap:6px;margin-top:auto">
+        <button class="sg-push-btn" style="flex:1" onclick="pushSGToGroups(${gi})">⊞ Group Builder</button>
+        <button class="sg-log-btn" onclick="logSGIntervention(${gi})">⚡ Log intervention</button>
+      </div>
     </div>`).join('')}</div>`;
   // stash for push
   window._diGroups=grps;
@@ -3148,6 +3198,7 @@ function deleteGroup(id){if(!confirm('Delete this group?'))return;groups=groups.
    M2: INTERVENTIONS
 ═══════════════════════════════════════ */
 function initInterventions(){
+  setIntMode('single');
   const sel=document.getElementById('intStudent');
   if(sel){
     const base=(activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod)).slice().sort((a,b)=>a.name.localeCompare(b.name));
@@ -3183,18 +3234,63 @@ function renderIntList(){
   }).join('');
 }
 function openIntForm(){document.getElementById('intForm').scrollIntoView({behavior:'smooth'});}
+function setIntMode(mode){
+  const isSingle=mode==='single';
+  document.getElementById('tabSingle').classList.toggle('on',isSingle);
+  document.getElementById('tabGroup').classList.toggle('on',!isSingle);
+  document.getElementById('intSingleSection').style.display=isSingle?'':'none';
+  document.getElementById('intGroupSection').style.display=isSingle?'none':'';
+  if(!isSingle)populateGroupSelect();
+}
+function populateGroupSelect(){
+  const sel=document.getElementById('intGroupSel');if(!sel)return;
+  const allGroups=[
+    ...groups.map(g=>({id:'g:'+g.id,name:g.name,members:g.members.map(id=>students.find(s=>s.id===id)).filter(Boolean)})),
+    ...(window._diGroups||[]).map((g,i)=>({id:'sg:'+i,name:'⊗ '+g.name,members:g.members}))
+  ];
+  sel.innerHTML='<option value="">— Select a group —</option>'+allGroups.map(g=>`<option value="${g.id}">${g.name} (${g.members.length})</option>`).join('');
+  sel._allGroups=allGroups;
+  previewGroupMembers();
+}
+function previewGroupMembers(){
+  const sel=document.getElementById('intGroupSel');
+  const preview=document.getElementById('intGroupPreview');if(!preview)return;
+  const val=sel.value;
+  if(!val){preview.innerHTML='';return;}
+  const grp=(sel._allGroups||[]).find(g=>g.id===val);
+  if(!grp){preview.innerHTML='';return;}
+  preview.innerHTML=grp.members.map(s=>`<span class="grp-pill pv-name">${s.name}</span>`).join('');
+}
 function saveIntervention(){
-  const sid=parseInt(document.getElementById('intStudent').value);
   const domain=document.getElementById('intDomain').value;
   const freq=document.getElementById('intFreq').value;
   const date=document.getElementById('intDate').value;
   const notes=document.getElementById('intNotes').value.trim();
-  if(!sid||!date){showToast('Select student and date','#f87171');return;}
-  const _ivs=students.find(x=>x.id===sid);const tagSnapshot=_ivs?[...(_ivs.tags||[])]:[];
-  interventions.push({id:Date.now(),sid,domain,freq,date,notes,outcome:null,tagSnapshot});
-  saveInts();renderIntList();
-  document.getElementById('intNotes').value='';
-  showToast('Intervention logged','#34d399');
+  const isGroup=document.getElementById('tabGroup').classList.contains('on');
+  if(!date){showToast('Select a date','#f87171');return;}
+  if(isGroup){
+    const sel=document.getElementById('intGroupSel');
+    const grp=(sel._allGroups||[]).find(g=>g.id===sel.value);
+    if(!grp||!grp.members.length){showToast('Select a group','#f87171');return;}
+    const ts=Date.now();
+    grp.members.forEach((s,i)=>{
+      const tagSnapshot=[...(s.tags||[])];
+      interventions.push({id:ts+i,sid:s.id,domain,freq,date,notes,outcome:null,tagSnapshot});
+    });
+    saveInts();renderIntList();renderEfficacySummary();
+    document.getElementById('intNotes').value='';
+    showToast(`Logged for ${grp.members.length} students ✓`,'#34d399');
+    logAudit('Group intervention logged',`${grp.name} · ${DL[domain]||domain} · ${grp.members.length} students`);
+  } else {
+    const sid=parseInt(document.getElementById('intStudent').value);
+    if(!sid){showToast('Select a student','#f87171');return;}
+    const _ivs=students.find(x=>x.id===sid);const tagSnapshot=_ivs?[...(_ivs.tags||[])]:[];
+    interventions.push({id:Date.now(),sid,domain,freq,date,notes,outcome:null,tagSnapshot});
+    saveInts();renderIntList();
+    document.getElementById('intNotes').value='';
+    showToast('Intervention logged','#34d399');
+  }
+  dismissIntent();
 }
 function removeInt(id){interventions=interventions.filter(x=>x.id!==id);saveInts();renderIntList();renderEfficacySummary();}
 
@@ -3227,6 +3323,97 @@ function renderEfficacySummary(){
   </div>
   ${topTag?`<div style="font-size:11px;color:var(--muted)">Highest-yield profile: students tagged <span style="color:var(--accent2)">"${topTag[0]}"</span> show the most effective intervention outcomes (${topTag[1]} record${topTag[1]>1?'s':''}).</div>`:''}`;
 }
+/* ── VOICE TO TEXT ── */
+let _voiceRec=null,_intentData={};
+function toggleVoice(){
+  const btn=document.getElementById('voiceBtn');
+  const lbl=document.getElementById('voiceBtnLbl');
+  const SpeechRec=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SpeechRec){showToast('Voice not supported in this browser','#fb923c');return;}
+  if(_voiceRec){_voiceRec.stop();_voiceRec=null;btn.classList.remove('listening');lbl.textContent='Speak';return;}
+  _voiceRec=new SpeechRec();
+  _voiceRec.continuous=false;
+  _voiceRec.interimResults=true;
+  _voiceRec.lang='en-US';
+  btn.classList.add('listening');lbl.textContent='Listening…';
+  _voiceRec.onresult=e=>{
+    const transcript=[...e.results].map(r=>r[0].transcript).join(' ');
+    document.getElementById('intNotes').value=transcript;
+    if(e.results[0].isFinal){parseVoiceIntent(transcript);_voiceRec=null;btn.classList.remove('listening');lbl.textContent='Speak';}
+  };
+  _voiceRec.onerror=()=>{_voiceRec=null;btn.classList.remove('listening');lbl.textContent='Speak';};
+  _voiceRec.onend=()=>{_voiceRec=null;btn.classList.remove('listening');lbl.textContent='Speak';};
+  _voiceRec.start();
+}
+function parseVoiceIntent(text){
+  const t=text.toLowerCase();
+  const DOMAIN_MAP=[
+    {keys:['fraction','number sense','numsen','place value','decimal','integer','rational'],val:'numSense',label:'Number Sense'},
+    {keys:['algebra','equation','variable','expression','linear','slope','function'],val:'algebra',label:'Algebra'},
+    {keys:['ratio','proportion','percent','rate','unit rate','scale'],val:'ratios',label:'Ratios'},
+    {keys:['statistic','data','graph','mean','median','mode','probability','scatter'],val:'stats',label:'Statistics'},
+    {keys:['geometry','angle','area','perimeter','volume','triangle','polygon'],val:'geometry',label:'Geometry'},
+  ];
+  const FREQ_MAP=[
+    {keys:['daily','every day','5x','five times'],val:'Daily'},
+    {keys:['3x','three times','3 times','three times a week'],val:'3x/week'},
+    {keys:['twice','2x','two times','2 times'],val:'2x/week'},
+    {keys:['once a week','1x','one time'],val:'1x/week'},
+    {keys:['as needed','when needed','occasionally'],val:'As needed'},
+  ];
+  let detectedDomain=null,detectedFreq=null;
+  for(const d of DOMAIN_MAP){if(d.keys.some(k=>t.includes(k))){detectedDomain=d;break;}}
+  for(const f of FREQ_MAP){if(f.keys.some(k=>t.includes(k))){detectedFreq=f;break;}}
+  if(!detectedDomain&&!detectedFreq)return;
+  _intentData={domain:detectedDomain,freq:detectedFreq};
+  const bar=document.getElementById('intentBar');
+  const chips=document.getElementById('intentChips');
+  const parts=[];
+  if(detectedDomain)parts.push(`<span class="intent-chip">Domain: ${detectedDomain.label}</span>`);
+  if(detectedFreq)parts.push(`<span class="intent-chip">Freq: ${detectedFreq.val}</span>`);
+  chips.innerHTML=parts.join(' ');
+  bar.style.display='flex';
+}
+function applyIntent(){
+  if(_intentData.domain){const el=document.getElementById('intDomain');if(el)el.value=_intentData.domain.val;}
+  if(_intentData.freq){const el=document.getElementById('intFreq');if(el){for(const opt of el.options){if(opt.value===_intentData.freq.val||opt.text===_intentData.freq.val){opt.selected=true;break;}}}}
+  dismissIntent();showToast('Fields updated from voice ✓','#34d399');
+}
+function dismissIntent(){document.getElementById('intentBar').style.display='none';_intentData={};}
+function clearIntentBar(){if(!document.getElementById('voiceBtn').classList.contains('listening'))dismissIntent();}
+
+/* ── LOG FROM SMART GROUP ── */
+function logSGIntervention(gi){
+  if(!window._diGroups)return;
+  const g=window._diGroups[gi];
+  go('interventions',document.querySelector('.ni[data-v=interventions]'));
+  setTimeout(()=>{
+    setIntMode('group');
+    populateGroupSelect();
+    // inject sg as a transient option
+    const sel=document.getElementById('intGroupSel');
+    if(sel){
+      const opt=document.createElement('option');
+      opt.value='sg:'+gi;
+      opt.text=`⊗ ${g.name} (${g.members.length})`;
+      opt.selected=true;
+      // make sure _allGroups has this entry
+      if(!sel._allGroups)sel._allGroups=[];
+      if(!sel._allGroups.find(x=>x.id==='sg:'+gi))sel._allGroups.push({id:'sg:'+gi,name:'⊗ '+g.name,members:g.members});
+      sel.appendChild(opt);
+      previewGroupMembers();
+    }
+    // prefill domain from group focus keyword
+    const focus=(g.focus||'').toLowerCase();
+    const domKW={numSense:['fraction','number','decimal','integer'],algebra:['algebra','equation','variable'],ratios:['ratio','proportion','percent','rate'],stats:['statistic','data','graph'],geometry:['geometry','angle','area']};
+    for(const [k,kws] of Object.entries(domKW)){
+      if(kws.some(w=>focus.includes(w))){const el=document.getElementById('intDomain');if(el)el.value=k;break;}
+    }
+    openIntForm();
+    showToast(`Group pre-filled: ${g.members.length} students`,'#34d399');
+  },200);
+}
+
 function generateCoOccurrences(base){
   const counts={},studs={};
   base.forEach(s=>{
