@@ -3254,10 +3254,13 @@ function printReport(type){
 
   const titles={snapshot:'Class Snapshot',mtss:'MTSS Intervention Log',tierdist:'Grade-Level Tier Report',domains:'Domain Gap Analysis',atrisk:'At-Risk Student Report',progress:'Student Progress Report'};
   const subtitles={snapshot:`${teacher} · All Periods`,mtss:`${teacher} · MTSS Documentation`,tierdist:`${teacher} · Administrator Review`,domains:`${teacher} · Curriculum Planning`,atrisk:`${teacher} · AP / Administrator Review`,progress:`${teacher} · Parent Conference Edition`};
-  const w=window.open('','_blank','width=900,height=700');
-  if(!w){alert('Pop-ups blocked. Please allow pop-ups for this site.');return;}
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${titles[type]||'Report'} — MathView</title><style>${CSS}</style></head><body>${header(titles[type],subtitles[type])}${body}<div class="footer">MathView · ${school} · ${today} · Data is private and stored locally only.</div></body></html>`);
-  w.document.close();
+  const fullHTML=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${titles[type]||'Report'} — MathView</title><style>${CSS}</style></head><body>${header(titles[type],subtitles[type])}${body}<div class="footer">MathView · ${school} · ${today} · Data is private and stored locally only.</div></body></html>`;
+  const blob=new Blob([fullHTML],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.target='_blank';a.rel='noopener';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),30000);
 }
 
 function initReports(){renderReportGallery();renderReports();}
