@@ -1928,6 +1928,17 @@ function filt(tier,btn){
   document.querySelectorAll('.frow .fb').forEach(b=>{b.className='fb';});
   btn.classList.add('fa');renderT(tier);
 }
+function av(s,sz){
+  sz=sz||28;
+  const pal=['#5b8dee','#a78bfa','#34d399','#fb923c','#f87171','#38bdf8','#e879f9','#84cc16','#06b6d4','#f59e0b'];
+  let h=0;for(const c of(s.name||'?'))h=(h*31+c.charCodeAt(0))|0;
+  const bg=pal[Math.abs(h)%pal.length];
+  const ini=(s.name||'?').split(' ').map(w=>w[0]||'').slice(0,2).join('').toUpperCase()||'?';
+  const fs=Math.round(sz*0.38);
+  const svg=`<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg"><circle cx="${sz/2}" cy="${sz/2}" r="${sz/2}" fill="${bg}"/><text x="${sz/2}" y="${sz/2+sz*0.15}" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-family="Arial,sans-serif" font-size="${fs}" font-weight="700">${ini}</text></svg>`;
+  return 'data:image/svg+xml;base64,'+btoa(svg);
+}
+function avEl(s,sz){sz=sz||28;return`<img src="${av(s,sz)}" width="${sz}" height="${sz}" style="border-radius:50%;flex-shrink:0;vertical-align:middle" alt="">`;}
 function renderT(f){
   af=f;const b=document.getElementById('tbody');if(!b)return;
   const list=filteredStudents(f);
@@ -1942,7 +1953,7 @@ function renderT(f){
     const bc=s.tier==='t3'?'#f87171':s.tier==='t2'?'#fb923c':'#34d399';
     const geq=s.ir<400?'Gr 4–5':s.ir<415?'Gr 6':s.ir<430?'Gr 6–7':s.ir<445?'Gr 7':'Gr 7–8';
     return `<tr onclick="selS(${s.id})" id="r-${s.id}" class="${sid===s.id?'sel':''}">
-      <td><span class="pv-name">${s.name}</span></td>
+      <td><div style="display:flex;align-items:center;gap:7px">${avEl(s,26)}<span class="pv-name">${s.name}</span></div></td>
       <td><span class="tb ${s.tier}">${s.tier==='t3'?'T3':s.tier==='t2'?'T2':'T1'}</span></td>
       <td><div class="sbw"><div class="sb"><div class="sbf" style="width:${Math.max(0,Math.min(100,pct))}%;background:${bc}"></div></div><span style="font-family:var(--mono);font-size:11px">${s.ir}</span></div></td>
       <td style="font-size:11px;color:var(--muted)">${geq}</td>
@@ -1963,7 +1974,7 @@ function renderDetail(s){
     <div class="dsec" style="padding:15px 18px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
         <div>
-          <div class="dname pv-name">${s.name}</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:2px"><img src="${av(s,46)}" width="46" height="46" style="border-radius:50%;flex-shrink:0"><div class="dname pv-name">${s.name}</div></div>
           <div class="dmeta">
             <span>Period ${s.pd}</span>
             <span>iReady <strong style="color:var(--text)">${s.ir}</strong></span>
@@ -3314,7 +3325,7 @@ function renderReports(){
     let topNeed='—';
     if(s.dom){const e=Object.entries(s.dom).sort((a,b)=>a[1]-b[1]);if(e.length)topNeed=DL[e[0][0]]||e[0][0];}
     return`<tr>
-      <td style="font-weight:500"><span class="pv-name">${s.name}</span></td>
+      <td style="font-weight:500"><div style="display:flex;align-items:center;gap:6px">${avEl(s,22)}<span class="pv-name">${s.name}</span></div></td>
       <td><span class="tb ${s.tier}">${s.tier.toUpperCase()}</span></td>
       <td style="font-family:var(--mono)">${boy}</td>
       <td style="font-family:var(--mono)">${moy}</td>
@@ -3686,7 +3697,7 @@ function renderDILandscape(base){
   // Flagged
   const flagged=base.filter(s=>s.tags.filter(t=>(TQ[t]||'qn')==='qc').length>=3).sort((a,b)=>b.tags.filter(t=>(TQ[t]||'qn')==='qc').length-a.tags.filter(t=>(TQ[t]||'qn')==='qc').length);
   const fEl=document.getElementById('qualFlagged');
-  if(fEl)fEl.innerHTML=flagged.length?flagged.map(s=>`<div class="flag-row"><div><div class="flag-name pv-name">${s.name}</div><div style="font-size:10px;font-family:var(--mono);color:var(--dim)">Pd ${s.pd} · ${s.tier.toUpperCase()}</div></div><div class="flag-tags">${s.tags.filter(t=>(TQ[t]||'qn')==='qc').map(t=>`<span class="qtag-rm qc">${t}</span>`).join('')}</div></div>`).join(''):'<div style="color:var(--dim);font-size:11px;padding:8px 0">No students with 3+ concern flags.</div>';
+  if(fEl)fEl.innerHTML=flagged.length?flagged.map(s=>`<div class="flag-row"><div><div style="display:flex;align-items:center;gap:7px">${avEl(s,28)}<div class="flag-name pv-name">${s.name}</div></div><div style="font-size:10px;font-family:var(--mono);color:var(--dim)">Pd ${s.pd} · ${s.tier.toUpperCase()}</div></div><div class="flag-tags">${s.tags.filter(t=>(TQ[t]||'qn')==='qc').map(t=>`<span class="qtag-rm qc">${t}</span>`).join('')}</div></div>`).join(''):'<div style="color:var(--dim);font-size:11px;padding:8px 0">No students with 3+ concern flags.</div>';
 }
 
 /* ── LESSON SIGNALS ENGINE ── */
@@ -3738,7 +3749,7 @@ function renderCoOccurrenceSection(base){
     ${pairs.map(p=>`<div class="cooc-card">
       <div class="cooc-tags"><span class="cooc-tag">"${p.tags[0]}"</span><span class="cooc-tag">"${p.tags[1]}"</span><span style="font-size:10px;font-family:var(--mono);color:var(--dim);margin-left:auto">${p.count} students</span></div>
       <div class="cooc-protocol">${getCoocProtocol(p.tags)}</div>
-      <div class="cooc-students">${p.students.slice(0,6).map(s=>`<span class="ins-student-chip pv-name">${s.name.split(' ')[0]}</span>`).join('')}${p.students.length>6?`<span class="ins-student-chip">+${p.students.length-6}</span>`:''}</div>
+      <div class="cooc-students">${p.students.slice(0,6).map(s=>`<span class="ins-student-chip" style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px 2px 3px">${avEl(s,14)}<span class="pv-name">${s.name.split(' ')[0]}</span></span>`).join('')}${p.students.length>6?`<span class="ins-student-chip">+${p.students.length-6}</span>`:''}</div>
     </div>`).join('')}
   </div>`;
 }
@@ -3758,7 +3769,7 @@ function renderDILessons(base){
         <span class="ins-priority ${pc[s.priority]}">${pl[s.priority]}</span>
       </div>
       <ul class="ins-actions">${s.actions.map(a=>`<li>${a}</li>`).join('')}</ul>
-      ${s.students.length?`<div class="ins-students">${s.students.slice(0,8).map(n=>`<span class="ins-student-chip pv-name">${n}</span>`).join('')}${s.students.length>8?`<span class="ins-student-chip">+${s.students.length-8} more</span>`:''}</div>`:''}
+      ${s.students.length?`<div class="ins-students">${s.students.slice(0,8).map(n=>{const st=students.find(x=>x.name===n)||{name:n};return`<span class="ins-student-chip" style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px 2px 3px">${avEl(st,14)}<span class="pv-name">${n}</span></span>`;}).join('')}${s.students.length>8?`<span class="ins-student-chip">+${s.students.length-8} more</span>`:''}</div>`:''}
     </div>`).join('')}</div>`;
   renderCoOccurrenceSection(base);
 }
@@ -3805,7 +3816,7 @@ function renderDIGroups(base){
       <div class="sg-rationale">${g.rationale}</div>
       <div><div class="sg-focus-lbl">Instructional focus</div><div class="sg-focus">${g.focus}</div></div>
       <div class="sg-divider"></div>
-      <div class="sg-members">${g.members.map(s=>`<div class="sg-member"><span class="tb ${s.tier}" style="font-size:9px">${s.tier.toUpperCase()}</span><span class="sg-member-name pv-name">${s.name}</span><span class="sg-member-meta">Pd ${s.pd}</span></div>`).join('')}</div>
+      <div class="sg-members">${g.members.map(s=>`<div class="sg-member"><span class="tb ${s.tier}" style="font-size:9px">${s.tier.toUpperCase()}</span>${avEl(s,18)}<span class="sg-member-name pv-name">${s.name}</span><span class="sg-member-meta">Pd ${s.pd}</span></div>`).join('')}</div>
       <div style="display:flex;gap:6px;margin-top:auto">
         <button class="sg-push-btn" style="flex:1" onclick="pushSGToGroups(${gi})">⊞ Group Builder</button>
         <button class="sg-log-btn" onclick="logSGIntervention(${gi})">⚡ Log intervention</button>
@@ -3852,7 +3863,7 @@ function renderDIFlags(base){
   el.innerHTML=`<div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:14px">Showing ${flags.length} students with 2+ concern indicators · sorted by complexity</div>
   <div class="flg-grid">${flags.map(({s,concerns,priority,signal})=>`
     <div class="flg-card ${priority}">
-      <div class="flg-card-name pv-name">${s.name}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">${avEl(s,34)}<div class="flg-card-name pv-name">${s.name}</div></div>
       <div class="flg-card-meta">Pd ${s.pd} · ${s.tier.toUpperCase()} · ${concerns.length} concerns</div>
       <div class="flg-concerns">${concerns.map(t=>`<span class="qtag-rm qc">${t}</span>`).join('')}</div>
       <div class="flg-signal">${signal}</div>
@@ -3890,7 +3901,7 @@ function renderGroupDetail(){
   if(!g){el.innerHTML='<div style="color:var(--dim);font-size:12px;text-align:center;padding:40px">← Select a group</div>';return;}
   const members=students.filter(s=>g.members.includes(s.id));
   const avail=students.filter(s=>!g.members.includes(s.id)&&(g.tier==='all'||s.tier===g.tier)&&(g.pd==='all'||s.pd===parseInt(g.pd))).slice(0,30);
-  const mRow=s=>`<div class="group-member"><span class="tb ${s.tier}" style="font-size:9px">${s.tier.toUpperCase()}</span><span class="group-member-name pv-name">${s.name}</span><span class="group-member-meta">Pd ${s.pd} · ${s.ir}</span>`;
+  const mRow=s=>`<div class="group-member"><span class="tb ${s.tier}" style="font-size:9px">${s.tier.toUpperCase()}</span>${avEl(s,20)}<span class="group-member-name pv-name">${s.name}</span><span class="group-member-meta">Pd ${s.pd} · ${s.ir}</span>`;
   el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
     <div style="font-size:14px;font-weight:500">${g.name}</div>
     <button class="btn" style="font-size:10px;color:var(--t3)" onclick="deleteGroup(${g.id})">Delete</button>
@@ -3930,7 +3941,7 @@ function renderIntList(){
     return `<div class="int-row">
       <span class="int-badge ${ov?'int-overdue':'int-active'}">${ov?'OVERDUE':'ACTIVE'}</span>
       <div style="flex:1">
-        <div class="int-name pv-name">${s.name}</div>
+        <div style="display:flex;align-items:center;gap:7px">${avEl(s,22)}<div class="int-name pv-name">${s.name}</div></div>
         <div class="int-meta">Pd ${s.pd} · ${DL[iv.domain]||iv.domain} · ${iv.freq} · Started ${iv.date}${ov?` · <span style="color:var(--t3)">${weeks}w ago</span>`:''}</div>
         ${iv.notes?`<div style="font-size:11px;color:var(--muted);margin-top:3px">${iv.notes}</div>`:''}
       </div>
@@ -3971,7 +3982,7 @@ function previewGroupMembers(){
   if(!val){preview.innerHTML='';return;}
   const grp=(sel._allGroups||[]).find(g=>g.id===val);
   if(!grp){preview.innerHTML='';return;}
-  preview.innerHTML=grp.members.map(s=>`<span class="grp-pill pv-name">${s.name}</span>`).join('');
+  preview.innerHTML=grp.members.map(s=>`<span class="grp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px 3px 4px">${avEl(s,16)}<span class="pv-name">${s.name}</span></span>`).join('');
 }
 function saveIntervention(){
   const domain=document.getElementById('intDomain').value;
