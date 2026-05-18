@@ -398,17 +398,25 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 .pl-resource-type{font-size:9px;font-family:'DM Mono',monospace;color:var(--accent);font-weight:600;margin-left:auto;white-space:nowrap}
 @media(max-width:768px){.pl-body.on{grid-template-columns:1fr}.pl-card-full{grid-column:1}}
 .recs-section{margin-bottom:18px}
-.recs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.recs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .recs-title{font-size:12px;font-weight:700;color:var(--fg);letter-spacing:.04em;text-transform:uppercase}
 .recs-count{font-size:10px;color:var(--dim);font-family:'DM Mono',monospace}
-.rec-card{display:flex;align-items:stretch;gap:0;margin-bottom:8px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.07);background:var(--card)}
-.rec-card:last-child{margin-bottom:0}
+.recs-nav{display:flex;align-items:center;gap:6px}
+.rec-scroll-btn{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--fg);font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:background .15s}
+.rec-scroll-btn:hover{background:var(--bg3)}
+.recs-carousel{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.recs-carousel::-webkit-scrollbar{display:none}
+.rec-group-divider{flex-shrink:0;display:flex;flex-direction:column;justify-content:center;padding:0 4px}
+.rec-group-line{width:2px;flex:1;border-radius:2px;opacity:.35}
+.rec-card{flex-shrink:0;width:272px;min-height:164px;display:flex;align-items:stretch;gap:0;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);background:var(--card);scroll-snap-align:start;transition:border-color .2s,box-shadow .2s}
+.rec-card:hover{border-color:rgba(255,255,255,0.16);box-shadow:0 4px 18px rgba(0,0,0,0.18)}
 .rec-left-bar{width:4px;flex-shrink:0}
 .rec-urgent .rec-left-bar{background:#f87171}
 .rec-priority .rec-left-bar{background:#fb923c}
 .rec-opportunity .rec-left-bar{background:#34d399}
-.rec-body{flex:1;padding:12px 14px;min-width:0}
-.rec-top{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.rec-body{flex:1;padding:12px 14px;min-width:0;display:flex;flex-direction:column}
+.rec-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.rec-card-footer{margin-top:auto;padding-top:10px}
 .rec-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:12px;font-family:'DM Mono',monospace;letter-spacing:.06em}
 .rec-badge-urgent{background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3)}
 .rec-badge-priority{background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid rgba(251,146,60,0.3)}
@@ -416,7 +424,7 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 .rec-category{font-size:10px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
 .rec-headline{font-size:13px;font-weight:600;color:var(--fg);line-height:1.4;margin-bottom:4px}
 .rec-evidence{font-size:10px;color:var(--dim);font-family:'DM Mono',monospace;line-height:1.5}
-.rec-action-wrap{display:flex;align-items:center;padding:0 14px;flex-shrink:0}
+.rec-action-wrap{display:none}
 .rec-action-btn{font-size:10px;font-weight:600;padding:5px 12px;border-radius:6px;border:1px solid;cursor:pointer;white-space:nowrap;background:transparent;font-family:inherit}
 .rec-action-urgent{color:#f87171;border-color:rgba(248,113,113,0.4)}
 .rec-action-urgent:hover{background:rgba(248,113,113,0.1)}
@@ -424,7 +432,7 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 .rec-action-priority:hover{background:rgba(251,146,60,0.1)}
 .rec-action-opportunity{color:#34d399;border-color:rgba(52,211,153,0.3)}
 .rec-action-opportunity:hover{background:rgba(52,211,153,0.08)}
-@media(max-width:768px){.rec-action-wrap{padding:0 10px 10px 14px;align-items:flex-end;align-self:stretch}.rec-card{flex-wrap:wrap}.rec-action-wrap{padding:0 14px 12px}}
+@media(max-width:768px){.recs-carousel{gap:10px}.rec-card{width:240px}}
 .alert-ok{display:flex;align-items:center;gap:8px;margin-bottom:18px;padding:10px 14px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:8px;color:var(--t1);font-size:12px}
 /* ── M5: GOALS ── */
 .goal-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -2927,12 +2935,21 @@ function renderRecommendations(base){
 
   if(!recs.length){panel.innerHTML='';return;}
 
-  panel.innerHTML=`<div class="recs-section">
-    <div class="recs-header">
-      <span class="recs-title">Recommended Actions</span>
-      <span class="recs-count">${recs.length} item${recs.length>1?'s':''}</span>
-    </div>
-    ${recs.map(r=>`<div class="rec-card rec-${r.level}">
+  // Sort: urgent → priority → opportunity
+  const order={urgent:0,priority:1,opportunity:2};
+  recs.sort((a,b)=>order[a.level]-order[b.level]);
+
+  // Build group dividers between level changes
+  const cards=[];
+  let lastLevel=null;
+  const barColor={urgent:'#f87171',priority:'#fb923c',opportunity:'#34d399'};
+  recs.forEach(r=>{
+    if(lastLevel&&lastLevel!==r.level){
+      cards.push(`<div class="rec-group-divider" aria-hidden="true">
+        <div class="rec-group-line" style="background:${barColor[r.level]}"></div>
+      </div>`);
+    }
+    cards.push(`<div class="rec-card rec-${r.level}">
       <div class="rec-left-bar"></div>
       <div class="rec-body">
         <div class="rec-top">
@@ -2941,14 +2958,40 @@ function renderRecommendations(base){
         </div>
         <div class="rec-headline">${r.headline}</div>
         <div class="rec-evidence">${r.evidence}</div>
+        <div class="rec-card-footer">
+          <button class="rec-action-btn rec-action-${r.level}" onclick="${r.fn}">${r.action} →</button>
+        </div>
       </div>
-      <div class="rec-action-wrap">
-        <button class="rec-action-btn rec-action-${r.level}" onclick="${r.fn}">${r.action} →</button>
+    </div>`);
+    lastLevel=r.level;
+  });
+
+  const urgentN=recs.filter(r=>r.level==='urgent').length;
+  const priorityN=recs.filter(r=>r.level==='priority').length;
+  const oppN=recs.filter(r=>r.level==='opportunity').length;
+  const countStr=[
+    urgentN?`<span style="color:#f87171;font-weight:700">${urgentN} urgent</span>`:'',
+    priorityN?`<span style="color:#fb923c;font-weight:700">${priorityN} priority</span>`:'',
+    oppN?`<span style="color:#34d399;font-weight:700">${oppN} opportunity</span>`:'',
+  ].filter(Boolean).join('<span style="color:var(--border);margin:0 4px">·</span>');
+
+  panel.innerHTML=`<div class="recs-section">
+    <div class="recs-header">
+      <span class="recs-title">Recommended Actions</span>
+      <div class="recs-nav">
+        <span class="recs-count" style="margin-right:6px">${countStr}</span>
+        <button class="rec-scroll-btn" onclick="scrollRecs(-1)" title="Scroll left">&#8249;</button>
+        <button class="rec-scroll-btn" onclick="scrollRecs(1)" title="Scroll right">&#8250;</button>
       </div>
-    </div>`).join('')}
+    </div>
+    <div class="recs-carousel" id="recsCarousel">${cards.join('')}</div>
   </div>`;
 }
 
+function scrollRecs(dir){
+  const c=document.getElementById('recsCarousel');
+  if(c)c.scrollBy({left:dir*296,behavior:'smooth'});
+}
 function recs_nav(type){
   if(type==='grouplog'){
     go('interventions',document.querySelector('.ni[data-v=interventions]'));
