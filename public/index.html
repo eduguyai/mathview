@@ -389,6 +389,27 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 .pl-strat-num{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--accent);margin-top:1px}
 .pl-misc-item{padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.5}
 .pl-misc-item:last-child{border-bottom:none}
+
+/* ── PL COURSE CARDS (Sprint 26) ── */
+.pl-course-carousel{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.pl-course-carousel::-webkit-scrollbar{display:none}
+.pl-course-section-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;display:flex;align-items:center;gap:8px}
+.pl-course-section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.pl-course-card{flex-shrink:0;width:218px;border-radius:10px;overflow:hidden;background:var(--bg2);border:1px solid var(--border);scroll-snap-align:start;display:flex;flex-direction:column;transition:border-color .2s,box-shadow .2s;cursor:pointer}
+.pl-course-card:hover{border-color:var(--bmed);box-shadow:0 4px 20px rgba(0,0,0,.22)}
+.pl-course-thumb{height:68px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;overflow:hidden}
+.pl-course-thumb-icon{font-size:30px;position:relative;z-index:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
+.pl-course-thumb-pattern{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.06) 0,rgba(255,255,255,.06) 1px,transparent 0,transparent 50%);background-size:8px 8px}
+.pl-course-body{padding:11px 13px;display:flex;flex-direction:column;flex:1}
+.pl-course-type{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.pl-course-title{font-size:12px;font-weight:700;color:var(--fg);line-height:1.35;margin-bottom:5px}
+.pl-course-desc{font-size:11px;color:var(--dim);line-height:1.5;flex:1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:all .2s}
+.pl-course-card.pl-expanded .pl-course-desc{-webkit-line-clamp:unset;overflow:visible}
+.pl-course-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);flex-shrink:0}
+.pl-course-duration{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted)}
+.pl-course-cta{font-size:10px;font-weight:700;padding:4px 10px;border-radius:5px;border:1px solid;cursor:pointer;background:transparent;font-family:inherit;transition:background .15s;white-space:nowrap}
+.pl-course-cta:hover{opacity:.85}
+
 .pl-misc-tag{display:inline-block;font-size:9px;font-weight:700;color:#fb923c;background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.2);padding:1px 6px;border-radius:10px;margin-right:6px;vertical-align:middle}
 .pl-resource-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
 .pl-resource-row:last-child{border-bottom:none}
@@ -3662,10 +3683,14 @@ function renderDomainPL(base){
     </button>`;
   }).join('');
 
-  // Build body panels in priority order
+  // Extract duration hint from strategy title
+  const getDur=title=>{const m=title.match(/(\d+[\u2013\u2014-]\d+|\d+)\s*min/i);return m?`~${m[0]}`:'~20 min';};
+
+  // Build IBM-style course card body panels
   const bodies=domOrder.map((k,idx)=>{
     const d=domData.find(x=>x.k===k);
     const info=pl[k];
+    const dm=DOMS[k]||{emoji:'📚',color:'var(--accent)',bg:'rgba(91,141,238,0.12)'};
     const priorityLevel=d.belowPct>60?'urgent':d.belowPct>40?'strong':'ok';
     const priorityText=d.belowPct>60?`High Priority — ${d.belowPct}% of students below proficiency (avg ${d.avg}%)`
       :d.belowPct>40?`Moderate Gap — ${d.belowPct}% below proficiency (avg ${d.avg}%)`
@@ -3674,36 +3699,66 @@ function renderDomainPL(base){
       :d.belowPct>40?'Schedule targeted small-group work on this domain in the next 2 weeks.'
       :'Maintain current pace. Use enrichment tasks for students performing above benchmark.';
 
+    const stratCards=info.strategies.map((s,i)=>`<div class="pl-course-card" onclick="this.classList.toggle('pl-expanded')">
+      <div class="pl-course-thumb" style="background:${dm.color}18">
+        <div class="pl-course-thumb-pattern"></div>
+        <span class="pl-course-thumb-icon">${dm.emoji}</span>
+      </div>
+      <div class="pl-course-body">
+        <span class="pl-course-type" style="color:${dm.color}">Strategy ${i+1} of ${info.strategies.length}</span>
+        <div class="pl-course-title">${s.title.replace(/\s*\([^)]*\)$/,'')}</div>
+        <div class="pl-course-desc">${s.desc}</div>
+        <div class="pl-course-footer">
+          <span class="pl-course-duration">${getDur(s.title)}</span>
+          <button class="pl-course-cta" style="color:${dm.color};border-color:${dm.color}55" onclick="event.stopPropagation();this.closest('.pl-course-card').classList.toggle('pl-expanded')">Read more →</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+    const miscCards=info.misconceptions.map(m=>`<div class="pl-course-card" onclick="this.classList.toggle('pl-expanded')">
+      <div class="pl-course-thumb" style="background:rgba(248,113,113,0.12)">
+        <div class="pl-course-thumb-pattern"></div>
+        <span class="pl-course-thumb-icon">⚠️</span>
+      </div>
+      <div class="pl-course-body">
+        <span class="pl-course-type" style="color:#f87171">Watch For</span>
+        <div class="pl-course-title">${m.label}</div>
+        <div class="pl-course-desc">${m.text}</div>
+        <div class="pl-course-footer">
+          <span class="pl-course-duration">~5 min discussion</span>
+          <button class="pl-course-cta" style="color:#f87171;border-color:rgba(248,113,113,0.4)" onclick="event.stopPropagation();this.closest('.pl-course-card').classList.toggle('pl-expanded')">Address this →</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+    const resCards=info.resources.map(r=>`<div class="pl-course-card">
+      <div class="pl-course-thumb" style="background:rgba(52,211,153,0.12)">
+        <div class="pl-course-thumb-pattern"></div>
+        <span class="pl-course-thumb-icon">${r.icon}</span>
+      </div>
+      <div class="pl-course-body">
+        <span class="pl-course-type" style="color:#34d399">${r.type}</span>
+        <div class="pl-course-title">${r.name}</div>
+        <div class="pl-course-desc">${r.desc}</div>
+        <div class="pl-course-footer">
+          <span class="pl-course-duration">Free</span>
+          <button class="pl-course-cta" style="color:#34d399;border-color:rgba(52,211,153,0.4)">Open →</button>
+        </div>
+      </div>
+    </div>`).join('');
+
     return `<div class="pl-body${idx===0?' on':''}" id="plb-${k}">
-      <div class="pl-card pl-card-full">
-        <div class="pl-priority-strip ${priorityLevel}">
-          <div class="pl-priority-text">${info.emoji} ${info.label}: ${priorityText}</div>
-          <div class="pl-priority-sub">${priorityAction}</div>
-        </div>
-        <div class="pl-card-title">Grade 7 Scope</div>
-        <div class="pl-scope-text">${info.scope}</div>
+      <div class="pl-priority-strip ${priorityLevel}" style="margin-bottom:10px">
+        <div class="pl-priority-text">${info.emoji} ${info.label}: ${priorityText}</div>
+        <div class="pl-priority-sub">${priorityAction}</div>
       </div>
-      <div class="pl-card">
-        <div class="pl-card-title">High-Leverage Instructional Strategies</div>
-        <ul class="pl-strategy-list">
-          ${info.strategies.map((s,i)=>`<li><span class="pl-strat-num">${i+1}</span><div><strong>${s.title}</strong><br>${s.desc}</div></li>`).join('')}
-        </ul>
-      </div>
-      <div class="pl-card">
-        <div class="pl-card-title">Common Misconceptions to Watch For</div>
-        ${info.misconceptions.map(m=>`<div class="pl-misc-item"><span class="pl-misc-tag">WATCH</span><strong>${m.label}</strong> — ${m.text}</div>`).join('')}
-        <div style="margin-top:14px">
-          <div class="pl-card-title">Free Resources & Tools</div>
-          ${info.resources.map(r=>`<div class="pl-resource-row">
-            <div class="pl-resource-icon" style="background:var(--bg4)">${r.icon}</div>
-            <div style="flex:1;min-width:0">
-              <div class="pl-resource-name">${r.name}</div>
-              <div class="pl-resource-desc">${r.desc}</div>
-            </div>
-            <div class="pl-resource-type">${r.type}</div>
-          </div>`).join('')}
-        </div>
-      </div>
+      <div class="pl-scope-text" style="margin-bottom:4px">${info.scope}</div>
+      <div class="pl-course-section-label">Instructional Strategies</div>
+      <div class="pl-course-carousel">${stratCards}</div>
+      <div class="pl-course-section-label">Common Misconceptions</div>
+      <div class="pl-course-carousel">${miscCards}</div>
+      <div class="pl-course-section-label">Free Resources & Tools</div>
+      <div class="pl-course-carousel">${resCards}</div>
     </div>`;
   }).join('');
 
