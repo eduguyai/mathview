@@ -639,6 +639,7 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
    MOBILE — iPhone / narrow viewport
 ══════════════════════════════════ */
 .mob-menu-btn{display:none;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:18px;border-radius:7px;cursor:pointer;flex-shrink:0}
+.mob-dock{display:none}
 .mob-nav-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:890;-webkit-tap-highlight-color:transparent}
 .mob-nav-backdrop.visible{display:block}
 
@@ -721,6 +722,48 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
   /* Misc */
   .demo-banner{flex-direction:column;align-items:flex-start;gap:6px}
   .persist-btns{flex-wrap:wrap}
+
+  /* ── MOBILE DOCK ── */
+  .mob-dock{
+    display:flex;align-items:center;
+    position:fixed;bottom:0;left:0;right:0;
+    height:56px;
+    padding:0 8px;
+    padding-bottom:env(safe-area-inset-bottom);
+    background:rgba(12,17,31,0.86);
+    backdrop-filter:blur(24px) saturate(180%);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);
+    border-top:1px solid rgba(255,255,255,0.09);
+    z-index:820;
+    gap:0;
+  }
+  .mob-dock-btn{
+    flex:1;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:3px;border:none;background:transparent;
+    cursor:pointer;padding:6px 0;color:rgba(255,255,255,0.38);
+    transition:color .15s;-webkit-tap-highlight-color:transparent;
+    font-family:inherit;
+  }
+  .mob-dock-btn.on{color:var(--accent)}
+  .mob-dock-btn.on .mob-dock-icon{text-shadow:0 0 8px rgba(91,141,238,0.6)}
+  .mob-dock-icon{font-size:20px;line-height:1;display:block}
+  .mob-dock-label{font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;line-height:1;display:block}
+  /* Primary action pill */
+  .mob-dock-primary{
+    flex:0 0 64px;
+    background:var(--accent);
+    border-radius:16px;
+    height:44px;
+    color:#fff !important;
+    box-shadow:0 4px 18px rgba(91,141,238,0.45);
+    margin-bottom:4px;
+  }
+  .mob-dock-primary .mob-dock-icon{font-size:20px}
+  .mob-dock-primary .mob-dock-label{font-size:9px;color:rgba(255,255,255,0.9)}
+  /* Coach panel above dock when open */
+  .coach-panel.open{z-index:860}
+  /* Extra bottom padding so content clears dock */
+  .view.on{padding-bottom:76px !important}
 }
 
 /* ── OUTCOME ATTRIBUTION ── */
@@ -1632,6 +1675,7 @@ function _goExec(v,btn){
   document.getElementById('vtitle').innerHTML=TITLES[v];
   if(!inited[v]){inited[v]=true;boot(v);}
   renderCoach(v);
+  syncDock(v);
 }
 
 function openDIGate(){
@@ -3327,7 +3371,28 @@ function printReport(type){
 
   const titles={snapshot:'Class Snapshot',mtss:'MTSS Intervention Log',tierdist:'Grade-Level Tier Report',domains:'Domain Gap Analysis',atrisk:'At-Risk Student Report',progress:'Student Progress Report'};
   const subtitles={snapshot:`${teacher} · All Periods`,mtss:`${teacher} · MTSS Documentation`,tierdist:`${teacher} · Administrator Review`,domains:`${teacher} · Curriculum Planning`,atrisk:`${teacher} · AP / Administrator Review`,progress:`${teacher} · Parent Conference Edition`};
-  const fullHTML=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${titles[type]||'Report'} — MathView</title><style>${CSS}</style></head><body>${header(titles[type],subtitles[type])}${body}<div class="footer">MathView · ${school} · ${today} · Data is private and stored locally only.</div></body></html>`;
+  const fullHTML=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${titles[type]||'Report'} — MathView</title><style>${CSS}</style></head><body>${header(titles[type],subtitles[type])}${body}<div class="footer">MathView · ${school} · ${today} · Data is private and stored locally only.</div>
+<!-- MOBILE DOCK -->
+<nav class="mob-dock" id="mobDock" aria-label="Mobile navigation">
+  <button class="mob-dock-btn on" id="dockBtn-overview" onclick="dockNav('overview')">
+    <span class="mob-dock-icon">◎</span>
+    <span class="mob-dock-label">Overview</span>
+  </button>
+  <button class="mob-dock-btn" id="dockBtn-roster" onclick="dockNav('roster')">
+    <span class="mob-dock-icon">◈</span>
+    <span class="mob-dock-label">Roster</span>
+  </button>
+  <button class="mob-dock-btn mob-dock-primary" onclick="dockLog()" aria-label="Log Intervention">
+    <span class="mob-dock-icon">⚡</span>
+    <span class="mob-dock-label">Log</span>
+  </button>
+  <button class="mob-dock-btn" id="dockBtn-groups" onclick="dockNav('groups')">
+    <span class="mob-dock-icon">⊞</span>
+    <span class="mob-dock-label">Groups</span>
+  </button>
+</nav>
+
+</body></html>`;
   const blob=new Blob([fullHTML],{type:'text/html'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -4382,7 +4447,28 @@ function printBubbleSheet(){
     </table>
     <div class="note">Domain Scores (0–100) — use back of sheet or attach domain report printout</div>
     <div class="note">MathView · ${school} · ${year} · <em>All student data stays local to your browser — never transmitted.</em></div>
-  </body></html>`);
+  
+<!-- MOBILE DOCK -->
+<nav class="mob-dock" id="mobDock" aria-label="Mobile navigation">
+  <button class="mob-dock-btn on" id="dockBtn-overview" onclick="dockNav('overview')">
+    <span class="mob-dock-icon">◎</span>
+    <span class="mob-dock-label">Overview</span>
+  </button>
+  <button class="mob-dock-btn" id="dockBtn-roster" onclick="dockNav('roster')">
+    <span class="mob-dock-icon">◈</span>
+    <span class="mob-dock-label">Roster</span>
+  </button>
+  <button class="mob-dock-btn mob-dock-primary" onclick="dockLog()" aria-label="Log Intervention">
+    <span class="mob-dock-icon">⚡</span>
+    <span class="mob-dock-label">Log</span>
+  </button>
+  <button class="mob-dock-btn" id="dockBtn-groups" onclick="dockNav('groups')">
+    <span class="mob-dock-icon">⊞</span>
+    <span class="mob-dock-label">Groups</span>
+  </button>
+</nav>
+
+</body></html>`);
   w.document.close();
   logAudit('Bubble sheet printed',`${students.length} student rows`);
 }
@@ -4763,10 +4849,52 @@ function closeMobileNav(){
   document.body.style.overflow='';
 }
 // Close mobile nav when a nav item is tapped
+/* ── MOBILE DOCK ── */
+const _dockViews=['overview','roster','groups'];
+function syncDock(v){
+  _dockViews.forEach(k=>{
+    const btn=document.getElementById('dockBtn-'+k);
+    if(btn)btn.classList.toggle('on',k===v);
+  });
+}
+function dockNav(v){
+  const btn=document.querySelector('.ni[data-v="'+v+'"]');
+  if(btn)go(v,btn);
+  if(window.innerWidth<=768)closeMobileNav();
+}
+function dockLog(){
+  dockNav('interventions');
+  setTimeout(()=>{
+    const form=document.getElementById('intForm');
+    if(form)form.scrollIntoView({behavior:'smooth',block:'start'});
+  },160);
+}
+
 document.querySelectorAll('.ni').forEach(btn=>btn.addEventListener('click',()=>{
   if(window.innerWidth<=768)closeMobileNav();
 }));
 
 </script>
+
+<!-- MOBILE DOCK -->
+<nav class="mob-dock" id="mobDock" aria-label="Mobile navigation">
+  <button class="mob-dock-btn on" id="dockBtn-overview" onclick="dockNav('overview')">
+    <span class="mob-dock-icon">◎</span>
+    <span class="mob-dock-label">Overview</span>
+  </button>
+  <button class="mob-dock-btn" id="dockBtn-roster" onclick="dockNav('roster')">
+    <span class="mob-dock-icon">◈</span>
+    <span class="mob-dock-label">Roster</span>
+  </button>
+  <button class="mob-dock-btn mob-dock-primary" onclick="dockLog()" aria-label="Log Intervention">
+    <span class="mob-dock-icon">⚡</span>
+    <span class="mob-dock-label">Log</span>
+  </button>
+  <button class="mob-dock-btn" id="dockBtn-groups" onclick="dockNav('groups')">
+    <span class="mob-dock-icon">⊞</span>
+    <span class="mob-dock-label">Groups</span>
+  </button>
+</nav>
+
 </body>
 </html>
