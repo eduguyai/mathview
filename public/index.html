@@ -364,6 +364,13 @@ tr.sel td{background:rgba(91,141,238,0.08)}
 .pl-tab:last-child{border-right:none}
 .pl-tab.on{color:var(--fg);background:var(--bg3)}
 .pl-tab .pl-tab-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.dom-tile-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.dom-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;width:62px;padding:6px 4px 5px;border-radius:8px;border:2px solid var(--border);background:var(--bg2);cursor:pointer;transition:border-color .15s,background .15s;font-family:inherit;gap:2px}
+.dom-tile-emoji{font-size:18px;line-height:1}
+.dom-tile-lbl{font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);line-height:1}
+.dom-tile.on .dom-tile-lbl{color:var(--fg)}
+.dom-tile-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+
 .pl-body{display:none}
 .pl-body.on{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .pl-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
@@ -1030,10 +1037,14 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
           </div>
           <!-- Shared fields -->
           <div class="int-field"><div class="int-label">Focus domain</div>
-            <select class="int-select" id="intDomain">
-              <option value="numSense">Number Sense</option><option value="algebra">Algebra</option>
-              <option value="ratios">Ratios &amp; Proportions</option><option value="stats">Statistics</option><option value="geometry">Geometry</option>
-            </select></div>
+            <input type="hidden" id="intDomain" value="numSense">
+            <div class="dom-tile-wrap" id="domTileWrap">
+              <button type="button" class="dom-tile on" id="dmt-numSense" onclick="setDomTile('numSense')" style="border-color:#f87171;background:rgba(248,113,113,0.12)"><span class="dom-tile-emoji">🔢</span><span class="dom-tile-lbl" style="color:#f87171">Num</span></button>
+              <button type="button" class="dom-tile" id="dmt-algebra"  onclick="setDomTile('algebra')"  style=""><span class="dom-tile-emoji">⚡</span><span class="dom-tile-lbl">Alg</span></button>
+              <button type="button" class="dom-tile" id="dmt-ratios"   onclick="setDomTile('ratios')"   style=""><span class="dom-tile-emoji">⚖</span><span class="dom-tile-lbl">Rat</span></button>
+              <button type="button" class="dom-tile" id="dmt-stats"    onclick="setDomTile('stats')"    style=""><span class="dom-tile-emoji">📊</span><span class="dom-tile-lbl">Stat</span></button>
+              <button type="button" class="dom-tile" id="dmt-geometry" onclick="setDomTile('geometry')" style=""><span class="dom-tile-emoji">📐</span><span class="dom-tile-lbl">Geo</span></button>
+            </div></div>
           <div class="int-field"><div class="int-label">Frequency</div>
             <select class="int-select" id="intFreq">
               <option>1x/week</option><option>2x/week</option><option selected>3x/week</option><option>Daily</option><option>As needed</option>
@@ -1367,6 +1378,14 @@ Enter your access code to continue.</div>
 const SL=['','Below Basic','Basic','Proficient','Advanced'];
 const DC={ratios:'#5b8dee',algebra:'#a78bfa',geometry:'#34d399',stats:'#fb923c',numSense:'#f87171'};
 const DL={numSense:'Number Sense',algebra:'Algebra',ratios:'Ratios & Prop.',stats:'Statistics',geometry:'Geometry'};
+const DOMS={
+  numSense:{label:'Number Sense',short:'Num',emoji:'🔢',color:'#f87171',bg:'rgba(248,113,113,0.12)'},
+  algebra: {label:'Algebra',     short:'Alg',emoji:'⚡',color:'#a78bfa',bg:'rgba(167,139,250,0.12)'},
+  ratios:  {label:'Ratios',      short:'Rat',emoji:'⚖',color:'#5b8dee',bg:'rgba(91,141,238,0.12)'},
+  stats:   {label:'Statistics',  short:'Stat',emoji:'📊',color:'#fb923c',bg:'rgba(251,146,60,0.12)'},
+  geometry:{label:'Geometry',    short:'Geo',emoji:'📐',color:'#34d399',bg:'rgba(52,211,153,0.12)'},
+};
+
 const DM={
   ns:{label:'Number Sense',color:'#f87171',bg:'rgba(248,113,113,0.08)',bd:'rgba(248,113,113,0.25)'},
   alg:{label:'Algebra',color:'#a78bfa',bg:'rgba(167,139,250,0.08)',bd:'rgba(167,139,250,0.25)'},
@@ -3473,12 +3492,37 @@ const DOM_PL = {
   }
 };
 
+function setDomTile(k){
+  const inp=document.getElementById('intDomain');
+  if(inp)inp.value=k;
+  Object.keys(DOMS).forEach(key=>{
+    const btn=document.getElementById('dmt-'+key);
+    if(!btn)return;
+    const d=DOMS[key];
+    if(key===k){
+      btn.classList.add('on');
+      btn.style.borderColor=d.color;
+      btn.style.background=d.bg;
+      btn.querySelector('.dom-tile-lbl').style.color=d.color;
+    }else{
+      btn.classList.remove('on');
+      btn.style.borderColor='';
+      btn.style.background='';
+      btn.querySelector('.dom-tile-lbl').style.color='';
+    }
+  });
+}
 function plTab(domKey){
   const domKeys=['numSense','algebra','ratios','stats','geometry'];
   domKeys.forEach(k=>{
     const tab=document.getElementById('plt-'+k);
     const body=document.getElementById('plb-'+k);
-    if(tab)tab.classList.toggle('on',k===domKey);
+    if(tab){
+      tab.classList.toggle('on',k===domKey);
+      const dm=DOMS[k]||{};
+      tab.style.borderBottom=k===domKey?'2px solid '+(dm.color||'var(--accent)'):'';
+      tab.style.color=k===domKey?(dm.color||'var(--fg)'):'';
+    }
     if(body)body.classList.toggle('on',k===domKey);
   });
 }
@@ -3504,8 +3548,9 @@ function renderDomainPL(base){
     const d=domData.find(x=>x.k===k);
     const info=pl[k];
     const dotColor=d.belowPct>60?'#f87171':d.belowPct>40?'#fb923c':'#34d399';
-    return `<button class="pl-tab${idx===0?' on':''}" id="plt-${k}" onclick="plTab('${k}')">
-      <span class="pl-tab-dot" style="background:${dotColor}"></span>${info.label}
+    const dm=DOMS[k]||{emoji:'●',color:dotColor,bg:'rgba(100,100,100,0.1)',short:k};
+    return `<button class="pl-tab${idx===0?' on':''}" id="plt-${k}" onclick="plTab('${k}')" style="${idx===0?'border-bottom:2px solid '+dm.color+';color:'+dm.color:''}">
+      <span style="font-size:13px;margin-right:4px">${dm.emoji}</span>${info.label}
     </button>`;
   }).join('');
 
@@ -3573,8 +3618,12 @@ function initDomains(){
   if(cards)cards.innerHTML=domKeys.map((k,i)=>{
     const avg=Math.round(base.reduce((s,x)=>s+x.dom[k],0)/base.length);
     const below=Math.round(base.filter(s=>s.dom[k]<70).length/base.length*100);
+    const dmInfo=DOMS[k]||{emoji:'●'};
     return `<div class="dom-card" style="border-top:3px solid ${domColors[i]}">
-      <div class="dom-card-name">${domLabels[i]}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:20px;line-height:1">${dmInfo.emoji}</span>
+        <div class="dom-card-name" style="margin-bottom:0">${domLabels[i]}</div>
+      </div>
       <div class="dom-avg" style="color:${domColors[i]}">${avg}%</div>
       <div class="dom-pct">${below}% below proficiency</div>
       <div style="margin-top:10px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden">
@@ -4098,7 +4147,7 @@ function parseVoiceIntent(text){
   bar.style.display='flex';
 }
 function applyIntent(){
-  if(_intentData.domain){const el=document.getElementById('intDomain');if(el)el.value=_intentData.domain.val;}
+  if(_intentData.domain){const el=document.getElementById('intDomain');if(el){el.value=_intentData.domain.val;setDomTile(_intentData.domain.val);}}
   if(_intentData.freq){const el=document.getElementById('intFreq');if(el){for(const opt of el.options){if(opt.value===_intentData.freq.val||opt.text===_intentData.freq.val){opt.selected=true;break;}}}}
   dismissIntent();showToast('Fields updated from voice ✓','#34d399');
 }
@@ -4130,7 +4179,7 @@ function logSGIntervention(gi){
     const focus=(g.focus||'').toLowerCase();
     const domKW={numSense:['fraction','number','decimal','integer'],algebra:['algebra','equation','variable'],ratios:['ratio','proportion','percent','rate'],stats:['statistic','data','graph'],geometry:['geometry','angle','area']};
     for(const [k,kws] of Object.entries(domKW)){
-      if(kws.some(w=>focus.includes(w))){const el=document.getElementById('intDomain');if(el)el.value=k;break;}
+      if(kws.some(w=>focus.includes(w))){const el=document.getElementById('intDomain');if(el){el.value=k;setDomTile(k);}break;}
     }
     openIntForm();
     showToast(`Group pre-filled: ${g.members.length} students`,'#34d399');
