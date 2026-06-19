@@ -656,6 +656,35 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
 .coach-divider{height:1px;background:var(--border);margin:14px 0 4px;display:flex;align-items:center;gap:8px}
 .coach-section-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);font-family:var(--mono);white-space:nowrap;padding:0 6px;background:var(--bg2)}
 
+/* ── COACH CHAT UI (Sprint 27) ── */
+.cp-thread{display:flex;flex-direction:column;gap:9px}
+.cp-bubble{display:flex;gap:8px;align-items:flex-start}
+.cp-bubble-body{background:var(--bg3);border:1px solid var(--border);border-radius:0 8px 8px 8px;padding:9px 11px;font-size:12px;color:var(--text);line-height:1.55;max-width:100%}
+.cp-user-row{display:flex;justify-content:flex-end}
+.cp-user-body{background:rgba(91,141,238,0.18);border:1px solid rgba(91,141,238,0.28);border-radius:8px 0 8px 8px;padding:8px 11px;font-size:12px;color:var(--text);max-width:230px;line-height:1.45}
+.cp-av{width:24px;height:24px;background:rgba(91,141,238,0.1);border:1px solid rgba(91,141,238,0.22);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px}
+.cp-chip-row{margin-top:8px;display:flex;gap:5px;flex-wrap:wrap}
+.cp-chip{border:1px solid;border-radius:20px;font-size:10px;padding:3px 9px;cursor:pointer;background:transparent;font-family:var(--sans)}
+.cp-sug-area{padding:6px 12px 8px;border-top:1px solid var(--border);flex-shrink:0}
+.cp-sug-label{font-size:9px;font-family:var(--mono);color:var(--dim);letter-spacing:.06em;margin-bottom:6px}
+.cp-sug-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.cp-sug-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 9px;text-align:left;cursor:pointer;color:rgba(255,255,255,0.65);font-size:11px;line-height:1.35;font-family:var(--sans);width:100%;transition:background .12s}
+.cp-sug-btn:hover{background:var(--bg4)}
+.cp-dom-row{display:flex;gap:5px;padding:6px 12px;border-top:1px solid var(--border);align-items:center;flex-wrap:wrap;flex-shrink:0}
+.cp-df{font-size:11px;padding:2px 7px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:var(--sans);transition:all .12s}
+.cp-df.on{background:rgba(91,141,238,0.12);border-color:rgba(91,141,238,0.3);color:var(--accent)}
+.cp-input-row{display:flex;gap:6px;padding:8px 12px 12px;border-top:1px solid var(--border);align-items:center;flex-shrink:0}
+#cpInput{flex:1;background:var(--bg3);border:1px solid var(--bmed);border-radius:8px;padding:7px 10px;font-size:12px;font-family:var(--sans);color:var(--text);outline:none;min-width:0}
+#cpInput:focus{border-color:rgba(91,141,238,0.4)}
+#cpInput::placeholder{color:var(--dim)}
+.cp-send{background:var(--accent);border:none;width:28px;height:28px;border-radius:7px;cursor:pointer;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .12s}
+.cp-send:hover{opacity:.85}
+/* ── SPLASH (Sprint 27) ── */
+.mv-splash{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;opacity:1;transition:opacity .7s ease .4s,visibility .7s ease .4s;pointer-events:all}
+.mv-splash.out{opacity:0;visibility:hidden;pointer-events:none}
+.mv-splash-logo{font-family:var(--serif);font-size:30px;font-weight:300;color:var(--text);letter-spacing:.02em}
+.mv-splash-sub{font-size:10px;font-family:var(--mono);color:var(--dim);letter-spacing:.08em}
+
 /* ══════════════════════════════════
    MOBILE — iPhone / narrow viewport
 ══════════════════════════════════ */
@@ -1390,7 +1419,7 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
   </div><!-- /content -->
 </div><!-- /main -->
 
-<!-- COACHING PANEL -->
+<!-- COACHING PANEL (Sprint 27: AI Chat) -->
 <div class="coach-panel" id="coachPanel">
   <div class="coach-head">
     <div class="coach-head-left">
@@ -1401,8 +1430,24 @@ body.privacy-on .pv-name{filter:blur(5px);user-select:none;pointer-events:none;t
     </div>
     <button class="coach-close" onclick="toggleCoach()">✕</button>
   </div>
-  <div class="coach-body" id="coachCards">
-    <div class="coach-empty">Open a view to see<br>context-aware coaching.</div>
+  <div class="coach-body" id="cpThread">
+    <div class="coach-empty">Loading coaching insights…</div>
+  </div>
+  <div class="cp-sug-area" id="cpSugArea">
+    <div class="cp-sug-label">Suggested</div>
+    <div class="cp-sug-grid" id="cpSugGrid"></div>
+  </div>
+  <div class="cp-dom-row">
+    <button class="cp-df on" id="cpdf-all" onclick="setCPDom('all')">All</button>
+    <button class="cp-df" id="cpdf-numSense" onclick="setCPDom('numSense')">🔢</button>
+    <button class="cp-df" id="cpdf-algebra" onclick="setCPDom('algebra')">⚡</button>
+    <button class="cp-df" id="cpdf-ratios" onclick="setCPDom('ratios')">⚖</button>
+    <button class="cp-df" id="cpdf-stats" onclick="setCPDom('stats')">📊</button>
+    <button class="cp-df" id="cpdf-geometry" onclick="setCPDom('geometry')">📐</button>
+  </div>
+  <div class="cp-input-row">
+    <input type="text" id="cpInput" placeholder="Ask about your class…" onkeydown="if(event.key==='Enter')cpSend()">
+    <button class="cp-send" onclick="cpSend()" aria-label="Send">→</button>
   </div>
 </div>
 </div><!-- /shell -->
@@ -4727,19 +4772,156 @@ function renderCoach(v){
   const base=activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod);
   const gen=COACH_GEN[v]||COACH_GEN._default;
   const cards=gen(base);
-  const el=document.getElementById('coachCards');
-  if(!el)return;
-  const pc={urgent:'coach-urgent',focus:'coach-focus',tip:'coach-tip'};
-  const pi={urgent:'⚑',focus:'◈',tip:'◎'};
-  el.innerHTML=cards.length?cards.map(c=>`<div class="coach-card ${pc[c.priority]||'coach-tip'}">
-    <div class="coach-card-top"><span class="coach-cat">${c.cat}</span><span class="coach-pi">${pi[c.priority]||'◎'}</span></div>
-    <div class="coach-card-title">${c.title}</div>
-    <div class="coach-card-body">${c.body}</div>
-    ${c.action?`<button class="coach-action-btn" onclick="${c.fn||''}">${c.action} →</button>`:''}</div>`).join('')
-  :`<div class="coach-empty">No coaching insights yet.<br>Add student data to unlock.</div>`;
+  // Badge
   const urgent=cards.filter(c=>c.priority==='urgent').length;
   const badge=document.getElementById('coachBadge');
   if(badge){badge.textContent=urgent;badge.style.display=urgent?'flex':'none';}
+  // Greeting bubble from top card
+  const thread=document.getElementById('cpThread');
+  if(thread){
+    const g=cards[0];
+    const txt=g?`${g.title}. ${g.body}`:'No urgent flags right now — add more student data to unlock deeper insights.';
+    const actionHtml=g&&g.action?`<div class="cp-chip-row"><button class="cp-chip" style="border-color:rgba(91,141,238,0.3);color:var(--accent)" onclick="${g.fn||''}">${g.action} →</button>${cards.length>1?`<button class="cp-chip" style="border-color:var(--bmed);color:var(--muted)" onclick="cpShowAllCards()">+${cards.length-1} more</button>`:''}</div>`:'';
+    thread.innerHTML=`<div class="cp-bubble"><div class="cp-av">◉</div><div class="cp-bubble-body">${txt}${actionHtml}</div></div>`;
+  }
+  // Suggestions
+  cpUpdateSug(v);
+  // Show sug area
+  const sa=document.getElementById('cpSugArea');
+  if(sa)sa.style.display='';
+  // Reset domain filter
+  document.querySelectorAll('.cp-df').forEach(b=>b.classList.remove('on'));
+  const all=document.getElementById('cpdf-all');
+  if(all)all.classList.add('on');
+}
+
+function cpShowAllCards(){
+  const base=activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod);
+  const cards=(COACH_GEN[_coachView]||COACH_GEN._default)(base);
+  const thread=document.getElementById('cpThread');
+  if(!thread||cards.length<2)return;
+  const extra=cards.slice(1).map(c=>`<div class="cp-bubble"><div class="cp-av" style="background:rgba(255,255,255,0.04);border-color:var(--border)">◎</div><div class="cp-bubble-body"><span style="font-size:9px;font-family:var(--mono);color:var(--dim);letter-spacing:.06em;display:block;margin-bottom:4px">${c.cat}</span>${c.title}${c.action?`<div class="cp-chip-row"><button class="cp-chip" style="border-color:rgba(91,141,238,0.3);color:var(--accent)" onclick="${c.fn||''}">${c.action} →</button></div>`:''}</div></div>`).join('');
+  thread.innerHTML+=extra;
+  document.getElementById('cpSugArea').style.display='none';
+  thread.scrollTop=thread.scrollHeight;
+}
+
+const CP_SUGS={
+  overview:[{t:'Who needs attention today?',k:'attention'},{t:'⚡ Top domain gap',k:'topDomain'},{t:'Recommend a strategy',k:'strategy'},{t:'My PL tip for today',k:'pl'}],
+  roster:[{t:"Who hasn't been logged?",k:'unlogged'},{t:'Most at-risk students',k:'atRisk'},{t:"Who's improving?",k:'improving'},{t:'Tier 3 breakdown',k:'t3Detail'}],
+  interventions:[{t:"Pre-fill today's log",k:'preFill'},{t:'What strategy worked best?',k:'bestStrategy'},{t:'Show recent patterns',k:'patterns'},{t:'Log missing students',k:'logMissing'}],
+  groups:[{t:'Which group needs focus?',k:'groupFocus'},{t:'Ungrouped T3 students',k:'ungrouped'},{t:'Suggest a group activity',k:'groupActivity'},{t:'Check group sizes',k:'groupSize'}],
+  domains:[{t:'Which domain has most gaps?',k:'topGap'},{t:'My PL tip for today',k:'pl'},{t:'Compare domain averages',k:'domCompare'},{t:'What to teach this week?',k:'teachThis'}],
+};
+
+function cpUpdateSug(v){
+  const sugs=CP_SUGS[v]||CP_SUGS.overview;
+  const grid=document.getElementById('cpSugGrid');
+  if(grid)grid.innerHTML=sugs.map(s=>`<button class="cp-sug-btn" onclick="cpSuggest('${s.k}')">${s.t}</button>`).join('');
+}
+
+function cpSuggest(key){
+  const base=activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod);
+  const thread=document.getElementById('cpThread');
+  if(!thread)return;
+  const sugs=CP_SUGS[_coachView]||CP_SUGS.overview;
+  const sug=sugs.find(s=>s.k===key);
+  const label=sug?sug.t:key;
+  thread.innerHTML+=`<div class="cp-user-row"><div class="cp-user-body">${label}</div></div>`;
+  document.getElementById('cpSugArea').style.display='none';
+  const cards=(COACH_GEN[_coachView]||COACH_GEN._default)(base);
+  let resp='';
+  const doms=['numSense','algebra','ratios','stats','geometry'];
+  if(key==='attention'||key==='atRisk'){
+    const urg=cards.filter(c=>c.priority==='urgent');
+    resp=urg.length?urg.map(c=>`<div style="margin-bottom:6px"><span style="font-size:9px;color:var(--t3);font-family:var(--mono)">${c.cat}</span><br>${c.title}${c.action?`<div class="cp-chip-row"><button class="cp-chip" style="border-color:rgba(91,141,238,0.3);color:var(--accent)" onclick="${c.fn||''}">${c.action} →</button></div>`:''}</div>`).join(''):'No urgent flags right now. '+(cards[0]?cards[0].title:'');
+  }else if(key==='topDomain'||key==='topGap'||key==='domCompare'){
+    const avgs=doms.map(d=>({d,avg:base.length?Math.round(base.reduce((s,x)=>s+(x.dom&&x.dom[d]||0),0)/base.length):0,pct:base.length?Math.round(base.filter(s=>s.dom&&s.dom[d]<70).length/base.length*100):0})).sort((a,b)=>a.avg-b.avg);
+    const w=avgs[0],b2=avgs[avgs.length-1];
+    resp=`<span style="color:${DC[w.d]}">${DL[w.d]}</span> is your largest gap — class avg <strong>${w.avg}%</strong> (${w.pct}% below 70%).<br><br><span style="color:${DC[b2.d]}">${DL[b2.d]}</span> is strongest at <strong>${b2.avg}%</strong>.`;
+  }else if(key==='improving'){
+    const up=base.filter(s=>s.trend==='up');
+    resp=up.length?`${up.length} students trending upward: ${up.slice(0,5).map(s=>`<span style="color:var(--t1)">${s.name.split(' ')[0]}</span>`).join(', ')}${up.length>5?' and more.':'.'}`:'No upward trends recorded yet.';
+  }else if(key==='unlogged'){
+    const today=new Date();
+    const stale=interventions.filter(i=>i.date&&(today-new Date(i.date))/(864e5)>7);
+    const names=[...new Set(stale.map(i=>i.studentName))].filter(Boolean);
+    resp=names.length?`${names.length} students not logged in 7+ days: ${names.slice(0,5).join(', ')}.`+'<div class="cp-chip-row"><button class="cp-chip" style="border-color:rgba(91,141,238,0.3);color:var(--accent)" onclick="_cnav(\'interventions\')">Go to log →</button></div>':'All recent logs are within the past week.';
+  }else if(key==='t3Detail'){
+    const t3=base.filter(s=>s.tier==='t3');
+    resp=t3.length?`${t3.length} Tier 3 students: ${t3.map(s=>`<span style="color:var(--t3)">${s.name.split(' ')[0]}</span>`).join(', ')}.`:'No Tier 3 students currently.';
+  }else if(key==='ungrouped'){
+    const hng=base.filter(s=>s.tier==='t3'&&!groups.some(g=>g.members&&g.members.includes(s.id)));
+    resp=hng.length?`${hng.length} T3 students without a group: ${hng.map(s=>`<span style="color:var(--t3)">${s.name.split(' ')[0]}</span>`).join(', ')}.<div class="cp-chip-row"><button class="cp-chip" style="border-color:rgba(91,141,238,0.3);color:var(--accent)" onclick="_cnav('qualdata')">Smart Groups →</button></div>`:'All Tier 3 students have a group assignment.';
+  }else if(key==='strategy'||key==='teachThis'){
+    const avgs=doms.map(d=>({d,avg:base.length?Math.round(base.reduce((s,x)=>s+(x.dom&&x.dom[d]||0),0)/base.length):0})).sort((a,b)=>a.avg-b.avg);
+    const d=avgs[0].d;
+    resp=`For <span style="color:${DC[d]}">${DL[d]}</span> (your weakest domain), Skill Domains has targeted strategies and Professional Learning resources.<div class="cp-chip-row"><button class="cp-chip" style="border-color:rgba(91,141,238,0.3);color:var(--accent)" onclick="_cnav('domains')">Skill Domains →</button></div>`;
+  }else if(key==='pl'){
+    resp='Skill Domains has today\'s Professional Learning recommendations — strategies, misconceptions to watch for, and free resources per domain.<div class="cp-chip-row"><button class="cp-chip" style="border-color:rgba(167,139,250,0.3);color:var(--accent2)" onclick="_cnav(\'domains\')">Open PL →</button></div>';
+  }else if(key==='preFill'){
+    resp='Head to Interventions and use the log form. The domain tiles auto-select based on student context.<div class="cp-chip-row"><button class="cp-chip" style="border-color:rgba(91,141,238,0.3);color:var(--accent)" onclick="_cnav(\'interventions\')">Go to log →</button></div>';
+  }else if(key==='patterns'){
+    const recent=interventions.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+    resp=recent.length?`Last ${recent.length} logs: ${recent.map(i=>`${i.studentName||'?'} (${i.domain||'?'})`).join(', ')}.`:'No interventions logged yet.';
+  }else if(key==='logMissing'){
+    const today=new Date();
+    const stale=interventions.filter(i=>i.date&&(today-new Date(i.date))/(864e5)>7);
+    const names=[...new Set(stale.map(i=>i.studentName))].filter(Boolean);
+    resp=names.length?`${names.length} students with stale logs: ${names.slice(0,5).join(', ')}.<div class="cp-chip-row"><button class="cp-chip" style="border-color:rgba(91,141,238,0.3);color:var(--accent)" onclick="_cnav(\'interventions\')">Go to log →</button></div>`:'All logs are current — nothing overdue.';
+  }else if(key==='groupFocus'){
+    const hng=base.filter(s=>s.tier==='t3'&&!groups.some(g=>g.members&&g.members.includes(s.id)));
+    resp=hng.length?`${hng.length} T3 students need group placement: ${hng.map(s=>s.name.split(' ')[0]).join(', ')}.`:'All Tier 3 students are in groups.';
+  }else if(key==='groupActivity'){
+    resp='For structured group sessions, Skill Domains has strategy guides per domain. Filter by your group\'s focus area for targeted activities.<div class="cp-chip-row"><button class="cp-chip" style="border-color:rgba(91,141,238,0.3);color:var(--accent)" onclick="_cnav(\'domains\')">Open Strategies →</button></div>';
+  }else if(key==='groupSize'){
+    const large=groups.filter(g=>g.members&&g.members.length>8);
+    resp=large.length?`${large.length} group${large.length!==1?'s':''} exceed 8 members: ${large.map(g=>g.name).join(', ')}. Research supports 4–6 students per group.`:'All group sizes are within the recommended range.';
+  }else if(key==='bestStrategy'){
+    const recent=interventions.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,10);
+    const domCounts={};recent.forEach(i=>{if(i.domain)domCounts[i.domain]=(domCounts[i.domain]||0)+1;});
+    const top=Object.entries(domCounts).sort((a,b)=>b[1]-a[1])[0];
+    resp=top?`Most logged domain recently: <span style="color:${DC[top[0]]}">${DL[top[0]]||top[0]}</span> (${top[1]} session${top[1]!==1?'s':''}).<div class="cp-chip-row"><button class="cp-chip" style="border-color:rgba(91,141,238,0.3);color:var(--accent)" onclick="_cnav('domains')">View strategies →</button></div>`:'No recent intervention data.';
+  }else{
+    resp=cards.length?cards[0].body:'No data available for this view yet.';
+  }
+  thread.innerHTML+=`<div class="cp-bubble"><div class="cp-av">◉</div><div class="cp-bubble-body">${resp}</div></div>`;
+  thread.scrollTop=thread.scrollHeight;
+}
+
+function cpSend(){
+  const inp=document.getElementById('cpInput');
+  if(!inp)return;
+  const txt=inp.value.trim();
+  if(!txt)return;
+  inp.value='';
+  const thread=document.getElementById('cpThread');
+  if(!thread)return;
+  thread.innerHTML+=`<div class="cp-user-row"><div class="cp-user-body">${txt}</div></div>`;
+  const base=activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod);
+  const cards=(COACH_GEN[_coachView]||COACH_GEN._default)(base);
+  const resp=cards.length?`${cards[0].title}. ${cards[0].body}`:'Add more student data to unlock deeper insights.';
+  thread.innerHTML+=`<div class="cp-bubble"><div class="cp-av">◉</div><div class="cp-bubble-body">${resp}</div></div>`;
+  thread.scrollTop=thread.scrollHeight;
+  document.getElementById('cpSugArea').style.display='none';
+}
+
+function setCPDom(key){
+  document.querySelectorAll('.cp-df').forEach(b=>b.classList.remove('on'));
+  const el=document.getElementById('cpdf-'+key);
+  if(el)el.classList.add('on');
+  if(key==='all')return;
+  const d=DOMS[key];
+  if(!d)return;
+  const thread=document.getElementById('cpThread');
+  if(!thread)return;
+  thread.innerHTML+=`<div class="cp-user-row"><div class="cp-user-body">Focus on ${d.emoji} ${d.label}</div></div>`;
+  const base=activePeriod==='all'?students:students.filter(s=>s.pd===activePeriod);
+  const below=base.filter(s=>s.dom&&s.dom[key]<70);
+  const avg=base.length?Math.round(base.reduce((s,x)=>s+(x.dom&&x.dom[key]||0),0)/base.length):0;
+  thread.innerHTML+=`<div class="cp-bubble"><div class="cp-av" style="border-color:${d.color};background:${d.bg}">◉</div><div class="cp-bubble-body"><span style="color:${d.color}">${d.emoji} ${d.label}</span> — class avg <strong>${avg}%</strong>.<br>${below.length} student${below.length!==1?'s':''} below 70%${below.length?': '+below.slice(0,4).map(s=>s.name.split(' ')[0]).join(', ')+(below.length>4?' and more':'')+'.' : '.'}${below.length?`<div class="cp-chip-row"><button class="cp-chip" style="border-color:rgba(91,141,238,0.3);color:var(--accent)" onclick="_cnav('domains')">Skill Domains →</button></div>`:''}</div></div>`;
+  thread.scrollTop=thread.scrollHeight;
+  document.getElementById('cpSugArea').style.display='none';
 }
 
 // Helper: nav shortcut for action buttons
@@ -4888,6 +5070,11 @@ function setPeriod(p,btn){_origSetPeriod(p,btn);renderCoach(_coachView);}
   document.getElementById('coachPanel').classList.add('open');
   document.getElementById('coachToggleBtn').classList.add('on');
   renderCoach('overview');
+  // Splash fade-out
+  setTimeout(()=>{
+    const sp=document.getElementById('mvSplash');
+    if(sp)sp.classList.add('out');
+  },1200);
 })();
 
 /* ── MOBILE NAV ── */
@@ -4930,6 +5117,12 @@ document.querySelectorAll('.ni').forEach(btn=>btn.addEventListener('click',()=>{
 }));
 
 </script>
+
+<!-- SPLASH (Sprint 27) -->
+<div class="mv-splash" id="mvSplash" aria-hidden="true">
+  <div class="mv-splash-logo">MathView</div>
+  <div class="mv-splash-sub">COACHING INTELLIGENCE</div>
+</div>
 
 <!-- MOBILE DOCK -->
 <nav class="mob-dock" id="mobDock" aria-label="Mobile navigation">
